@@ -1,0 +1,64 @@
+import Link from "next/link";
+import { SITE, TREATMENTS } from "@/lib/site";
+import { LogoMark } from "./Logo";
+
+export function Footer() {
+  const year = new Date().getFullYear();
+  return (
+    <footer className="ft">
+      <div className="wrap">
+        <div className="grid">
+          <div>
+            <Link className="logo ft-logo" href="/" aria-label="Medtours home">
+              <LogoMark />
+              <span>
+                <b>Medtours</b>
+                <small>HEAL WITH EXPERIENCE</small>
+              </span>
+            </Link>
+            <p style={{ color: "var(--soft)", maxWidth: "34ch", fontSize: 15, marginTop: 16 }}>
+              International medical travel to India, for patients and the people who travel with them.
+            </p>
+          </div>
+          <div>
+            <h4>Care</h4>
+            <ul>
+              {TREATMENTS.map((t) => (
+                <li key={t.slug}>
+                  <Link href={`/treatments/${t.slug}`}>{t.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4>Plan</h4>
+            <ul>
+              <li><Link href="/#journeys">For patients</Link></li>
+              <li><Link href="/#journeys">For attenders</Link></li>
+              <li><Link href="/#hospitals">Hospitals</Link></li>
+              <li><Link href="/about">About us</Link></li>
+              <li><Link href="/faq">Questions</Link></li>
+              <li>
+                <button className="linklike" data-open="enquire" type="button">Get a quote</button>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4>Contact</h4>
+            <ul>
+              <li style={{ userSelect: "all" }}>{SITE.phone}</li>
+              <li style={{ userSelect: "all" }}>{SITE.email}</li>
+              <li><Link href="/contact">Contact page</Link></li>
+              <li><a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="brand" aria-hidden="true">Medtours<i>.</i></div>
+        <div className="base">
+          <span>© {year} Medtoursin.com · Heal With Experience · <Link href="/privacy">Privacy</Link></span>
+          <span>Medical information here is general and not a substitute for advice from your doctor.</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
