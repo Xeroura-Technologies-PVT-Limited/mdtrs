@@ -1,10 +1,10 @@
+import { SiteLink as Link } from "@/components/site/SiteLink";
+import { TREATMENTS } from "@/lib/site";
+
 export function Marquee() {
   return (
-    <>
-<div className="marquee" aria-hidden="true"><div className="mq">
-  <span>Medical</span><span>Surgical</span><span>Dental</span><span>Rehabilitation</span><span>Longevity</span><span>Holistic health</span>
-  <span>Medical</span><span>Surgical</span><span>Dental</span><span>Rehabilitation</span><span>Longevity</span><span>Holistic health</span>
-</div></div>
-    </>
+    <nav className="care-directory wrap" aria-label="Treatment directory">
+      {TREATMENTS.map((t) => <Link href={`/treatments/${t.slug}`} key={t.slug}>{t.name}</Link>)}
+    </nav>
   );
 }

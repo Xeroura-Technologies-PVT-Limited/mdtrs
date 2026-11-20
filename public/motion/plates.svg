@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 216"><defs>
+  <g id="home-base"><circle cx="174" cy="105" r="77" pathLength="1" /><ellipse cx="174" cy="105" rx="39" ry="77" pathLength="1"/><path d="M97 105h154M113 56q59 26 122 0M113 154q59-26 122 0" pathLength="1" /></g>
+  <g id="home-line"><path d="M45 151C104 160 115 75 170 78C214 80 201 117 183 103S198 58 265 49" pathLength="1" /></g>
+  <g id="home-accent"><path d="m265 47-12-2-5-7-3 1 3 9-9 3-5-3-2 1 5 6 27-5z" pathLength="1" fill="currentColor"/></g>
+  <g id="treatments-base"><path d="M38 92h284M38 110h284M38 129h284M64 66v88m23-88v88m23-88v88m23-88v88m23-88v88m23-88v88m23-88v88m23-88v88m23-88v88m23-88v88" pathLength="1" /></g>
+  <g id="treatments-line"><path d="M112 53v25c0 35 33 50 54 37 14-8 20-21 20-40V53" pathLength="1" /><path d="M110 57l-6-1v-9l9-1m71 11 8-1v-9l-9-1" pathLength="1" /><path d="M150 120v21c0 27 23 39 44 37 30-2 43-25 43-54" pathLength="1" /><circle cx="237" cy="108" r="16" pathLength="1" /><circle cx="237" cy="108" r="10" pathLength="1" /></g>
+  <g id="treatments-accent"><path d="M46 134h39l9-8 10 11 12-33 11 56 13-26h20" pathLength="1" /></g>
+  <g id="medical-base"><ellipse cx="177" cy="105" rx="87" ry="78" pathLength="1"/><path d="M60 70h53m-60 69h65m132-73h54m-69 80h56" pathLength="1" /></g>
+  <g id="medical-line"><path d="M172 35v37c0 12-18 19-26 31m38-68v37c0 12 18 19 26 31" pathLength="1" /><path d="M162 62c-6-6-18-2-28 8-22 20-43 57-43 83 0 17 12 21 27 15l34-15c8-4 12-12 12-21l3-59q0-7-5-11z" pathLength="1" /><path d="M194 62c7-6 19-1 29 9 21 20 42 57 42 82 0 17-12 21-27 15l-34-15c-8-4-13-13-13-22l-2-58q0-7 5-11z" pathLength="1" /></g>
+  <g id="medical-accent"><path d="M169 77l-24 34-20 28m20-28-19 7m26-19-14-2m46-20 25 34 20 28m-20-28 19 7m-27-19 14-2" pathLength="1" /><path d="M173 43h10m-10 7h10m-10 7h10m-10 7h10" pathLength="1" /></g>
+  <g id="surgical-base"><circle cx="182" cy="116" r="64" pathLength="1" /><path d="M85 116h189M182 29v152" pathLength="1" /><path d="M113 167l132-94" pathLength="1" /></g>
+  <g id="surgical-line"><path d="M158 20c5 26 4 52-2 68-5 12-11 14-11 24 0 12 14 17 25 8 8-7 9-8 18-2 13 8 26 6 29-6 3-11-8-18-13-30-7-16-5-37-3-63" pathLength="1" /><path d="M159 135c9 3 14-4 22-5 9 0 16 7 29 3 7-2 8 6 5 12-4 9-15 11-17 23l-2 26m-35-58c-8-3-13 1-10 9 3 9 14 13 15 23l2 26" pathLength="1" /></g>
+  <g id="surgical-accent"><path d="M151 127q14 5 24-3t24 2q11 5 18-1" pathLength="1" /><path d="M159 112q6 7 14-1m17 0q9 6 16 1" pathLength="1" /></g>
+  <g id="dental-base"><ellipse cx="180" cy="103" rx="81" ry="69" pathLength="1"/><path d="M75 54h59m94 77h67M72 160h70m90-99h47" pathLength="1" /></g>
+  <g id="dental-line"><path d="M178 56c-16 2-30-16-48-10-21 7-26 25-21 49 3 16 12 26 18 46 6 22 10 38 20 38 11 0 10-45 23-56 8-7 14-3 18 9 7 16 6 47 16 47 12 0 17-26 23-48 4-16 17-31 21-46 5-22-4-38-19-41-20-5-31 9-51 12z" pathLength="1" /></g>
+  <g id="dental-accent"><path d="M133 75c9-12 28-2 42 1 14 2 30-10 41-4" pathLength="1" /><path d="M138 90c12 7 14 26 15 39 5-18 12-26 25-27 14 0 23 14 26 28 1-17 5-27 14-38" pathLength="1" /><path d="M169 59q11 8 28 1" pathLength="1" /></g>
+  <g id="rehabilitation-base"><circle cx="150" cy="134" r="48" pathLength="1" /><path d="M150 134l74-65m-74 65-33-83" pathLength="1" /><path d="M102 142a50 50 0 0 1 53-57" pathLength="1" /></g>
+  <g id="rehabilitation-line"><path d="M106 39q12-12 21-1l29 74q3 6 1 11l-8 13q-8 7-14-1L104 54q-5-9 2-15z" pathLength="1" /><path d="M158 130l63-48q7-6 16 0l21 11q7 7 1 12l-15-6-70 55q-9 4-15-3-6-8-1-21z" pathLength="1" /></g>
+  <g id="rehabilitation-accent"><circle cx="150" cy="135" r="10" pathLength="1" /><path d="M187 133a40 40 0 0 0-12-28m11 5-12-6 2 12" pathLength="1" /><path d="M216 148l25-20m-19 28 32-24" pathLength="1" /></g>
+  <g id="longevity-base"><path d="M112 39h136m-136 138h136M180 25v168" pathLength="1" /><ellipse cx="179" cy="109" rx="86" ry="71" pathLength="1"/></g>
+  <g id="longevity-line"><path d="M115 28c100 17 105 54 49 80-56 27-65 57 45 78" pathLength="1" /><path d="M209 28c-102 20-89 57-41 80 62 29 62 60-53 78" pathLength="1" /></g>
+  <g id="longevity-accent"><path d="M135 38h56m-42 9h30m-31 11h33m-40 12h47m-56 13h67m-48 13h30m-31 29h35m-49 11h60m-66 12h73m-63 12h54m-43 11h34" pathLength="1" /></g>
+  <g id="holistic-base"><circle cx="180" cy="98" r="65" pathLength="1" /><path d="M95 178q86 14 174 0m-151 9q60 10 118 0" pathLength="1" /></g>
+  <g id="holistic-line"><circle cx="181" cy="65" r="17" pathLength="1" /><path d="M164 88q-13 5-19 25l-10 17-25 8q-7 6 1 10l34-5 15-19m38-36q13 5 19 25l10 17 25 8q7 6-1 10l-34-5-16-19" pathLength="1" /><path d="M163 111q3 20-8 35l-23 13q-9 8 3 12c15 5 47-5 60-11m3-49q-3 21 8 35l24 13q9 8-4 13c-15 5-47-4-64-12" pathLength="1" /></g>
+  <g id="holistic-accent"><path d="M152 68q-8 9-8 19m65-19q8 9 8 19" pathLength="1" /><path d="M126 83q-6 10-6 22m115-22q7 10 7 22" pathLength="1" /></g>
+  <g id="journey-base"><path d="M23 68q47-33 103-15t100-4 107 5M27 167q43-22 86-6t109-5 96-8" pathLength="1" /></g>
+  <g id="journey-line"><path d="M38 137C71 139 69 76 107 76S151 152 192 145 243 71 305 69" pathLength="1" /></g>
+  <g id="journey-accent"><circle cx="38" cy="137" r="4" pathLength="1" fill="currentColor"/><circle cx="107" cy="76" r="4" pathLength="1" fill="currentColor"/><circle cx="192" cy="145" r="4" pathLength="1" fill="currentColor"/><circle cx="305" cy="69" r="4" pathLength="1" fill="currentColor"/><path d="m27 115 10-6-1-10 3-1 4 9 8-3 2 2-9 5-2 8-2 1 0-8-11 5z" pathLength="1" /><path d="M98 56l9-8 9 8v10H98z" pathLength="1" /><path d="M185 122h5v-5h5v5h5v5h-5v5h-5v-5h-5z" pathLength="1" /><path d="M295 48q11-17 22-10-2 15-22 10zm0 0 14-7" pathLength="1" /></g>
+  <g id="companions-base"><circle cx="189" cy="106" r="71" pathLength="1" /><path d="M37 142h42m198-73h35" pathLength="1" /></g>
+  <g id="companions-line"><path d="M37 124C91 122 101 54 145 64S188 133 217 115 245 66 300 64" pathLength="1" /><path d="M36 153c80 4 87-66 127-65s51 76 92 33l45-57" pathLength="1" /></g>
+  <g id="companions-accent"><circle cx="37" cy="124" r="4" pathLength="1" fill="currentColor"/><circle cx="36" cy="153" r="4" pathLength="1" fill="currentColor"/><circle cx="300" cy="64" r="4" pathLength="1" fill="currentColor"/><circle cx="300" cy="64" r="10" pathLength="1" /></g>
+  <g id="hospitals-base"><path d="M37 164h282m-276 5h266M55 64v108m235-110v108M96 48v115m125-115v115" pathLength="1" /></g>
+  <g id="hospitals-line"><path d="M57 159v-56h45v56m0 0V65h18v-7h36V39h48v19h33v7h16v94m0-59h43v59M48 160h263" pathLength="1" /><path d="M158 159v-28h45v28m-27-28v28m8-28v28" pathLength="1" /><path d="M163 65h34m-31 6h28" pathLength="1" /></g>
+  <g id="hospitals-accent"><path d="M176 44h7v7h7v6h-7v7h-7v-7h-7v-6h7z" pathLength="1" /><path d="M112 77h7v5h-7z M129 77h7v5h-7z M146 77h7v5h-7z M163 77h7v5h-7z M180 77h7v5h-7z M197 77h7v5h-7z M214 77h7v5h-7z M231 77h7v5h-7z" pathLength="1" /><path d="M112 89h7v5h-7z M129 89h7v5h-7z M146 89h7v5h-7z M163 89h7v5h-7z M180 89h7v5h-7z M197 89h7v5h-7z M214 89h7v5h-7z M231 89h7v5h-7z" pathLength="1" /><path d="M112 101h7v5h-7z M129 101h7v5h-7z M146 101h7v5h-7z M163 101h7v5h-7z M180 101h7v5h-7z M197 101h7v5h-7z M214 101h7v5h-7z M231 101h7v5h-7z" pathLength="1" /><path d="M112 113h7v5h-7z M129 113h7v5h-7z M146 113h7v5h-7z M163 113h7v5h-7z M180 113h7v5h-7z M197 113h7v5h-7z M214 113h7v5h-7z M231 113h7v5h-7z" pathLength="1" /><path d="M66 113h10v8H66zm17 0h10v8H83zm180 0h10v8h-10zm16 0h10v8h-10z" pathLength="1" /></g>
+  <g id="doctors-base"><path d="M91 179V95a62 62 0 0 1 124 0v84z" pathLength="1" /><path d="M74 183h160m-154 5h146" pathLength="1" /></g>
+  <g id="doctors-line"><path d="M123 88c-1-26 10-42 31-43 22-2 34 15 33 41l-5 20-8 13v9l29 13q12 6 19 35H84q8-30 25-36l28-12v-10q-12-13-14-30z" pathLength="1" /><path d="M124 81q15 4 30-12 13 14 32 11m-43 21q9 5 20 0" pathLength="1" /><path d="M137 129l16 26 21-26m-40 2-8 11 10 3-7 10 18 19m30-45 8 12-9 4 7 9-20 20" pathLength="1" /></g>
+  <g id="doctors-accent"><path d="M123 135q-15 5-13 22m-5 0v5q0 8 8 8t8-8v-5m64-22q11 11 6 23" pathLength="1" /><circle cx="190" cy="162" r="4" pathLength="1" /><path d="M241 79h51m-51 7h36m-36 24h62m-62 7h42m-42 25h53" pathLength="1" /></g>
+  <g id="wellness-base"><ellipse cx="174" cy="169" rx="96" ry="13" pathLength="1"/><ellipse cx="174" cy="169" rx="62" ry="8" pathLength="1"/><ellipse cx="174" cy="169" rx="28" ry="4" pathLength="1"/></g>
+  <g id="wellness-line"><path d="M171 166q2-50 36-110" pathLength="1" /><path d="M179 124q-26-3-43-36 31 1 43 36z" pathLength="1" /><path d="M188 100q2-36 32-65 6 43-32 65z" pathLength="1" /><path d="M183 119q20-27 52-24-17 25-52 24z" pathLength="1" /><path d="M174 145q-35-5-62-34 43 1 62 34z" pathLength="1" /><path d="M177 139q20-21 44-17-14 17-44 17z" pathLength="1" /></g>
+  <g id="wellness-accent"><path d="M124 115l43 24m-23-44 28 24m23-26 20-46m-25 69 35-15" pathLength="1" /></g>
+  <g id="hospitality-base"><path d="M69 177h223M89 175V98a92 69 0 0 1 184 0v77M103 174V98a78 56 0 0 1 156 0v76" pathLength="1" /></g>
+  <g id="hospitality-line"><path d="M106 172V99a74 57 0 0 1 148 0v73M96 172h169m-174 6h179m-185 5h197" pathLength="1" /><path d="M76 102h24m160 0h25M81 98v73m195-73v73" pathLength="1" /></g>
+  <g id="hospitality-accent"><path d="M178 33v7m-29-5 2 7m-28 3 4 6m81-16-2 7m28 4-5 5M86 120h9m171 0h9" pathLength="1" /></g>
+  <g id="about-base"><path d="M43 165l23-123 140 14m-151 119 114 11" pathLength="1" /></g>
+  <g id="about-line"><path d="M96 63l185-16 12 121-185 17z" pathLength="1" /><path d="M114 189l184-16" pathLength="1" /></g>
+  <g id="about-accent"><path d="M231 187h66m-49 5h49" pathLength="1" /></g>
+  <g id="contact-base"><circle cx="211" cy="103" r="72" pathLength="1" /><path d="M43 56h28m-33 61h24m-7 53h25" pathLength="1" /></g>
+  <g id="contact-line"><path d="M43 50c89 0 77 55 137 55M36 108c61-29 90 10 144-3M50 164c69 4 74-51 130-59" pathLength="1" /><path d="M182 80h83v52h-83z" pathLength="1" /><path d="m183 82 40 30 40-30m-80 47 28-26m51 26-27-26" pathLength="1" /></g>
+  <g id="contact-accent"><circle cx="43" cy="50" r="3" pathLength="1" fill="currentColor"/><circle cx="36" cy="108" r="3" pathLength="1" fill="currentColor"/><circle cx="50" cy="164" r="3" pathLength="1" fill="currentColor"/><circle cx="179" cy="105" r="7" pathLength="1" /></g>
+  <g id="faq-base"><path d="M95 65l143-25 19 114-144 27z" pathLength="1" /><path d="M108 57l142-8 7 112-146 12z" pathLength="1" /></g>
+  <g id="faq-line"><path d="M112 66h147v105H112z" pathLength="1" /><path d="M132 91h76m-76 11h98m-98 20h94m-94 11h73m-74 12h60" pathLength="1" /></g>
+  <g id="faq-accent"><path d="M223 66v29l8-6 8 6V66" pathLength="1" /><path d="M255 78h12v28h-12m0 10h12v24h-12" pathLength="1" /></g>
+  <g id="privacy-base"><path d="M99 44l133-6 9 135-135 7zM94 190h169" pathLength="1" /></g>
+  <g id="privacy-line"><path d="M114 35h103l26 27v117H114z" pathLength="1" /><path d="M217 35v28h26M135 67h49m-49 15h74m-74 12h66m-66 12h54m-53 39q6-17 9-3t10-2q4-8 9 0t16-1" pathLength="1" /></g>
+  <g id="privacy-accent"><circle cx="217" cy="136" r="21" pathLength="1" /><circle cx="217" cy="136" r="16" pathLength="1" /><path d="M210 138v-7a7 7 0 0 1 14 0v7m-15-6h16v13h-16z" pathLength="1" /></g>
+  <g id="cities-base"><path d="M73 36q39 10 69-3l47 20 20-5 24 15 28-11 17 7-21 18-37 5-6 21-17 16-10 29-20 30-13-23-7-28-13-29-20-6-11-18-17-4 5-14z" pathLength="1" /></g>
+  <g id="cities-line"><path d="M138 91q47-62 53-24t-10 63q-2 29-15 21" pathLength="1" /></g>
+  <g id="cities-accent"><circle cx="138" cy="91" r="4" pathLength="1" fill="currentColor"/><circle cx="191" cy="67" r="4" pathLength="1" fill="currentColor"/><circle cx="181" cy="130" r="4" pathLength="1" fill="currentColor"/><circle cx="166" cy="151" r="4" pathLength="1" fill="currentColor"/></g>
+  <g id="missing-base"><circle cx="180" cy="106" r="68" pathLength="1" /><circle cx="180" cy="106" r="60" pathLength="1" /><path d="M180 32v18m0 113v17m-77-74h18m118 0h17M130 55l10 10m81 81 11 11m-102 0 10-11m81-81 12-10" pathLength="1" /></g>
+  <g id="missing-line"><path d="M208 65l-19 51-35 33 19-51z" pathLength="1" /><path d="m208 65-35 33 16 18z" pathLength="1" /></g>
+  <g id="missing-accent"><circle cx="181" cy="107" r="5" pathLength="1" /><path d="M43 155c29-18 37 14 63-17m144-62 56-25" pathLength="1" stroke-dasharray="3 6"/></g>
+</defs></svg>

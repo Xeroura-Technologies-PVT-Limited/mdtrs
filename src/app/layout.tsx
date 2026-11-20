@@ -1,21 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant, DM_Mono, Instrument_Sans, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { SITE } from "@/lib/site";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { EnquiryModal } from "@/components/site/EnquiryModal";
-import { Intro } from "@/components/site/Intro";
-import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { SiteMotion } from "@/components/site/SiteMotion";
+import { NavigationMotion } from "@/components/site/NavigationMotion";
 import { SvgDefs } from "@/components/site/Logo";
+import { MotionStage } from "@/components/site/MotionStage";
+import { addresses, resolveScene } from "@/lib/motion/scenes";
+import { loaderDisplayMs, startIntroduction } from "@/lib/motion/intro";
 import "@/styles/site.css";
 import "@/styles/pages.css";
+import "@/styles/navigation-motion.css";
+import "@/styles/destination-motion.css";
 
-const cormorant = Cormorant({ subsets: ["latin"], weight: ["300", "400", "500", "600"], style: ["normal", "italic"], variable: "--font-cormorant", display: "swap" });
-const instrument = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-instrument", display: "swap" });
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-jakarta", display: "swap" });
-const dmMono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dmmono", display: "swap" });
-
+const editorial = localFont({
+  src: [
+    { path: "../fonts/cormorant-latin.woff2", weight: "300 700", style: "normal" },
+    { path: "../fonts/cormorant-italic-latin.woff2", weight: "300 700", style: "italic" },
+  ],
+  variable: "--font-editorial",
+  display: "swap",
+});
+const humanist = localFont({
+  src: "../fonts/instrument-sans-latin.woff2",
+  weight: "400 700",
+  variable: "--font-humanist",
+  display: "swap",
+});
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: { default: "Medtours · Medical travel to India", template: "%s · Medtours" },
@@ -33,13 +46,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F7F9FD",
+  themeColor: "#361a31",
   colorScheme: "light",
   viewportFit: "cover",
 };
-
-// Runs before paint: hides the opening screen until the logo intro plays, so nothing flashes.
-const introBoot = `(function(){try{if('scrollRestoration' in history)history.scrollRestoration='manual';if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;document.documentElement.classList.add('js-intro');window.__introFail=setTimeout(function(){document.documentElement.classList.remove('js-intro')},7000);}catch(e){}})();`;
 
 const orgJsonLd = {
   "@context": "https://schema.org",
@@ -54,20 +64,23 @@ const orgJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${instrument.variable} ${jakarta.variable} ${dmMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${editorial.variable} ${humanist.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: introBoot }} />
+        <script dangerouslySetInnerHTML={{ __html: `(${startIntroduction.toString()})((${resolveScene.toString()})(location.pathname,location.hash,${JSON.stringify(addresses)}),${loaderDisplayMs});` }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
       <body>
         <SvgDefs />
-        <Intro />
-        <Header />
-        <main id="top">{children}</main>
-        <Footer />
-        <EnquiryModal />
-        <SmoothScroll />
-        <SiteMotion />
+        <MotionStage />
+        <NavigationMotion />
+        <div id="site-content" suppressHydrationWarning>
+          <a className="skip-link" href="#top">Skip to content</a>
+          <Header />
+          <main id="top" tabIndex={-1}>{children}</main>
+          <Footer />
+          <EnquiryModal />
+          <SiteMotion />
+        </div>
       </body>
     </html>
   );

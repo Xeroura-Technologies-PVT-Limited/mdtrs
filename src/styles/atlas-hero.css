@@ -1,0 +1,71 @@
+.atlas-hero { position: relative; overflow: clip; background: var(--aubergine); color: var(--apricot); }
+.atlas-spread { display: grid; grid-template-columns: 1fr 1.04fr; align-items: center; gap: clamp(18px,3vw,50px); padding-block: clamp(48px,5vw,83px) clamp(49px,5.3vw,87px); }
+.atlas-intro { position: relative; z-index: 1; min-width: 0; }
+.atlas-intro .eyebrow { color: var(--on-dark); letter-spacing: .14em; font-size: clamp(.64rem,.8vw,.76rem); }
+.atlas-intro .eyebrow::before { display: none; }
+.atlas-intro .eyebrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.15; }
+.atlas-intro h1 { font-size: clamp(76px,8.55vw,153px); line-height: .83; font-weight: 500; letter-spacing: -.055em; margin: clamp(24px,2.15vw,34px) 0 28px; }
+.atlas-intro h1 em { color: var(--apricot); font-weight: 500; letter-spacing: -.063em; }
+.hero-line { display: block; clip-path: inset(-.19em -.15em -.24em); }
+.hero-line > span { display: block; }
+.hero-period { color: var(--on-dark); margin-left: .01em; }
+.atlas-lead { max-width: 45ch; color: var(--on-dark); font-size: clamp(16px,1.3vw,21px); line-height: 1.55; }
+.atlas-intro .hero-cta { margin-top: clamp(24px,2.3vw,38px); gap: 12px clamp(15px,1.7vw,28px); }
+.atlas-intro .btn { gap: 18px; background: var(--apricot); color: var(--aubergine); }
+.atlas-intro .btn:hover { background: var(--on-dark); }
+.atlas-intro .btn span { font: 400 1.16rem/1 var(--f-body); color: currentColor; }
+.journey-link { display: inline-flex; align-items: center; gap: 9px; min-height: 46px; font-size: .91rem; font-weight: 600; text-decoration: underline; text-decoration-color: var(--on-dark); text-underline-offset: .38em; }
+.journey-link span { font-size: 1.05rem; color: var(--on-dark); }
+.journey-link:hover { color: var(--on-dark); text-decoration-color: currentColor; }
+.atlas-art { position: relative; isolation: isolate; min-width: 0; padding: 6px clamp(12px,1.8vw,30px) 10px 5px; }
+.atlas-grid { position: absolute; width: 122%; max-width: none; height: 119%; right: -14%; top: -8%; z-index: -2; opacity: .17; color: var(--on-dark); mask-image: radial-gradient(ellipse at 48% 51%, black 45%, transparent 73%); }
+.postage { position: relative; transform: rotate(-3deg); filter: drop-shadow(1px 7px 6px #361a3124); }
+.stamp-back { position: absolute; inset: 6% 1% 3% 4%; transform: rotate(6deg); background: var(--paper-shade); border: 1px solid var(--line-strong); }
+.stamp-face { position: relative; background: var(--apricot); padding: clamp(10px,1.08vw,19px) clamp(10px,1.15vw,20px) 0;
+  mask: linear-gradient(#000 0 0) center/calc(100% - 12px) calc(100% - 12px) no-repeat,
+    radial-gradient(circle at 50% 0,transparent 3.5px,#000 4px) left top / 14px 7px repeat-x,
+    radial-gradient(circle at 50% 100%,transparent 3.5px,#000 4px) left bottom / 14px 7px repeat-x,
+    radial-gradient(circle at 0 50%,transparent 3.5px,#000 4px) left top / 7px 14px repeat-y,
+    radial-gradient(circle at 100% 50%,transparent 3.5px,#000 4px) right top / 7px 14px repeat-y;
+}
+.stamp-face > svg { width: 100%; height: auto; }
+.stamp-face figcaption { display: flex; align-items: center; gap: 10px; padding: 6px 1px 10px; color: var(--muted); font: 600 clamp(.51rem,.65vw,.7rem)/1 var(--f-mono); text-transform: uppercase; letter-spacing: .15em; }
+.stamp-face figcaption i { flex: 1; background: var(--line); height: 1px; }
+.stamp-face figcaption svg { height: 13px; width: 16px; }
+.postmark { position: absolute; width: 25%; top: -6%; right: -6%; color: var(--line-strong); transform: rotate(12deg); opacity: .85; }
+.care-assurance { background: var(--paper-tint); color: var(--ink); }
+.care-assurance ul { margin-block: 0; padding: 22px 0; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); list-style: none; }
+.care-assurance li { display: flex; align-items: center; justify-content: center; gap: clamp(12px,1.4vw,25px); padding: 1px 16px; border-inline-start: 1px solid var(--line); }
+.care-assurance li:first-child { border: 0; }
+.care-assurance li>svg { flex: none; width: clamp(25px,2vw,35px); height: auto; fill: none; stroke: var(--accent); stroke-width: 1.22; stroke-linecap: round; stroke-linejoin: round; }
+.care-assurance li strong { display: block; font: 500 clamp(1.35rem,1.7vw,1.87rem)/1.1 var(--f-display); letter-spacing: -.018em; }
+.care-assurance li span { display: block; margin-top: 4px; font-size: .78rem; color: var(--muted); }
+@media (max-width: 1080px) and (min-width: 761px) {
+  .atlas-spread { grid-template-columns: 1fr .95fr; gap: 8px; }
+  .atlas-intro h1 { font-size: clamp(76px,9.1vw,98px); }
+  .atlas-intro .hero-cta { gap: 5px 16px; }
+  .atlas-intro .btn,.journey-link { font-size: .85rem; }
+  .atlas-intro .btn { padding-inline: 14px; gap: 9px; }
+}
+@media (max-width: 760px) {
+  .atlas-spread { grid-template-columns: 1fr; gap: 34px; padding-top: clamp(30px,7.5vw,48px); padding-bottom: 34px; }
+  .atlas-intro h1 { font-size: clamp(68px,14.7vw,100px); line-height: .85; margin: 19px 0 16px; }
+  .atlas-intro .eyebrow svg { width: 17px; height: 17px; }
+  .atlas-intro .eyebrow { font-size: .65rem; }
+  .atlas-lead { max-width: 40ch; font-size: 1rem; line-height: 1.46; }
+  .atlas-intro .hero-cta { margin-top: 18px; gap: 3px 15px; }
+  .atlas-intro .btn { gap: 8px; padding: 10px 13px; }
+  .atlas-intro .btn,.journey-link { font-size: .82rem; }
+  .journey-link { gap: 5px; }
+  .atlas-art { width: min(100% - 12px,460px); margin-inline: auto; padding: 0 5px; }
+  .atlas-art .postmark { right: -5%; }
+  .care-assurance ul { padding-block: 18px; }
+  .care-assurance li { flex-direction: column; gap: 5px; padding: 2px 7px; text-align: center; }
+  .care-assurance li>svg { width: 23px; }
+  .care-assurance li strong { font-size: 1.1rem; }
+  .care-assurance li span { font-size: .69rem; line-height: 1.3; }
+}
+@media (max-width: 370px) {
+  .atlas-intro .hero-cta { align-items: flex-start; flex-direction: column; }
+  .care-assurance .wrap { width: calc(100% - 16px); }
+}

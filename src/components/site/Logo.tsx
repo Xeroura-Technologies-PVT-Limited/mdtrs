@@ -6,7 +6,7 @@ export function LogoMark({ className }: { className?: string }) {
       <rect className="ink" x="80" y="44" width="40" height="112" rx="12" />
       <rect className="ink" x="44" y="80" width="112" height="40" rx="12" />
       <path className="cut" d="M38 150 C 14 104, 52 44, 128 40" fill="none" strokeWidth="16" strokeLinecap="round" />
-      <path className="acc" d="M38 150 C 14 104, 52 44, 128 40" fill="none" strokeWidth="7" strokeLinecap="round" />
+      <path className="acc" pathLength="1" d="M38 150 C 14 104, 52 44, 128 40" fill="none" strokeWidth="7" strokeLinecap="round" />
       <use className="accf" href="#plane" transform="translate(146 39) rotate(86) scale(1.6) translate(-12 -12)" />
     </svg>
   );

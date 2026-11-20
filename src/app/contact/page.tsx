@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
+import { SiteLink } from "@/components/site/SiteLink";
 import { PageHero } from "@/components/page/PageHero";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 
@@ -17,9 +18,8 @@ export default function ContactPage() {
         eyebrow="Talk to us"
         title={<>Start with <em>your</em> reports</>}
         lead="Tell us what you need and attach any reports you have. A doctor on our team reviews them and replies with hospital options and an itemised estimate, usually within 48 hours."
-      />
+      ><SiteLink className="btn btn-ghost" href="#contact-form">Write to the team <span aria-hidden="true">↓</span></SiteLink></PageHero>
       <section className="band b-white pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap contact-grid">
           <div className="contact-ways">
             <div className="way" data-reveal="">
@@ -46,7 +46,7 @@ export default function ContactPage() {
               </ol>
             </div>
           </div>
-          <div className="form-card" data-reveal="">
+          <div className="form-card" id="contact-form" data-reveal="">
             <p className="eyebrow" style={{ marginBottom: 12 }}>Treatment quote</p>
             <h2 className="form-title">Tell us what you need</h2>
             <EnquiryForm idPrefix="c" />

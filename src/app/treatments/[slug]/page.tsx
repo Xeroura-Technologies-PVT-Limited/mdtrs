@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { SiteLink as Link } from "@/components/site/SiteLink";
 import { notFound } from "next/navigation";
 import { TREATMENTS } from "@/lib/site";
 import { PageHero } from "@/components/page/PageHero";
@@ -36,15 +36,14 @@ export default async function TreatmentPage({ params }: { params: Params }) {
         art={t.render}
         artAlt={t.alt}
       >
-        <button className="btn btn-solid mag" data-open="enquire" data-care={t.name} type="button"><span className="dot" />Get a Treatment Quote</button>
+        <button className="btn btn-solid" data-open="enquire" data-care={t.name} type="button">Get a Treatment Quote</button>
       </PageHero>
 
       <section className="band b-white pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap">
           <p className="intro-text" data-reveal="">{t.intro}</p>
           <div className="sec-head" style={{ marginTop: "clamp(64px,8vw,120px)" }}>
-            <h2 data-split-scroll="">What we <em>treat</em></h2>
+            <h2>What we <em>treat</em></h2>
           </div>
           <div className="areas">
             {t.areas.map((a) => (
@@ -58,11 +57,10 @@ export default async function TreatmentPage({ params }: { params: Params }) {
       </section>
 
       <section className="band b-peri pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap split">
           <div>
             <p className="eyebrow gap">Arranged for you</p>
-            <h2 data-split-scroll="">What we <em>take care of</em></h2>
+            <h2>What we <em>take care of</em></h2>
           </div>
           <div className="checks" data-reveal="">
             <ul>
@@ -86,7 +84,6 @@ export default async function TreatmentPage({ params }: { params: Params }) {
       </section>
 
       <section className="band b-paper pad-sm">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap">
           <Link className="next-t" href={`/treatments/${next.slug}`}>
             <span className="mono">Next</span>

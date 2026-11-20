@@ -11,11 +11,10 @@ const config = [
     rules: {
       // Copy uses natural apostrophes and quotes.
       "react/no-unescaped-entities": "off",
-      // Renders are small pre-optimised JPEGs that animate with GSAP; plain <img> is intentional.
+      // Editorial photography is supplied as pre-optimised local assets.
       "@next/next/no-img-element": "off",
     },
   },
-  { ignores: ["src/lib/motion/**"] },
 ];
 
 export default config;

@@ -6,8 +6,8 @@ Designed and built by Xeroura Technologies.
 ## Stack
 
 - Next.js 15 (App Router) with React 19 and TypeScript
-- GSAP + ScrollTrigger for scroll-linked motion, Lenis for smooth scrolling
-- Plain CSS (`src/styles`), with fonts from `next/font/google`
+- Native scrolling, SVG illustration and CSS motion
+- Plain CSS (`src/styles`), with locally hosted Cormorant and Instrument Sans
 - No database. The enquiry form posts to a route handler that emails the team (see below)
 
 ## Getting started
@@ -27,7 +27,7 @@ Requires Node 18.18 or newer.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Homepage: logo intro, pinned globe story, promises, care cards, patient/attender switch, accreditations, journey, cities map, FAQ, slide-to-quote |
+| `/` | Illustrated arrival, treatment directory, patient and attender planning, accreditations, itinerary, city routes, FAQ and slide-to-quote |
 | `/treatments` | Overview of the six services |
 | `/treatments/[slug]` | Medical, Surgical, Dental, Rehabilitation, Longevity, Holistic health |
 | `/about` | Who Medtours is and how it works |
@@ -43,19 +43,21 @@ Requires Node 18.18 or newer.
 src/
   app/                    routes, layout, API route, sitemap, robots, favicon
   components/
-    site/                 header + menu, footer, enquiry modal and form, logo, intro, smooth scroll, shared motion
-    home/                 homepage sections and HomeMotion (mounts the scroll story)
+    site/                 navigation, footer, enquiry dialog and form, logo and section reveals
+    home/                 homepage sections and the illustrated arrival scene
     page/                 PageHero and CtaBand for inner pages
   lib/
     site.ts               all editable copy: contact details, navigation, treatments, FAQ
-    scroll.ts             helpers for Lenis
-    motion/globe.js       Canvas2D globe (dot-matrix earth, flights, extruded India)
-    motion/home.js        homepage motion (globe pin, persona switch, city map, journey plane, slider)
+  fonts/                  local font files and their licences
   styles/
-    site.css              tokens, header, menu, homepage sections, footer, modal
+    site.css              tokens, navigation, footer, FAQ and enquiry form
+    atlas-hero.css        homepage introduction and postage frame
+    arrival-illustration.css  single-play flight path and arrival highlight
+    navigation-motion.css  arrival screen, page transitions and interactive motion
+    atlas-home.css        treatment directory and travel planning sections
     pages.css             inner pages
 public/
-  renders/                3D renders used on cards and page heroes
+  editorial/              care, treatment and hospitality imagery
   og.jpg                  social share image
 ```
 
@@ -78,15 +80,16 @@ Without `RESEND_API_KEY` and `ENQUIRY_TO`, the route logs enquiries in developme
 
 ## Motion notes
 
-- The logo intro plays on every full page load. A small inline script in `layout.tsx` adds `js-intro` to `<html>` before paint; `Intro.tsx` removes it when the animation hands over (with a 7 s failsafe).
-- Everything respects `prefers-reduced-motion`: no intro, no smooth scroll, no pinned sections.
-- The homepage motion is plain JavaScript in `src/lib/motion`, ported from the approved prototype. It runs inside a `gsap.context`, so it cleans up when you navigate away.
+- `ArrivalIllustration.tsx` defines one path for the aircraft and the route reveal. Its default SVG renders the completed scene. CSS adds the flight when the browser supports motion paths and the visitor allows motion.
+- On a full document visit, the introduction displays its message for 2 seconds before revealing the hero. The priority image and fonts load during that time. Skip intro and Escape dismiss it immediately. The HTML content is available with JavaScript disabled.
+- Use `SiteLink` for internal page links. Destination messages use the same reading time for page links, section links, and browser history. The router loads the destination in parallel. If it is still pending when the curtain lifts, a small loading label stays visible until it arrives. Reduced motion opens pages directly.
+- Section reveals keep text visible throughout. The mobile navigation, section reveals and aircraft respond to changes in the visitor's reduced-motion preference.
 
 ## Before launch
 
 - [ ] Confirm NABH / JCI wording with the client
-- [ ] Replace the three `[Partner hospital]` cards on the homepage with real hospitals and photos
-- [ ] Add a portrait of Dr. Ravi Teja on `/about` (see the comment in `src/app/about/page.tsx`)
+- [ ] Replace the three sample profiles on the homepage with real hospitals and photos
+- [ ] Add a portrait of Dr. Ravi Teja on `/about` when one is available
 - [ ] Confirm the brand name (Medtours vs MedtoursIn) and domain
 - [ ] Set up Resend and the environment variables above
 - [ ] Have the privacy notice reviewed

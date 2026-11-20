@@ -27,7 +27,6 @@ export default function FaqPage() {
         lead="Can't find your answer here? Your coordinator replies within a working day."
       />
       <section className="band b-paper pad faq">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap faq-page">
           <FaqList items={FAQ} />
         </div>

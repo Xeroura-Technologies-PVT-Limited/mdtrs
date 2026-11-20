@@ -1,85 +1,69 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getLenis } from "@/lib/scroll";
+import { useEffect, useRef, useState } from "react";
 import { EnquiryForm } from "./EnquiryForm";
 
-/** The quote form as a dialog. Any element with [data-open] opens it,
- *  as does a `mt:enquire` window event (used by the slide-to-quote control). */
+type Enquiry = { visit: number; role: "patient" | "attender"; care?: string };
+
 export function EnquiryModal() {
-  const [open, setOpen] = useState(false);
-  const [role, setRole] = useState<"patient" | "attender">("patient");
-  const [care, setCare] = useState<string | undefined>();
-  const [key, setKey] = useState(0);
-  const lastFocus = useRef<HTMLElement | null>(null);
-
-  const show = useCallback((careName?: string) => {
-    lastFocus.current = document.activeElement as HTMLElement | null;
-    setRole(document.documentElement.dataset.persona === "attender" ? "attender" : "patient");
-    setCare(careName);
-    setKey((k) => k + 1);
-    window.dispatchEvent(new Event("mt:close-menu"));
-    setOpen(true);
-  }, []);
-
-  const hide = useCallback(() => {
-    setOpen(false);
-    lastFocus.current?.focus?.();
-  }, []);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const returnTo = useRef<HTMLElement | null>(null);
+  const visit = useRef(0);
+  const [enquiry, setEnquiry] = useState<Enquiry | null>(null);
 
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-open]");
-      if (t) {
-        e.preventDefault();
-        show(t.dataset.care);
-      }
-    };
-    const onEvent = () => show();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+    function open(opener: HTMLElement | null, care?: string) {
+      returnTo.current = opener?.closest("#mobile-menu")
+        ? document.querySelector(".menu-btn")
+        : opener;
+      window.dispatchEvent(new Event("mt:close-menu"));
+      setEnquiry({ visit: ++visit.current, role: document.documentElement.dataset.persona === "attender" ? "attender" : "patient", care });
+    }
+    function onClick(event: MouseEvent) {
+      const opener = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-open="enquire"]') : null;
+      if (opener) { event.preventDefault(); open(opener, opener.dataset.care); }
+    }
+    const onEnquire = () => open(document.activeElement as HTMLElement | null);
+    const onNavigate = () => {
+      returnTo.current = null;
+      if (dialog.current?.open) dialog.current.close();
     };
     document.addEventListener("click", onClick);
-    window.addEventListener("mt:enquire", onEvent);
-    window.addEventListener("keydown", onKey);
+    window.addEventListener("mt:enquire", onEnquire);
+    window.addEventListener("mt:locationchange", onNavigate);
     return () => {
       document.removeEventListener("click", onClick);
-      window.removeEventListener("mt:enquire", onEvent);
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mt:enquire", onEnquire);
+      window.removeEventListener("mt:locationchange", onNavigate);
     };
-  }, [show]);
+  }, []);
 
   useEffect(() => {
-    const lenis = getLenis();
-    if (open) lenis?.stop();
-    else lenis?.start();
-  }, [open]);
+    if (enquiry && !dialog.current?.open) dialog.current?.showModal();
+  }, [enquiry]);
 
+  const close = () => dialog.current?.close();
+  function afterClose(event: React.SyntheticEvent<HTMLDialogElement>) {
+    const panel = event.currentTarget;
+    if (panel.open) return;
+    returnTo.current?.focus({ preventScroll: true });
+    // Native close releases focus immediately. Keep the sheet painted through
+    // its CSS exit, then discard its fields unless a new enquiry has opened.
+    const closedVisit = visit.current;
+    const animations = panel.getAnimations?.() ?? [];
+    void Promise.allSettled(animations.map(animation => animation.finished)).then(() => {
+      if (!panel.open && visit.current === closedVisit) setEnquiry(null);
+    });
+  }
   return (
-    <div
-      className="modal"
-      hidden={!open}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="enqTitle"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) hide();
-      }}
-    >
-      {open && (
-        <div className="sheet" data-lenis-prevent="">
-          <button className="x" type="button" onClick={hide}>
-            Close
-          </button>
-          <div>
-            <p className="eyebrow" style={{ marginBottom: 12 }}>
-              Treatment quote
-            </p>
-            <h3 id="enqTitle">Tell us what you need</h3>
-          </div>
-          <EnquiryForm key={key} idPrefix="m" autoFocus defaultRole={role} defaultCare={care} onDone={hide} />
-        </div>
-      )}
-    </div>
+    <dialog className="modal" ref={dialog} aria-labelledby="enqTitle" onClose={afterClose}
+      onClick={event => { if (event.target === event.currentTarget) close(); }}>
+      {enquiry && <div className="sheet" key={enquiry.visit}>
+        <button className="x" type="button" onClick={close}>Close</button>
+        <p className="eyebrow gap">Treatment quote</p>
+        <h3 id="enqTitle">Tell us what you need</h3>
+        <EnquiryForm idPrefix="m" defaultRole={enquiry.role} defaultCare={enquiry.care} onDone={close} />
+      </div>}
+    </dialog>
   );
 }

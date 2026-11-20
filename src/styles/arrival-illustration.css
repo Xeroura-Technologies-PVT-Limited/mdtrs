@@ -1,0 +1,63 @@
+.arrival-landscape {
+  position: relative;
+  aspect-ratio: 600 / 425;
+}
+
+.arrival-landscape > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.arrival-print {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  --flight-time: 3.4s;
+  --flight-ease: cubic-bezier(.34, .08, .45, 1);
+}
+
+.arrival-print__halo { opacity: 0; }
+
+/* The ordinary SVG is the completed print. Only enhance browsers that
+   can move the aircraft and uncover the same length of route together. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (offset-path: path("M0 0L1 1")) {
+    .arrival-print__plane {
+      transform: none;
+      offset-path: var(--arrival-route);
+      offset-anchor: 0 0;
+      offset-rotate: auto;
+      animation: arrival-flight var(--flight-time) var(--flight-ease) both;
+    }
+
+    .arrival-print__reveal {
+      animation: arrival-draw var(--flight-time) var(--flight-ease) both;
+    }
+
+    .arrival-print__halo {
+      transform-origin: 339px 130px;
+      animation: arrival-touchdown .85s 3.05s ease-out both;
+    }
+  }
+}
+
+@keyframes arrival-flight {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
+
+@keyframes arrival-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes arrival-touchdown {
+  0% { opacity: 0; transform: scale(.65); }
+  32% { opacity: .72; }
+  100% { opacity: 0; transform: scale(1.55); }
+}
