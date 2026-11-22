@@ -16,7 +16,7 @@ uniform vec3 uEye, uCamF, uCamR, uCamU;
 uniform float uFocal;
 uniform mat3 uCrossInv, uRingInv;
 uniform vec3 uCenter;
-uniform float uScale, uGroundY, uTime;
+uniform float uScale, uGroundY, uTime, uRingK, uShadowK;
 uniform vec4 uSat[10];
 uniform vec3 uCross, uRing, uSatCol, uTrail, uShadow, uEnvTop, uEnvHor, uEnvBot;
 
@@ -31,8 +31,9 @@ vec2 map(vec3 p){
   vec3 c = uCrossInv * (p - uCenter) / uScale;
   float d = smin(sdRoundBox(c, vec3(0.34, 1.02, 0.34), 0.22), sdRoundBox(c, vec3(1.02, 0.34, 0.34), 0.22), 0.07) * uScale;
   vec2 res = vec2(d, 1.0);
+  if (uRingK < 0.01) return res;
   vec3 r = uRingInv * (p - uCenter) / uScale;
-  float dr = sdTorus(r, vec2(1.62, 0.05)) * uScale;
+  float dr = sdTorus(r, vec2(1.62 * uRingK, 0.05 * min(1.0, uRingK * 3.0))) * uScale;
   if (dr < res.x) res = vec2(dr, 2.0);
   // Satellite and its tapering trail, blended into one smooth comet.
   float dsat = 1e5; float id = 0.0;
@@ -156,7 +157,7 @@ void main(){
     }
   }
 
-  if (!hit && rd.y < 0.0) {
+  if (!hit && rd.y < 0.0 && uShadowK > 0.01) {
     // Contact shadow on an invisible studio floor.
     float t = (uGroundY - ro.y) / rd.y;
     vec3 p = ro + rd*t;
@@ -166,7 +167,7 @@ void main(){
       float above = softShadow(p + vec3(0.0, 0.01, 0.0), normalize(vec3(-0.2, 1.0, 0.15)), 1.6);
       float dark = (1.0 - above) * 0.3;
       dark *= smoothstep(2.6*uScale, 0.5*uScale, dist);
-      gl_FragColor = vec4(uShadow, clamp(dark, 0.0, 0.3));
+      gl_FragColor = vec4(uShadow, clamp(dark, 0.0, 0.3) * uShadowK);
       return;
     }
   }
@@ -177,7 +178,25 @@ void main(){
   gl_FragColor = vec4(col, alpha);
 }`;
 
-export type OrbitScene = { setProgress(p: number): void; destroy(): void };
+/** Where and how the emblem should be drawn this frame. Positions and sizes
+ *  are in CSS pixels of the viewport; the page's motion controller owns them so
+ *  one emblem can travel from the loader to the hero and on down the page. */
+export type OrbitPose = {
+  x: number; y: number;
+  /** Diameter of the orbit ring, in pixels. */
+  ringPx: number;
+  yaw: number; pitch: number;
+  ringRy: number; ringRx: number;
+  /** 0 hides the ring and satellite, 1 shows them fully. */
+  ringK: number;
+  shadow: number;
+  /** Whether pointer tilt and drag spin apply. */
+  interactive: boolean;
+  visible: boolean;
+};
+
+export type OrbitScene = { destroy(): void };
+export type OrbitOptions = { getPose: (t: number) => OrbitPose; onFirstFrame?: () => void };
 
 const lin = (hex: string): Vec3 => hexToRgb(hex).map(c => Math.pow(c, 2.2)) as Vec3;
 
@@ -188,15 +207,9 @@ function inv3(m: Mat4) {
   return o;
 }
 
-export type OrbitOptions = {
-  /** "hero": shrinks and lifts away as the hero scrolls. "side": turns and opens its orbit as a section is read. */
-  mode?: "hero" | "side";
-  onFirstFrame?: () => void;
-};
+const EYE_Z = 9, FOV = 0.5, RING_R = 1.62;
 
-export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, opts: OrbitOptions = {}): OrbitScene | null {
-  const side = opts.mode === "side";
-  let firstFrame = false;
+export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, opts: OrbitOptions): OrbitScene | null {
   const gl = createCanvasGL(canvas);
   if (!gl) return null;
   const prog = program(gl, VS, FS);
@@ -205,122 +218,91 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
   const C = {
-    cross: lin("#FBF3EA"),
-    ring: lin("#4A1D41"),
-    sat: lin("#9B3D7E"),
-    trail: lin("#E7B9CF"),
-    shadow: hexToRgb("#361A31"),
-    top: lin("#FFFBF6"),
-    hor: lin("#FBEFE2"),
-    bot: lin("#E9D3C6"),
+    cross: lin("#FBF3EA"), ring: lin("#4A1D41"), sat: lin("#9B3D7E"), trail: lin("#E7B9CF"),
+    shadow: hexToRgb("#361A31"), top: lin("#FFFBF6"), hor: lin("#FBEFE2"), bot: lin("#E9D3C6"),
   };
 
-  const R = 1.62;
   const state = {
-    progress: 0, smoothP: 0,
-    yaw: -0.35, pitch: 0.08, spin: 0,
-    targetYaw: 0, targetPitch: 0,
+    tYaw: 0, tPitch: 0, yaw: 0, pitch: 0, spin: 0,
     dragging: false, lastX: 0, lastY: 0,
-    visible: true, raf: 0, t0: performance.now(), last: performance.now(),
-    angle: 0.6,
-    // Adaptive resolution: start sharp, step down if frames run long.
-    res: Math.min(window.devicePixelRatio || 1, innerWidth < 900 ? 1.25 : 1.6),
-    frameAvg: 16, frames: 0,
+    raf: 0, t0: performance.now(), last: performance.now(), angle: 0.6,
+    res: Math.min(window.devicePixelRatio || 1, innerWidth < 900 ? 1.25 : 1.5),
+    frameAvg: 16, frames: 0, firstFrame: false, cleared: false,
   };
-
-  function request() { if (!state.raf && state.visible) state.raf = requestAnimationFrame(frame); }
 
   function onMove(e: PointerEvent) {
-    const r = canvas.getBoundingClientRect();
-    const nx = (e.clientX - r.left) / r.width * 2 - 1;
-    const ny = (e.clientY - r.top) / r.height * 2 - 1;
     if (state.dragging) {
       state.spin += (e.clientX - state.lastX) * 0.0045;
-      state.targetPitch = Math.max(-0.6, Math.min(0.6, state.targetPitch + (e.clientY - state.lastY) * 0.004));
+      state.tPitch = Math.max(-0.6, Math.min(0.6, state.tPitch + (e.clientY - state.lastY) * 0.004));
       state.lastX = e.clientX; state.lastY = e.clientY;
-    } else {
-      state.targetYaw = nx * 0.38;
-      state.targetPitch = ny * 0.22;
+    } else if (e.pointerType === "mouse") {
+      state.tYaw = (e.clientX / innerWidth * 2 - 1) * 0.3;
+      state.tPitch = (e.clientY / innerHeight * 2 - 1) * 0.18;
     }
-    request();
   }
+  // The canvas never takes pointer events; elements marked as anchors start a drag.
   function onDown(e: PointerEvent) {
+    const anchor = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-orbit-anchor]") : null;
+    if (!anchor || (e.target instanceof Element && e.target.closest("a, button"))) return;
     state.dragging = true; state.lastX = e.clientX; state.lastY = e.clientY;
-    canvas.setPointerCapture(e.pointerId);
-    canvas.dataset.dragging = "";
+    anchor.dataset.dragging = "";
   }
-  function onUp(e: PointerEvent) {
+  function onUp() {
     state.dragging = false;
-    if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
-    delete canvas.dataset.dragging;
+    document.querySelectorAll<HTMLElement>("[data-orbit-anchor][data-dragging]").forEach(a => delete a.dataset.dragging);
   }
   window.addEventListener("pointermove", onMove, { passive: true });
-  canvas.addEventListener("pointerdown", onDown);
-  canvas.addEventListener("pointerup", onUp);
-  canvas.addEventListener("pointercancel", onUp);
+  window.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
 
-  const io = new IntersectionObserver(([entry]) => {
-    state.visible = entry.isIntersecting;
-    request();
-  });
-  io.observe(canvas);
-
-  function render(now: number) {
+  function frame(now: number) {
+    state.raf = requestAnimationFrame(frame);
+    if (document.hidden) return;
     const dt = Math.min(0.05, (now - state.last) / 1000);
     state.last = now;
     const t = (now - state.t0) / 1000;
+    const pose = opts.getPose(t);
 
-    // Resolution management.
-    if (!reduced && dt > 0) {
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    if (!pose.visible || cw === 0) {
+      if (!state.cleared) { gl!.clearColor(0, 0, 0, 0); gl!.clear(gl!.COLOR_BUFFER_BIT); state.cleared = true; }
+      return;
+    }
+    state.cleared = false;
+
+    if (!reduced) {
       state.frameAvg += (dt * 1000 - state.frameAvg) * 0.08;
       if (++state.frames > 40 && state.frameAvg > 26 && state.res > 0.7) { state.res *= 0.85; state.frames = 0; }
     }
-    const w = Math.max(1, Math.round(canvas.clientWidth * state.res));
-    const h = Math.max(1, Math.round(canvas.clientHeight * state.res));
+    const w = Math.max(1, Math.round(cw * state.res)), h = Math.max(1, Math.round(ch * state.res));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     gl!.viewport(0, 0, w, h);
-    const aspect = w / h;
 
-    const k = 1 - Math.pow(0.0015, dt);
-    state.smoothP += (state.progress - state.smoothP) * k;
-    const p = state.smoothP;
-    if (!reduced) {
-      state.spin *= Math.pow(0.12, dt);
-      state.angle += dt * (0.55 + p * 0.6);
-    }
-    state.yaw += ((state.targetYaw + state.spin) - state.yaw) * k * 0.9;
-    state.pitch += (state.targetPitch - state.pitch) * k;
+    const k = 1 - Math.pow(0.002, dt);
+    if (!reduced) { state.spin *= Math.pow(0.12, dt); state.angle += dt * 0.6; }
+    const live = pose.interactive ? 1 : 0;
+    state.yaw += ((state.tYaw + state.spin) * live - state.yaw) * k;
+    state.pitch += (state.tPitch * live - state.pitch) * k;
 
-    const narrow = aspect < 0.9;
-    const fov = narrow ? 0.62 : 0.5;
-    const eye: Vec3 = side ? [0, 0.15, narrow ? 10.2 : 9.4] : [0, 0.15, (narrow ? 10.6 : 9.0) + p * 1.4];
-    const target: Vec3 = [0, 0.05, 0];
-
-    const float = reduced ? 0 : Math.sin(t * 0.9) * 0.07;
-    const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
-    const yaw = side ? state.yaw + idle + p * Math.PI * 1.4 - 0.9 : state.yaw + idle + p * Math.PI * 0.9 - 0.42;
-    const scale = side ? 0.88 : 1 - p * 0.18;
-    const center: Vec3 = side ? [0, float, 0] : [0, float + p * 0.35, 0];
-    const rot = m4.chain(m4.rotY(yaw), m4.rotX(state.pitch + (side ? 0.18 - p * 0.3 : 0.06 - p * 0.25)));
-    const ringRot = side
-      ? m4.chain(rot, m4.rotY(0.95 - p * 0.7), m4.rotX(1.15 - p * 0.95), m4.rotZ(reduced ? 0.4 : t * 0.08))
-      : m4.chain(rot, m4.rotY(0.55 + p * 0.5), m4.rotX(0.32 + p * 0.9), m4.rotZ(reduced ? 0.4 : t * 0.08));
+    // Pixels to world units on the z = 0 plane.
+    const wpp = 2 * EYE_Z * Math.tan(FOV / 2) / ch;
+    const scale = Math.max(0.001, pose.ringPx * wpp / (RING_R * 2));
+    const center: Vec3 = [(pose.x - cw / 2) * wpp, -(pose.y - ch / 2) * wpp, 0];
+    const rot = m4.chain(m4.rotY(pose.yaw + state.yaw), m4.rotX(pose.pitch + state.pitch));
+    const ringRot = m4.chain(rot, m4.rotY(pose.ringRy), m4.rotX(pose.ringRx), m4.rotZ(reduced ? 0.4 : t * 0.08));
     const ringFrame = m4.chain(m4.translation(...center), ringRot, m4.scaling(scale));
+    const rk = Math.max(0, Math.min(1, pose.ringK));
 
     const sats = new Float32Array(40);
     for (let i = 0; i < 10; i++) {
       const ai = state.angle - i * 0.05;
-      const pos = m4.apply(ringFrame, [Math.cos(ai) * R, Math.sin(ai) * R, 0]);
-      sats.set([pos[0], pos[1], pos[2], (i === 0 ? 0.13 : 0.075 * Math.pow(1 - i / 10.5, 1.3)) * scale], i * 4);
+      const pos = m4.apply(ringFrame, [Math.cos(ai) * RING_R * rk, Math.sin(ai) * RING_R * rk, 0]);
+      const r = rk < 0.05 ? 0 : (i === 0 ? 0.13 : 0.075 * Math.pow(1 - i / 10.5, 1.3)) * scale * Math.min(1, rk * 1.5);
+      sats.set([pos[0], pos[1], rk < 0.05 ? 1e4 : pos[2], r], i * 4);
     }
 
-    // Camera basis.
-    let f: Vec3 = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]];
-    let l = Math.hypot(...f); f = [f[0] / l, f[1] / l, f[2] / l];
-    let r: Vec3 = [-f[2], 0, f[0]]; // cross(f, up)
-    l = Math.hypot(...r); r = [r[0] / l, r[1] / l, r[2] / l];
-    const u: Vec3 = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
-
+    const eye: Vec3 = [0, 0, EYE_Z];
     gl!.clearColor(0, 0, 0, 0);
     gl!.clear(gl!.COLOR_BUFFER_BIT);
     prog.use();
@@ -330,16 +312,18 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     gl!.vertexAttribPointer(loc, 2, gl!.FLOAT, false, 0, 0);
     gl!.uniform2f(prog.u("uRes"), w, h);
     gl!.uniform3fv(prog.u("uEye"), eye);
-    gl!.uniform3fv(prog.u("uCamF"), f);
-    gl!.uniform3fv(prog.u("uCamR"), r);
-    gl!.uniform3fv(prog.u("uCamU"), u);
-    gl!.uniform1f(prog.u("uFocal"), 1 / Math.tan(fov / 2) / 2);
+    gl!.uniform3fv(prog.u("uCamF"), [0, 0, -1]);
+    gl!.uniform3fv(prog.u("uCamR"), [1, 0, 0]);
+    gl!.uniform3fv(prog.u("uCamU"), [0, 1, 0]);
+    gl!.uniform1f(prog.u("uFocal"), 1 / Math.tan(FOV / 2) / 2);
     gl!.uniformMatrix3fv(prog.u("uCrossInv"), false, inv3(rot));
     gl!.uniformMatrix3fv(prog.u("uRingInv"), false, inv3(ringRot));
     gl!.uniform3fv(prog.u("uCenter"), center);
     gl!.uniform1f(prog.u("uScale"), scale);
-    gl!.uniform1f(prog.u("uGroundY"), -2.05);
+    gl!.uniform1f(prog.u("uGroundY"), center[1] - 2.05 * scale);
     gl!.uniform1f(prog.u("uTime"), t);
+    gl!.uniform1f(prog.u("uRingK"), rk);
+    gl!.uniform1f(prog.u("uShadowK"), Math.max(0, Math.min(1, pose.shadow)));
     gl!.uniform4fv(prog.u("uSat"), sats);
     gl!.uniform3fv(prog.u("uCross"), C.cross);
     gl!.uniform3fv(prog.u("uRing"), C.ring);
@@ -350,38 +334,17 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     gl!.uniform3fv(prog.u("uEnvHor"), C.hor);
     gl!.uniform3fv(prog.u("uEnvBot"), C.bot);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
-    if (!firstFrame) { firstFrame = true; opts.onFirstFrame?.(); }
+    if (!state.firstFrame) { state.firstFrame = true; opts.onFirstFrame?.(); }
   }
-
-  function frame(now: number) {
-    state.raf = 0;
-    if (!state.visible || document.hidden) return;
-    // While the first-visit loader covers the page, draw one frame (so shaders are compiled) and then wait.
-    if (firstFrame && document.documentElement.classList.contains("pm-loading")) {
-      window.setTimeout(() => { state.last = performance.now(); request(); }, 150);
-      return;
-    }
-    render(now);
-    if (!reduced || state.dragging || Math.abs(state.progress - state.smoothP) > 0.001) {
-      state.raf = requestAnimationFrame(frame);
-    }
-  }
-  const onVisibility = () => request();
-  document.addEventListener("visibilitychange", onVisibility);
-  window.addEventListener("resize", request);
-  request();
+  state.raf = requestAnimationFrame(frame);
 
   return {
-    setProgress(p) { state.progress = p; request(); },
     destroy() {
       cancelAnimationFrame(state.raf);
-      io.disconnect();
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("resize", request);
-      document.removeEventListener("visibilitychange", onVisibility);
-      canvas.removeEventListener("pointerdown", onDown);
-      canvas.removeEventListener("pointerup", onUp);
-      canvas.removeEventListener("pointercancel", onUp);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     },
   };

@@ -1,4 +1,4 @@
-import { createOrbitScene, type OrbitScene } from "./orbit-scene";
+import { createOrbitScene, type OrbitPose, type OrbitScene } from "./orbit-scene";
 import { createGlobeScene, type GlobeScene } from "./globe-scene";
 
 /** Motion engine for the premium homepage.
@@ -149,7 +149,7 @@ export function initPremium(root: HTMLElement): () => void {
   const passing = Array.from(root.querySelectorAll<HTMLElement>("[data-view]"));
   const progressBar = document.querySelector<HTMLElement>(".pm-progress");
   let orbit: OrbitScene | null = null;
-  let orbitSide: OrbitScene | null = null;
+  let heroP = 0, sideP = 0;
   let globe: GlobeScene | null = null;
   const route = root.querySelector<SVGPathElement>("[data-route]");
   const plane = root.querySelector<SVGGElement>("[data-route-plane]");
@@ -170,8 +170,8 @@ export function initPremium(root: HTMLElement): () => void {
       const span = r.height - vh;
       const p = span > 0 ? clamp(-r.top / span) : clamp((vh - r.top) / (vh + r.height));
       el.style.setProperty("--p", p.toFixed(4));
-      if (el.dataset.progress === "hero") orbit?.setProgress(p);
-      if (el.dataset.progress === "manifesto") orbitSide?.setProgress(p);
+      if (el.dataset.progress === "hero") heroP = p;
+      if (el.dataset.progress === "manifesto") sideP = p;
       if (el.dataset.progress === "globe") globe?.setProgress(p);
       if (el.dataset.progress === "journey") paintRoute(p);
     }
@@ -236,11 +236,7 @@ export function initPremium(root: HTMLElement): () => void {
       const canvas = e.target as HTMLCanvasElement;
       lazy.unobserve(canvas);
       try {
-        if (canvas.dataset.scene === "orbit" && !orbit) {
-          orbit = createOrbitScene(canvas, reduced, { onFirstFrame: () => loader.mark("scene") });
-          if (!orbit) loader.mark("scene");
-        }
-        if (canvas.dataset.scene === "orbit-side" && !orbitSide) orbitSide = createOrbitScene(canvas, reduced, { mode: "side" });
+
         if (canvas.dataset.scene === "globe" && !globe) {
           const cities = Array.from(root.querySelectorAll<HTMLElement>("[data-city]"));
           globe = createGlobeScene(canvas, reduced, idx => cities.forEach((c, i) => c.toggleAttribute("data-arrived", i <= idx)));
@@ -249,12 +245,114 @@ export function initPremium(root: HTMLElement): () => void {
         lastY = -1;
       } catch (err) {
         console.warn("Medtours 3D scene unavailable", err);
-        if (canvas.dataset.scene === "orbit") loader.mark("scene");
       }
     }
   }, { rootMargin: "300px 0px" });
   root.querySelectorAll<HTMLCanvasElement>("canvas[data-scene]").forEach(c => lazy.observe(c));
-  cleanups.push(() => { lazy.disconnect(); orbit?.destroy(); orbitSide?.destroy(); globe?.destroy(); });
+  cleanups.push(() => { lazy.disconnect(); orbit?.destroy(); globe?.destroy(); });
+
+  /* ---------- The single Care Orbit emblem ----------
+     One fixed, full-viewport canvas. Its pose is blended between anchors:
+     the loader mark, the hero (while it is pinned), and the promise section,
+     so the same object travels through the page. */
+  const orbitCanvas = root.querySelector<HTMLCanvasElement>("[data-orbit-canvas]");
+  const halo = root.querySelector<HTMLElement>(".pm-orbit-halo");
+  const heroAnchor = root.querySelector<HTMLElement>('[data-orbit-anchor="hero"]');
+  const sideAnchor = root.querySelector<HTMLElement>('[data-orbit-anchor="side"]');
+  const sideSection = sideAnchor?.closest<HTMLElement>("section") ?? null;
+  const loaderMark = root.querySelector<SVGElement>(".pm-loader-mark");
+  type Pose = OrbitPose;
+  const ease = (x: number) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  const mixPose = (a: Pose, b: Pose, k: number): Pose => ({
+    x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, ringPx: a.ringPx + (b.ringPx - a.ringPx) * k,
+    yaw: a.yaw + (b.yaw - a.yaw) * k, pitch: a.pitch + (b.pitch - a.pitch) * k,
+    ringRy: a.ringRy + (b.ringRy - a.ringRy) * k, ringRx: a.ringRx + (b.ringRx - a.ringRx) * k,
+    ringK: a.ringK + (b.ringK - a.ringK) * k, shadow: a.shadow + (b.shadow - a.shadow) * k,
+    interactive: k > 0.5 ? b.interactive : a.interactive, visible: true,
+  });
+  /** An anchor's box where it sits while its section is pinned (or where it is now, if nothing pins). */
+  const pinnedBox = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    const sticky = el.closest<HTMLElement>(".pm-sticky");
+    if (!sticky || reduced) return r;
+    const sr = sticky.getBoundingClientRect();
+    const top = parseFloat(getComputedStyle(sticky).top) || 0;
+    return { left: r.left, top: top + (r.top - sr.top), width: r.width, height: r.height } as DOMRect;
+  };
+  const heroPose = (t: number): Pose => {
+    const b = heroAnchor ? pinnedBox(heroAnchor) : ({ left: innerWidth * 0.45, top: 0, width: innerWidth * 0.55, height: innerHeight } as DOMRect);
+    const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
+    const size = Math.min(b.width, b.height) * 0.74 * (1 - heroP * 0.18);
+    const bob = reduced ? 0 : Math.sin(t * 0.9) * size * 0.02;
+    return {
+      x: b.left + b.width / 2, y: b.top + b.height / 2 - heroP * innerHeight * 0.05 + bob, ringPx: size,
+      yaw: idle + heroP * Math.PI * 0.9 - 0.42, pitch: 0.06 - heroP * 0.25,
+      ringRy: 0.55 + heroP * 0.5, ringRx: 0.32 + heroP * 0.9, ringK: 1, shadow: 1, interactive: true, visible: true,
+    };
+  };
+  const sidePose = (t: number): Pose => {
+    const r = sideAnchor!.getBoundingClientRect();
+    const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
+    const size = Math.min(r.width, r.height) * 0.66;
+    const bob = reduced ? 0 : Math.sin(t * 0.9) * size * 0.02;
+    return {
+      x: r.left + r.width / 2, y: r.top + r.height / 2 + bob, ringPx: size,
+      // Continues the hero's turn rather than starting over.
+      yaw: idle + Math.PI * 0.9 - 0.42 + sideP * Math.PI * 1.4, pitch: -0.19 + Math.sin(sideP * Math.PI) * 0.3,
+      ringRy: 1.05 - sideP * 0.8, ringRx: 1.22 - sideP * 1.05, ringK: 1, shadow: 1, interactive: true, visible: true,
+    };
+  };
+  // The loader's mark is measured while it is still; the flight starts from that spot.
+  let markBox: DOMRect | null = null;
+  const loaderPose = (t: number): Pose => {
+    if (loader.phase === "loading" || !markBox) {
+      const box = loaderMark?.getBoundingClientRect();
+      if (box && box.width > 0) markBox = box;
+    }
+    const r = markBox;
+    const size = r ? r.width : 220;
+    const lp = loader.lp;
+    const pop = 1 - Math.pow(1 - clamp(lp * 2.2), 3);
+    return {
+      x: r ? r.left + r.width / 2 : innerWidth / 2, y: r ? r.top + r.height / 2 : innerHeight / 2,
+      // The 3D cross fills the drawn ring; the orbit ring itself is folded away until the flight.
+      ringPx: size * 0.86 * pop,
+      yaw: -0.42 + (lp - 1) * Math.PI * 2 + (reduced ? 0 : Math.sin(t * 0.8) * 0.05), pitch: 0.06 + (1 - lp) * 0.3,
+      ringRy: 0.55, ringRx: 0.32, ringK: 0, shadow: 0, interactive: false, visible: true,
+    };
+  };
+  const getPose = (t: number): Pose => {
+    let pose: Pose;
+    if (loader.phase === "loading") pose = loaderPose(t);
+    else if (loader.phase === "flying") {
+      const f = ease((performance.now() - loader.flyStart) / (reduced ? 300 : FLIGHT_MS));
+      pose = mixPose(loaderPose(t), heroPose(t), f);
+      pose.yaw += Math.sin(Math.PI * f) * 0.9;
+      pose.ringK = clamp(f * 1.3 - 0.15);
+    } else if (sideAnchor && sideSection) {
+      const top = sideSection.getBoundingClientRect().top;
+      const stickyTop = parseFloat(getComputedStyle(sideAnchor.closest(".pm-sticky") ?? sideSection).top) || 0;
+      const w = clamp((innerHeight - top) / Math.max(1, innerHeight - stickyTop));
+      pose = mixPose(heroPose(t), sidePose(t), ease(w));
+    } else pose = heroPose(t);
+    pose.visible = pose.y + pose.ringPx > -40 && pose.y - pose.ringPx < innerHeight + 40;
+    if (halo) {
+      const glow = loader.phase === "loading" ? 0 : loader.phase === "flying" ? clamp((performance.now() - loader.flyStart) / FLIGHT_MS) : 1;
+      halo.style.transform = `translate3d(${pose.x.toFixed(1)}px, ${pose.y.toFixed(1)}px, 0) scale(${(pose.ringPx * 1.25 / 100).toFixed(3)})`;
+      halo.style.opacity = String(pose.visible ? glow : 0);
+    }
+    return pose;
+  };
+  if (orbitCanvas) {
+    try {
+      orbit = createOrbitScene(orbitCanvas, reduced, { getPose, onFirstFrame: () => loader.mark("scene") });
+      if (orbit) html.classList.add("pm-gl");
+    } catch (err) {
+      console.warn("Medtours 3D emblem unavailable", err);
+    }
+  }
+  if (!orbit) loader.mark("scene");
+  cleanups.push(() => html.classList.remove("pm-gl"));
 
   tick = requestAnimationFrame(loop);
   cleanups.push(() => cancelAnimationFrame(tick));
@@ -418,7 +516,8 @@ export function initPremium(root: HTMLElement): () => void {
 /* ---------- First-visit loader ----------
    Progress follows real milestones (fonts, page load, the hero's first 3D
    frame) but never runs faster than a short minimum, so the sequence reads. */
-type Loader = { active: boolean; mark(name: "scene"): void };
+type Loader = { active: boolean; phase: "loading" | "flying" | "done"; lp: number; flyStart: number; mark(name: "scene"): void };
+export const FLIGHT_MS = 1400;
 
 function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cleanups: (() => void)[]): Loader {
   const html = document.documentElement;
@@ -432,9 +531,10 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
   // Only a full page load of the homepage plays it; client-side navigation goes straight in.
   if (!el || el.hidden || !w.__pmLoadStart || w.__pmLoaderDone) {
     hide();
-    return { active: false, mark() {} };
+    return { active: false, phase: "done", lp: 1, flyStart: 0, mark() {} };
   }
   html.classList.add("pm-loading");
+  const api: Loader = { active: true, phase: "loading", lp: 0, flyStart: 0, mark(name) { milestones[name] = true; } };
 
   const milestones = { fonts: false, load: false, scene: false };
   const total = Object.keys(milestones).length;
@@ -459,9 +559,13 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
     steps.forEach((s, i) => s.toggleAttribute("data-active", i === steps.length - 1));
     outside.forEach(n => { n.inert = false; });
     el.dataset.state = "exit";
-    html.classList.remove("pm-loading"); // let the hero start rendering as the curtain opens
-    window.setTimeout(onReveal, reduced ? 50 : 650);
-    window.setTimeout(hide, reduced ? 350 : 1700);
+    // The emblem now flies from the loader into the hero while the curtain opens.
+    api.lp = 1;
+    api.phase = "flying";
+    api.flyStart = performance.now();
+    const flight = reduced ? 300 : FLIGHT_MS;
+    window.setTimeout(onReveal, reduced ? 50 : flight * 0.45);
+    window.setTimeout(() => { api.phase = "done"; hide(); }, flight);
   };
 
   const tick = (now: number) => {
@@ -474,6 +578,7 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
     shown += (target - shown) * (1 - Math.exp(-dt / (reduced ? 0.05 : 0.22)));
     if (target === 1 && shown > 0.985) shown = 1;
     el.style.setProperty("--lp", shown.toFixed(4));
+    api.lp = shown;
     const pct = Math.floor(shown * 100);
     if (count && count.textContent !== String(pct)) count.textContent = String(pct);
     const step = shown >= 1 ? steps.length - 1 : Math.min(steps.length - 2, Math.floor(shown * (steps.length - 1)));
@@ -503,5 +608,5 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
   });
 
   raf = requestAnimationFrame(tick);
-  return { active: true, mark(name) { milestones[name] = true; } };
+  return api;
 }
