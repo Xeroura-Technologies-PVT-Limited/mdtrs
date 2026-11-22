@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { SITE } from "@/lib/site";
 
 const CARE = ["Not sure yet", "Medical", "Surgical", "Dental", "Rehabilitation", "Longevity", "Holistic health", "Second opinion"];
@@ -9,28 +9,22 @@ type Status = "idle" | "sending" | "sent" | "error";
 
 export function EnquiryForm({
   idPrefix = "f",
-  autoFocus = false,
   defaultRole = "patient",
   defaultCare,
   onDone,
 }: {
   idPrefix?: string;
-  autoFocus?: boolean;
   defaultRole?: "patient" | "attender";
   defaultCare?: string;
   onDone?: () => void;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
   const id = (k: string) => `${idPrefix}-${k}`;
-
-  useEffect(() => {
-    if (autoFocus) setTimeout(() => nameRef.current?.focus(), 60);
-  }, [autoFocus]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (status === "sending") return;
     const form = e.currentTarget;
     const data = new FormData(form);
     const miss: string[] = [];
@@ -60,7 +54,7 @@ export function EnquiryForm({
       <div className="ok" role="status">
         <div className="tick">
           <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-            <path d="M6 13l5 5 9-10" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M6 13l5 5 9-10" pathLength="1" fill="none" stroke="currentColor" strokeWidth="2" />
           </svg>
         </div>
         <h3>Thank you</h3>
@@ -77,7 +71,7 @@ export function EnquiryForm({
   }
 
   return (
-    <form className="form" noValidate onSubmit={onSubmit}>
+    <form className="form" aria-busy={status === "sending"} noValidate onSubmit={onSubmit}>
       <fieldset className="field">
         <legend>I am</legend>
         <div className="seg">
@@ -92,17 +86,17 @@ export function EnquiryForm({
       <div className="two">
         <div className="field">
           <label htmlFor={id("name")}>Full name</label>
-          <input ref={nameRef} id={id("name")} name="name" autoComplete="name" />
+          <input id={id("name")} name="name" autoComplete="name" required />
         </div>
         <div className="field">
           <label htmlFor={id("country")}>Country</label>
-          <input id={id("country")} name="country" autoComplete="country-name" placeholder="e.g. Kenya" />
+          <input id={id("country")} name="country" autoComplete="country-name" placeholder="e.g. Kenya" required />
         </div>
       </div>
       <div className="two">
         <div className="field">
           <label htmlFor={id("phone")}>Phone or WhatsApp</label>
-          <input id={id("phone")} name="phone" type="tel" autoComplete="tel" placeholder="+254 …" />
+          <input id={id("phone")} name="phone" type="tel" autoComplete="tel" placeholder="+254 …" required />
         </div>
         <div className="field">
           <label htmlFor={id("care")}>Care needed</label>
@@ -126,7 +120,7 @@ export function EnquiryForm({
         <input id={id("files")} name="files" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx" />
       </div>
       <label className="consent">
-        <input type="checkbox" name="consent" value="yes" /> I agree that Medtours may contact me about this enquiry and keep my details securely, as described in the privacy notice.
+        <input type="checkbox" name="consent" value="yes" required /> I agree that Medtours may contact me about this enquiry and keep my details securely, as described in the privacy notice.
       </label>
       {error && (
         <p className="err" role="alert">
@@ -134,7 +128,6 @@ export function EnquiryForm({
         </p>
       )}
       <button className="btn btn-solid" type="submit" style={{ justifyContent: "center" }} disabled={status === "sending"}>
-        <span className="dot" />
         {status === "sending" ? "Sending…" : "Get a Treatment Quote"}
       </button>
     </form>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { SiteLink as Link } from "@/components/site/SiteLink";
 import { SITE } from "@/lib/site";
 import { PageHero } from "@/components/page/PageHero";
 import { CtaBand } from "@/components/page/CtaBand";
@@ -29,15 +29,14 @@ export default function AboutPage() {
       />
 
       <section className="band b-white pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap founder">
-          {/* Replace this plate with a portrait of Dr. Ravi Teja when available: <img className="art" src="/team/ravi-teja.jpg" alt="Dr. Ravi Teja" /> */}
-          <div className="plate navy founder-art" data-reveal="">
-            <LogoMark className="founder-mark" />
-          </div>
+          <figure className="founder-art" data-reveal="">
+            <img src="/editorial/arrival.webp" alt="A covered arrival entrance lit up at dusk" width={1536} height={1024} loading="lazy" />
+            <span className="founder-seal"><LogoMark className="founder-mark" /></span>
+          </figure>
           <div className="founder-txt">
             <p className="eyebrow gap">Who we are</p>
-            <h2 data-split-scroll="">Led by {SITE.founder}</h2>
+            <h2>Led by {SITE.founder}</h2>
             <p className="lead">
               Medtours is led by {SITE.founder}. The idea behind it is simple: international patients should have a doctor guiding their choice of
               hospital and specialist, and a team that takes care of everything around the treatment.
@@ -47,19 +46,18 @@ export default function AboutPage() {
               sends you an itemised estimate. From there, one coordinator stays with you from the visa application to your follow-up calls at home.
             </p>
             <div className="hero-cta">
-              <Link className="btn btn-ghost mag" href="/contact">Contact the team</Link>
+              <Link className="btn btn-ghost" href="/contact">Contact the team</Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="band b-paper pad promises">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
+      <section className="band b-paper pad about-principles">
         <div className="wrap">
           <div className="top">
             <div>
               <p className="eyebrow gap">How we work</p>
-              <h2 data-split-scroll="">What we <em>promise</em></h2>
+              <h2>What we <em>promise</em></h2>
             </div>
             <p className="lead">Four commitments we hold to on every case, whatever the treatment.</p>
           </div>
@@ -74,11 +72,10 @@ export default function AboutPage() {
       </section>
 
       <section className="band b-peri pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap split">
           <div>
             <p className="eyebrow gap">Two journeys</p>
-            <h2 data-split-scroll="">Patients <em>and</em> attenders</h2>
+            <h2>Patients <em>and</em> attenders</h2>
           </div>
           <div className="two-cards">
             <div className="icard" data-reveal="">

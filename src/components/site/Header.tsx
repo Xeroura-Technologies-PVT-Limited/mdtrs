@@ -1,154 +1,171 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { NAV, SITE } from "@/lib/site";
-import { getLenis, scrollToTarget } from "@/lib/scroll";
+import { SiteLink as Link } from "@/components/site/SiteLink";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { GUIDE_LINKS, NAV, SITE } from "@/lib/site";
 import { LogoLockup } from "./Logo";
+
+const stops = NAV.filter((link) => link.href.includes("#"));
+const home = { href: "/", label: "Home", kicker: "" };
 
 export function Header() {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
+  const [stop, setStop] = useState("");
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const dropdown = useRef<HTMLDetailsElement>(null);
 
-  // Body classes drive the menu, header colours and the header CTA.
-  useEffect(() => {
-    document.body.classList.toggle("menu-open", open);
-    const lenis = getLenis();
-    if (lenis) {
-      if (open) lenis.stop();
-      else lenis.start();
-    }
-  }, [open]);
+  function closeMenu() {
+    setOpen(false);
+    trigger.current?.focus({ preventScroll: true });
+  }
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 30);
-      const prologue = document.getElementById("prologue");
-      // On the homepage the header CTA waits until the hero story is over.
-      document.body.classList.toggle(
-        "cta-on",
-        prologue ? prologue.getBoundingClientRect().top < window.innerHeight * 0.5 : true,
-      );
-      if (!document.body.classList.contains("menu-open")) {
-        if (y > lastY.current + 2 && y > 600) setHidden(true);
-        else if (y < lastY.current - 2) setHidden(false);
-      }
-      lastY.current = y;
+    if (pathname !== "/") return;
+    let frame = 0;
+    const update = () => {
+      const y = (document.querySelector("header")?.offsetHeight ?? 78) + 36;
+      const section = stops.find(({href}) => {
+        const el = document.getElementById(href.slice(2));
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top <= y && rect.bottom > y;
+      });
+      setStop(section?.href ?? "");
+      frame = 0;
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    window.addEventListener("mt:locationchange", queue);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", queue);
+      window.removeEventListener("resize", queue);
+      window.removeEventListener("mt:locationchange", queue);
+    };
   }, [pathname]);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+    if (!open) return;
+    const drawer = menu.current;
+    const background = document.querySelectorAll<HTMLElement>("main, footer, .skip-link");
+    background.forEach(el => { el.inert = true; });
+    const initialLink = drawer?.querySelector<HTMLAnchorElement>("nav a[aria-current]")
+      ?? drawer?.querySelector<HTMLAnchorElement>("nav a");
+    initialLink?.focus({ preventScroll: true });
+    const closeForDialog = () => setOpen(false);
+    const breakpoint = matchMedia("(min-width:1081px)");
+    const onResize = () => { if (breakpoint.matches) setOpen(false); };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); closeMenu(); }
+      if (event.key !== "Tab" || !drawer) return;
+      const last = drawer.querySelectorAll<HTMLElement>("a[href],button");
+      if (event.shiftKey && document.activeElement === trigger.current) {
+        event.preventDefault(); last[last.length - 1]?.focus();
+      } else if (!event.shiftKey && document.activeElement === last[last.length - 1]) {
+        event.preventDefault(); trigger.current?.focus();
+      }
     };
-    const onClose = () => setOpen(false);
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("mt:close-menu", onClose);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("mt:close-menu", closeForDialog);
+    breakpoint.addEventListener("change", onResize);
     return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("mt:close-menu", onClose);
+      background.forEach(el => { el.inert = false; });
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("mt:close-menu", closeForDialog);
+      breakpoint.removeEventListener("change", onResize);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const closeOutside = (event: Event) => {
+      if (dropdown.current && !dropdown.current.contains(event.target as Node)) dropdown.current.open = false;
+    };
+    const closeOnNavigation = () => {
+      if (menu.current?.contains(document.activeElement)) closeMenu();
+      else setOpen(false);
+      const details = dropdown.current;
+      if (details?.open) {
+        if (details.contains(document.activeElement)) details.querySelector("summary")?.focus({ preventScroll: true });
+        details.open = false;
+      }
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("focusin", closeOutside);
+    window.addEventListener("mt:locationchange", closeOnNavigation);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("focusin", closeOutside);
+      window.removeEventListener("mt:locationchange", closeOnNavigation);
     };
   }, []);
 
-  // Close the menu on route change.
-  useEffect(() => setOpen(false), [pathname]);
-
-  const onNav = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      const [path, hash] = href.split("#");
-      setOpen(false);
-      if (hash && (path || "/") === pathname) {
-        e.preventDefault();
-        setTimeout(() => scrollToTarget(document.getElementById(hash)), 350);
-      } else if (!hash && href === pathname) {
-        e.preventDefault();
-      } else {
-        e.preventDefault();
-        setTimeout(() => router.push(href), 250);
-      }
-    },
-    [pathname, router],
+  const current = (href: string) => {
+    if (href.includes("#")) return pathname === "/" && stop === href ? "location" : undefined;
+    if (href === "/treatments" && pathname.startsWith("/treatments/")) return "location";
+    return pathname === href && (href !== "/" || !stop) ? "page" : undefined;
+  };
+  const plainLink = ({ href, label }: typeof home) => (
+    <Link className="nav-item" href={href} key={href} aria-current={current(href)}>{label}</Link>
   );
 
   return (
-    <>
-      <header className={`hdr${scrolled ? " scrolled" : ""}${hidden ? " hide" : ""}`} id="hdr">
-        <div className="wrap">
-          <Link
-            className="logo"
-            href="/"
-            aria-label="Medtours home"
-            onClick={(e) => {
-              if (pathname === "/") {
-                e.preventDefault();
-                const lenis = getLenis();
-                if (lenis) lenis.scrollTo(0, { duration: 1.6 });
-                else window.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            }}
-          >
-            <LogoLockup />
-          </Link>
-          <div className="hdr-actions">
-            <button className="btn btn-solid hide-sm mag hdr-cta" data-open="enquire" type="button">
-              <span className="dot" />
-              Get a Treatment Quote
-            </button>
-            <button
-              className="menu-btn"
-              type="button"
-              aria-expanded={open}
-              aria-controls="menu"
-              onClick={() => setOpen((o) => !o)}
-            >
-              <span className="burger" />
-              <span>{open ? "Close" : "Menu"}</span>
-            </button>
-          </div>
+    <header className="hdr" id="hdr">
+      <div className="wrap">
+        <Link className="logo" href="/" onClick={() => setOpen(false)}>
+          <LogoLockup /><span className="sr-only"> home</span>
+        </Link>
+        <nav className="desk-nav" aria-label="Main navigation">
+          {plainLink(home)}
+          {plainLink(NAV[0])}
+          <details className="nav-drop" ref={dropdown} onKeyDown={(event) => {
+            if (event.key === "Escape" && dropdown.current?.open) {
+              dropdown.current.open = false;
+              dropdown.current.querySelector("summary")?.focus();
+            }
+          }}>
+            <summary className={(pathname === "/" && stop) || GUIDE_LINKS.some(link => link.href === pathname) ? "current" : ""}>Your journey
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 6 4.5 4 4.5-4" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
+            </summary>
+            <div className="drop-links">
+              {[{ title: "On this journey", links: stops }, { title: "Explore our guides", links: GUIDE_LINKS }].map(group =>
+                <div className="menu-group" key={group.title}><p className="mono">{group.title}</p>
+                  {group.links.map(({href,label}) => <Link key={href} href={href} aria-current={current(href)} onClick={() => {
+                    if (dropdown.current) { dropdown.current.open = false; dropdown.current.querySelector("summary")?.focus(); }
+                  }}>{label}<span aria-hidden="true">↗</span></Link>)}
+                </div>)}
+            </div>
+          </details>
+          {NAV.filter(link => !link.href.includes("#") && link.href !== NAV[0].href).map(plainLink)}
+        </nav>
+        <div className="hdr-actions">
+          <button className="btn hdr-cta" type="button" data-open="enquire">Get a Treatment Quote <span aria-hidden="true">↗</span></button>
+          <button className="menu-btn" type="button" aria-expanded={open} aria-controls="mobile-menu" ref={trigger}
+            onClick={() => open ? closeMenu() : setOpen(true)}>
+            <span>{open ? "Close" : "Menu"}</span><span className="burger" aria-hidden="true" />
+          </button>
         </div>
-      </header>
-
-      <div className="menu" id="menu" aria-hidden={!open} inert={!open}>
+      </div>
+      <div className={`menu-scrim${open ? " is-open" : ""}`} aria-hidden="true" onClick={closeMenu} />
+      <div id="mobile-menu" ref={menu} className={`mobile-menu${open ? " is-open" : ""}`} inert={!open} aria-hidden={!open}>
         <div className="wrap">
-          <nav aria-label="Main">
-            {NAV.map((l, i) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={(e) => onNav(e, l.href)}
-                style={{ transitionDelay: open ? `${0.25 + i * 0.05}s` : "0s" }}
-                aria-current={l.href === pathname ? "page" : undefined}
-              >
-                <small>{l.kicker}</small>
-                {l.label}
-              </Link>
-            ))}
+          <nav aria-label="Mobile navigation">
+            {[home, ...NAV].map(({href,label,kicker}) => <Link href={href} key={href} aria-current={current(href)} prefetch={open ? null : false} onClick={closeMenu}>{label}<span>{kicker}</span></Link>)}
+            <div className="mobile-guides"><p className="mono">Explore our guides</p>
+              {GUIDE_LINKS.map(({href,label}) => <Link href={href} key={href} aria-current={current(href)} prefetch={open ? null : false} onClick={closeMenu}>{label}<span aria-hidden="true">↗</span></Link>)}
+            </div>
           </nav>
-          <div className="menu-side">
-            <div>
-              <strong>Speak to us</strong>
-              <span style={{ userSelect: "all" }}>{SITE.phone}</span>
-              <br />
-              <span style={{ userSelect: "all", overflowWrap: "anywhere" }}>{SITE.email}</span>
-            </div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button className="btn btn-solid" data-open="enquire" type="button">
-                <span className="dot" />
-                Get a Treatment Quote
-              </button>
-            </div>
+          <div className="menu-contact">
+            <button className="btn" data-open="enquire" type="button">Get a Treatment Quote</button>
+            <a href={SITE.phoneHref}>{SITE.phone}</a>
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
           </div>
         </div>
       </div>
-    </>
+    </header>
   );
 }

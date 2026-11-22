@@ -27,6 +27,14 @@ export const NAV: NavLink[] = [
   { href: "/contact", label: "Contact", kicker: "Talk" },
 ];
 
+export const GUIDE_LINKS: NavLink[] = [
+  { href: "/patient-journey", label: "Patient journey", kicker: "Itinerary" },
+  { href: "/hospitals", label: "Hospitals", kicker: "Network" },
+  { href: "/doctors", label: "Doctors", kicker: "Clinical team" },
+  { href: "/wellness", label: "Wellness", kicker: "Programmes" },
+  { href: "/hospitality", label: "Hospitality", kicker: "Your stay" },
+];
+
 export type Treatment = {
   slug: string;
   name: string;
@@ -40,13 +48,18 @@ export type Treatment = {
   notes: { title: string; text: string }[];
 };
 
+export function treatmentSources(file: string) {
+  const prefix = file.replace("/treatments/", "/treatments/previews/").replace(/\.webp$/, "");
+  return `${prefix}-600.webp 600w, ${prefix}-900.webp 900w, ${file} 1280w`;
+}
+
 export const TREATMENTS: Treatment[] = [
   {
     slug: "medical",
     name: "Medical",
     group: "Clinical",
-    render: "/renders/medical.jpg",
-    alt: "A two-tone capsule and tablets",
+    render: "/editorial/treatments/medical.webp",
+    alt: "A doctor and patient reviewing a tablet together",
     summary:
       "Diagnosis and treatment without surgery, and second opinions from senior physicians before you decide.",
     intro:
@@ -73,8 +86,8 @@ export const TREATMENTS: Treatment[] = [
     slug: "surgical",
     name: "Surgical",
     group: "Clinical",
-    render: "/renders/care-orbit.jpg",
-    alt: "A soft white medical cross circled by an orbit",
+    render: "/editorial/treatments/surgical.webp",
+    alt: "A surgical team preparing an operating room",
     summary:
       "Planned operations by experienced surgical teams, from joint replacement to cardiac and transplant surgery.",
     intro:
@@ -101,8 +114,8 @@ export const TREATMENTS: Treatment[] = [
     slug: "dental",
     name: "Dental",
     group: "Clinical",
-    render: "/renders/dental.jpg",
-    alt: "A sculpted white tooth on a pedestal",
+    render: "/editorial/treatments/dental.webp",
+    alt: "A dentist examining a patient in a dental chair",
     summary:
       "Implants, smile restoration and full-mouth rehabilitation, often completed within a single trip.",
     intro:
@@ -127,8 +140,8 @@ export const TREATMENTS: Treatment[] = [
     slug: "rehabilitation",
     name: "Rehabilitation",
     group: "Clinical",
-    render: "/renders/rehab.jpg",
-    alt: "Balanced stones",
+    render: "/editorial/treatments/rehabilitation.webp",
+    alt: "A physiotherapist supporting a patient at parallel bars",
     summary:
       "Physiotherapy and recovery programmes after surgery, stroke or injury, built into your stay.",
     intro:
@@ -153,8 +166,8 @@ export const TREATMENTS: Treatment[] = [
     slug: "longevity",
     name: "Longevity",
     group: "Wellness",
-    render: "/renders/longevity.jpg",
-    alt: "A DNA helix",
+    render: "/editorial/treatments/longevity.webp",
+    alt: "A clinician measuring a patient's blood pressure",
     summary:
       "Advanced screening and a personal plan to stay healthy for longer, reviewed by physicians.",
     intro:
@@ -179,8 +192,8 @@ export const TREATMENTS: Treatment[] = [
     slug: "holistic-health",
     name: "Holistic health",
     group: "Wellness",
-    render: "/renders/holistic.jpg",
-    alt: "A lotus flower",
+    render: "/editorial/treatments/holistic.webp",
+    alt: "A seated group stretching with a yoga instructor",
     summary:
       "Ayurveda, yoga and nutrition programmes for recovery and balance, in calm retreat settings.",
     intro:

@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="425" viewBox="0 0 600 425">
+  <title>A waterfront hospital and palace hotel in India</title>
+  <defs>
+    <linearGradient id="arrival-sky" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#e7dcd1" />
+      <stop offset="1" stop-color="#faf1e2" />
+    </linearGradient>
+    <linearGradient id="arrival-lake" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#b7a8a6" />
+      <stop offset="1" stop-color="#76606b" />
+    </linearGradient>
+    <pattern id="arrival-hatch" width="5" height="5" patternUnits="userSpaceOnUse">
+      <path d="M-1 4L4-1M1 6l5-5" stroke="#5b4252" stroke-width=".65" opacity=".34" />
+    </pattern>
+    <pattern id="arrival-paper" width="13" height="17" patternUnits="userSpaceOnUse">
+      <path d="M1 2h.7m5 8h1m4-5h.5M2 15h1" stroke="#442a3e" stroke-width=".8" opacity=".12" />
+      <path d="M4 5h1m5 8h1.2m-4 3h.5" stroke="#fdf4e5" stroke-width=".8" opacity=".3" />
+    </pattern>
+    <pattern id="arrival-sun-lines" width="5" height="5" patternUnits="userSpaceOnUse">
+      <path d="M0 .5h5" stroke="#dfd3ca" opacity=".45" />
+    </pattern>
+    <path id="arrival-backridge" d="M0 223l31-16 25-4 31-22 18 5 43-29 27 12 32 21 31-10 30 12 38-21 18 1 33-34 17-6 19 12 17-5 24 13 24-10 35 24 27-19 18 3 30-16 25 16 15-9v156H0Z" />
+    <path id="arrival-ripple" d="M0 0h38m7 0h9m8 2h27m16-1h12" />
+    <g id="palm" fill="currentColor">
+      <path d="M-1 1C-3 32-9 61-15 85h5C-5 62 1 27 1 1Z" />
+      <g stroke="currentColor" stroke-width=".7" stroke-linejoin="round">
+        <path d="M0 0Q-23-19-46 1l10-4-5 5 10-6-3 4 11-5-2 3 11-3-2 2Z" />
+        <path d="M0 0Q-16-28-36-20l8 1-4 2 8-1-1 2 8 1-2 1 9 4-2 1Z" />
+        <path d="M0 0Q-7-24-1-31l-1 9 2-3-1 8 2-2-1 10 1-2Z" />
+        <path d="M0 1Q7-26 32-24l-7 3 4 1-9 2 2 1-8 3 1 1-7 5 2-1Z" />
+        <path d="M0 1Q22-15 43-2l-8-2 2 3-9-4 3 3-9-3 2 2-11-2 2 2Z" />
+        <path d="M0 1Q27-4 35 24l-6-7 1 4-6-9 1 4-7-9 1 3-9-7 2 4Z" />
+        <path d="M0 1Q-21 2-27 29l5-7v4l5-11-1 5 5-9v3l7-8-1 3Z" />
+        <path d="M0 1Q11 11 8 33L6 23l-1 3-1-10-1 3-1-10-1 3Z" />
+      </g>
+    </g>
+    <g id="pavilion">
+      <path d="M-13 0h26v20h-26Z" fill="#d2c5be" />
+      <path d="M-10 19V8q0-4 3-5 3 1 3 5v11Zm9 0V8q0-4 3-5 3 1 3 5v11Z" fill="#5f4756" />
+      <path d="M8 1h5v18H8Z" fill="#917e84" />
+      <path d="M-17 1h34l-2-3h-30Z" fill="#634b5a" />
+      <path d="M-14-3Q-14-11-5-16q4-2 5-5 1 3 5 5 9 5 9 13Z" fill="#9f8d90" />
+      <path d="M0-20q8 8 6 17h8q0-9-10-14Z" fill="#77626c" />
+      <path d="M0-20v-7m-2 5h4" fill="none" stroke="#614958" stroke-width="1.2" />
+      <path d="M-13-3h26M-14 19h28" fill="none" stroke="#e9ded3" stroke-width="1.5" />
+    </g>
+  </defs>
+  <g id="sky">
+    <path fill="url(#arrival-sky)" d="M0 0h600v425H0Z" />
+    <circle cx="439" cy="109" r="66" fill="#af9f9f" />
+    <circle cx="439" cy="109" r="66" fill="url(#arrival-sun-lines)" />
+    <g fill="#fdf4e5">
+      <path d="M-5 88h19q4-5 12-5 7-8 14-3 6-3 12 2h12q5 0 7 3h35l-6 2-65 1-40 3Z" />
+      <path d="M249 29h29q3-5 11-4 7-8 15-3 7-2 12 2l28 1 8 3-50 1-53 2Z" />
+      <path d="M434 91h25q6-6 14-4 5-9 17-7 10-7 19 0 12-2 18 5h22l13 3h-64l-64 5Z" />
+      <path d="M26 166l41-2 12-3 18 2h24l10 3-66 1Z" />
+    </g>
+    <g fill="none" stroke="#aa999a" stroke-width="1" stroke-linecap="round" opacity=".65">
+      <path d="M35 94h55m9-1h15m175-59h38m149 60h66m6 0h12m-83 10h29" />
+      <path d="M237 129q5-2 8 2 1-5 6-6m62 26q4-3 6 0 1-4 4-4m196-88q3-2 6 1 2-4 6-4" stroke="#664f5d" stroke-width="1.5" />
+    </g>
+  </g>
+  <g id="distant-ridges">
+    <use href="#arrival-backridge" fill="#c7b9b4" />
+    <use href="#arrival-backridge" fill="url(#arrival-hatch)" opacity=".43" />
+    <path d="M0 235l28-13 21-1 26-13 34 10 26-20 16-2 37 17 37-11 22-12 39 18 31-1 43-20 22 5 20-10 30 7 29 15 27-10 27 7 27-16 18 5 23-14 17 9v123H0Z" fill="#b5a6a4" />
+    <path d="M0 253q31-27 60-23 40 3 68-4 41-12 85 8 29 6 65-5 41-14 69-4 37 15 70 7 35-9 66-7 35 2 64-8 29-13 53-9v108H0Z" fill="#a19092" />
+    <g fill="none" stroke="#d5c8c1" stroke-width="1.2" opacity=".72">
+      <path d="M7 234l26-13 14-1m30-15 11-10 11-3m49-30-17 15-8 4m124 14-11-4-19 7m126-47 16-12 9-2m122 26 17-11 12-1m29 2 12-5 5 1" />
+    </g>
+    <g fill="#867179">
+      <path d="M0 287v-39q4-16 12-9 6-17 14-13 10 0 13 22 9-15 16-5 11-7 16 11 9-11 17-4v38Zm229 11v-44q6-12 14-7 6-17 15-9 8-15 18-1 6-7 10 3 11-19 24-2 10-18 19-4 8-6 13 16v46Zm276-16v-43q5-18 14-9 7-9 11 0 9-16 15-5 9-17 17-8 6-19 16-8 10-11 22 1v71Z" />
+    </g>
+    <use href="#palm" transform="translate(47 228) scale(0.61)" color="#8c787f" />
+    <use href="#palm" transform="translate(283 232) scale(0.47)" color="#8b777e" />
+    <use href="#palm" transform="translate(554 211) scale(0.8)" color="#8c787f" />
+  </g>
+  <g id="hospital">
+    <path d="M44 255l36-13h56v69H44Z" fill="#c6b8b3" />
+    <path d="M187 226l22-14h56v96h-78Z" fill="#af9e9e" />
+    <path d="M202 227l63-1v65h-63Z" fill="#d5c8c0" />
+    <path d="M109 188l34-17h66v143H109Z" fill="#ac9b9c" />
+    <path d="M102 186l33-17h78l-28 17Z" fill="#fdf4e5" />
+    <path d="M104 186h80v126h-80Z" fill="#f7ede0" />
+    <path d="M184 186l27-16v139l-27 4Z" fill="#c4b5b1" />
+    <path d="M102 186h83v4h-83Z" fill="#d2c5be" />
+    <path d="M185 187l27-16v4l-27 16Z" fill="#a39193" />
+    <path d="M125 193h10v7h7v10h-7v7h-10v-7h-7v-10h7Z" fill="#563d4e" />
+    <path d="M146 198h28m-28 4h20" stroke="#bfb0ad" stroke-width="1.25" />
+    <path d="M114 229h59v18h-59Z" fill="#6c5562" />
+    <path d="M116 231h56m-56 8h54m-47-9v16m14-16v16m15-16v16m12-16v16" fill="none" stroke="#d2c5be" stroke-width="1.3" />
+    <path d="M114 255h59v16h-59Z" fill="#7a646e" />
+    <path d="M115 263h58m-50-7v14m14-14v14m15-14v14m12-14v14" fill="none" stroke="#d5c8c1" stroke-width="1.2" />
+    <path d="M191 227l15-8v15l-15 8Zm0 24 15-7v15l-15 7Z" fill="#745e69" />
+    <path d="M198 223v14m0 10v15" stroke="#c3b4b0" stroke-width="1.5" />
+    <path d="M217 235h44v12h-44Zm0 20h44v12h-44Z" fill="#917e84" />
+    <path d="M224 234v14m0 6v14" stroke="#d8ccc4" stroke-width="1.8" />
+    <path d="M237 234v14m0 6v14" stroke="#d8ccc4" stroke-width="1.8" />
+    <path d="M249 234v14m0 6v14" stroke="#d8ccc4" stroke-width="1.8" />
+    <path d="M48 256h57v52H48Z" fill="#ded2c9" />
+    <path d="M47 257h58m-58 18h57" stroke="#b3a3a2" stroke-width="3" />
+    <path d="M58 262h33v8H58Zm0 19h33v8H58Z" fill="#9b888c" />
+    <path d="M68 262v8m13-8v8m-13 11v8m13-8v8" stroke="#d3c6bf" stroke-width="2" />
+    <path d="M53 295l37-15h70v31H53Z" fill="#e0d4ca" />
+    <path d="M91 282h68v13H91Z" fill="#ede3d7" />
+    <text x="125" y="291.7" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.6" font-weight="bold" letter-spacing="1.25" fill="#361a31">HOSPITAL</text>
+    <path d="M68 300h90v4H68Z" fill="#9e8b8f" />
+    <path d="M82 304v12m63-12v12" stroke="#ddd1c8" stroke-width="4" />
+    <path d="M96 305h33v11H96Z" fill="#6c5562" />
+    <path d="M112 304v13" stroke="#d0c3bc" stroke-width="2" />
+  </g>
+  <g id="palace-hotel">
+    <path d="M289 307v-46h39v-26h28v-19h113v18h30v14h58v60Z" fill="#917e83" />
+    <path d="M283 264h51v41h-51Zm47-23h39v66h-39Zm135 2h34v65h-34Zm28 12h60v54h-60Z" fill="#bdaeab" />
+    <path d="M283 266h48m-2-25h35m106 4h30m-4 9h56" fill="none" stroke="#dacec6" stroke-width="4" />
+    <path d="M294 300v-20q0-6 5-8 5 2 5 8v20Zm17 0v-20q0-6 5-8 5 2 5 8v20Z" fill="#705a66" />
+    <use href="#pavilion" transform="translate(344 218) scale(0.93)" />
+    <use href="#pavilion" transform="translate(490 219) scale(0.87)" />
+    <use href="#pavilion" transform="translate(529 239) scale(0.72)" />
+    <path d="M327 240h35v22h-35Zm145 0h34v24h-34Z" fill="#cdc0ba" />
+    <path d="M327 240h35m110 0h34" stroke="#6f5864" stroke-width="3" />
+    <path d="M355 235l17-7v-30l11-10h59l10 11v28l18 7v74H355Z" fill="#bcadaa" />
+    <path d="M369 202h86v29h-86Z" fill="#d4c7c0" />
+    <path d="M434 203h18v26h-18Z" fill="#907d83" />
+    <path d="M365 200l4-5h86l5 5v3h-95Z" fill="#664e5c" />
+    <path d="M372 194q-1-18 11-30c9-8 23-15 29-27 5 12 20 19 29 28q12 13 10 29Z" fill="#a79698" />
+    <path d="M412 139q31 25 28 55h11q4-20-14-34-18-14-25-21Z" fill="#7e6872" />
+    <path d="M374 191q1-16 13-26 16-13 23-22m-24 48q0-15 8-28m9 28q-2-16 2-31m15 31q2-24-6-44m18 44q2-15-7-30" fill="none" stroke="#dfd3ca" stroke-width="1.25" />
+    <path d="M372 192h80v4h-80Z" fill="#d9cdc5" />
+    <path d="M408 137h8l-1-3h-6Zm4-5v-9" fill="#634c5a" stroke="#634c5a" stroke-width="1.2" />
+    <circle cx="412" cy="130" r="2" fill="#7c6770" />
+    <path transform="translate(379 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path transform="translate(391 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path transform="translate(403 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path transform="translate(415 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path transform="translate(427 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path transform="translate(439 0)" d="M0 224v-11q0-4 3-6 4 2 4 6v11Z" fill="#705965" />
+    <path d="M351 234l17-7h87l17 7v4H351Z" fill="#745e69" />
+    <path d="M355 237h114v4H355Z" fill="#ddd1c8" />
+    <path d="M349 254h124v54H349Z" fill="#bcadaa" />
+    <path d="M347 255h128v5H347Z" fill="#735d68" />
+    <path d="M347 254h128" stroke="#dbcec6" stroke-width="2" />
+    <g transform="translate(337 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(352 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(369 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(388 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(411 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(433 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(451 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(468 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(483 0)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(507 8)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(525 8)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <g transform="translate(541 8)">
+      <path d="M-5 303v-24q0-5 2-7l3-2 3 2q2 2 2 7v24Z" fill="#664f5c" />
+      <path d="M-6 303v-25q0-7 6-10" fill="none" stroke="#e7dbd1" stroke-width="1.3" />
+    </g>
+    <path d="M366 245h90" stroke="#917e84" stroke-width="1.5" />
+    <rect x="390" y="242" width="43" height="12" rx="1" fill="#ddd1c8" />
+    <text x="412" y="251.4" text-anchor="middle" font-family="Georgia, serif" font-size="9" font-weight="bold" letter-spacing="1.6" fill="#5d4454">HOTEL</text>
+    <path d="M286 308h265v8H286Z" fill="#927e84" />
+    <path d="M289 308h260m-246 5h49m40 0h116" fill="none" stroke="#d3c6bf" stroke-width="1.4" />
+  </g>
+  <g id="waterfront">
+    <path d="M0 318q61-6 119-4l123 1 47-5 70 5 102-6 63 3 76-4v117H0Z" fill="url(#arrival-lake)" />
+    <path d="M0 313q28-4 48-1l54 3 68-4 72 1 49-5 66 5 94-5 74 2 75-5v8l-74 3-84-2-84 5-67-6-51 7-68-1-71 3-65-5-36 3Z" fill="#755f6a" />
+    <path d="M36 323l57-2 51 2-12 2 31 1-3 1-76-1 6-2Zm243 0 61-2 62 2 48-3 51 1-18 3-65 1-36 2-40-2-31 1Zm-179 12 48-1 27 1-11 2-58 1Zm236-4 89 1-13 2-70 1Zm33 10 26-1 28 1-19 2Zm-14 5h37l-19 2Z" fill="#cbbdb8" opacity=".83" />
+    <g stroke="#d9cdc5" fill="none" stroke-width="1" opacity=".73">
+      <use href="#arrival-ripple" transform="translate(11 333) scale(.65 1)" />
+      <use href="#arrival-ripple" transform="translate(188 325) scale(.73 1)" />
+      <use href="#arrival-ripple" transform="translate(479 327) scale(.9 1)" />
+      <use href="#arrival-ripple" transform="translate(101 348)" />
+      <use href="#arrival-ripple" transform="translate(273 355) scale(.84 1)" />
+      <use href="#arrival-ripple" transform="translate(420 344)" />
+      <use href="#arrival-ripple" transform="translate(47 368) scale(.9 1)" />
+      <use href="#arrival-ripple" transform="translate(229 371) scale(1.1 1)" />
+      <use href="#arrival-ripple" transform="translate(133 389)" />
+    </g>
+    <g transform="translate(396 366)">
+      <path d="M-4 5h44l-10 2H8Z" fill="#867179" />
+      <path d="M0-2q15 4 30 2l13-3-7 6H7Z" fill="#614958" />
+      <path d="M10-1v-9m19 10v-10m5 9v-8" fill="none" stroke="#735d68" stroke-width="1.5" />
+      <path d="M6-9q4-6 8-6h14q5 0 9 6Z" fill="#c1b2ae" />
+      <path d="M26-15q6 0 11 6h-5Z" fill="#9a888b" />
+      <path d="M-6 3l11-1m9 2h16" fill="none" stroke="#d6c9c2" stroke-width=".9" />
+    </g>
+    <g fill="#6e5764">
+      <path d="M0 309q10-10 20-12 6-14 15-5 8-14 18-5 8-6 17 7 14-12 21-3 10-3 15 8 5-4 12 2l13 11-131 8Zm177 4 10-11q7-5 12 1 5-13 12-6 7-12 19 0 10-14 20-6 10-10 19 3 8-10 15 3 7-7 17 4l15 10Zm312-2 12-11q6-10 13-4 5-10 10-5 8-12 15-3 12-12 24 6 9-9 21-4 5-8 16-6v26Z" />
+    </g>
+    <use href="#palm" transform="translate(26 229) scale(0.93)" color="#6e5864" />
+    <use href="#palm" transform="translate(249 255) scale(0.67)" color="#76616b" />
+    <use href="#palm" transform="translate(580 209) scale(1.12)" color="#6d5663" />
+  </g>
+  <g id="near-shore">
+    <path d="M0 363q28 4 57 17 29 16 74 19l94 13 62 13H0Z" fill="#a59395" />
+    <path d="M0 371q41 5 82 25 40 14 88 15l80 14H0Z" fill="#78636d" />
+    <path d="M600 333q-40 13-70 30-34 19-73 24-48 9-78 23l-46 15h267Z" fill="#99878b" />
+    <path d="M600 344q-34 8-63 26-31 20-82 26l-57 18-23 11h225Z" fill="#725b67" />
+    <path d="M600 346q-25 18-49 30-34 20-83 25l-41 12-25 12h198Z" fill="url(#arrival-hatch)" />
+    <g fill="none" stroke="#b9aaa8" stroke-width="1.3">
+      <path d="M0 378q33 4 62 20m-45-4 35 12m78 9 37 3m277-11 39-8 28-8m-86 21 17-6m88-23 26-15m-9 17 33-19m-21 22 16-9" />
+    </g>
+    <path d="M0 354q5-3 12 1 2-8 5-10 4 6 4 11 8-7 15-6-5 7-11 10 7-1 13 5-6 2-14 0c19 6 35 15 47 22l23 13 29 6 37 12 44 7H0Z" fill="#573f4f" />
+    <path d="M600 337q-7 0-13 8-2-13-6-17-3 13-1 23-8-7-17-6 5 8 14 12-12 1-16 7 10 0 17-4-10 12-28 19l-28 12-15 8-34 6-29 10-34 10h190Z" fill="#573f4f" />
+    <path d="M0 391q14-4 30 4t27 5M506 414q16-10 28-11l26-13m-34 18 21-6m11-8 18-6" fill="none" stroke="#b4a4a3" opacity=".66" />
+  </g>
+  <path d="M0 0h600v425H0Z" fill="url(#arrival-paper)" pointer-events="none" id="paper-grain" />
+  <g transform="translate(18 43)" fill="#584050" id="india-imprint">
+    <text font-family="Georgia, serif" font-size="38" letter-spacing="2.5">INDIA</text>
+    <path d="M1 6h110m-110 3h35" fill="none" stroke="#8a767d" stroke-width=".8" />
+  </g>
+</svg>

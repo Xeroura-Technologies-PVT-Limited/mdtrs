@@ -13,7 +13,6 @@ export default function PrivacyPage() {
     <>
       <PageHero crumbs={[{ href: "/privacy", label: "Privacy" }]} eyebrow="Last updated November 2026" title="Privacy notice" />
       <section className="band b-white pad">
-        <svg className="edge" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100C320 10 1120 10 1440 100Z" /></svg>
         <div className="wrap">
           <div className="prose">
             <p>

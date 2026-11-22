@@ -9,23 +9,24 @@ import { Journey } from "@/components/home/Journey";
 import { Cities } from "@/components/home/Cities";
 import { HomeFaq } from "@/components/home/HomeFaq";
 import { Closing } from "@/components/home/Closing";
-import { HomeMotion } from "@/components/home/HomeMotion";
+import "@/styles/atlas-home.css";
 
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <Prologue />
-      <PromiseSection />
-      <Marquee />
-      <Care />
-      <Journeys />
-      <Hospitals />
-      <Journey />
-      <Cities />
-      <HomeFaq />
-      <Closing />
-      <HomeMotion />
+      <div className="atlas-content">
+        <Care />
+        <Prologue />
+        <Journeys />
+        <PromiseSection />
+        <Hospitals showArrival />
+        <Journey />
+        <Cities />
+        <HomeFaq />
+        <Marquee />
+        <Closing />
+      </div>
     </>
   );
 }
