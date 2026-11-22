@@ -2,6 +2,7 @@ import { SiteLink as Link } from "@/components/site/SiteLink";
 import { FAQ, SITE, TREATMENTS, treatmentSources } from "@/lib/site";
 import { ORIGINS } from "@/lib/premium/globe-scene";
 import { PremiumMotion } from "./PremiumMotion";
+import { PremiumLoader } from "./PremiumLoader";
 
 const Arrow = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className="pm-arrow"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -66,6 +67,7 @@ export function PremiumHome() {
   const faqs = FAQ.slice(0, 5);
   return (
     <div id="pm-home" className="pm">
+      <PremiumLoader />
       <PremiumMotion />
 
       {/* 1 · Hero: the Care Orbit emblem in 3D */}
@@ -105,7 +107,11 @@ export function PremiumHome() {
       {/* 2 · Manifesto: words light up as you read */}
       <section className="pm-manifesto" data-progress="manifesto" aria-labelledby="pm-manifesto-title">
         <div className="pm-sticky">
-          <div className="wrap">
+          <div className="pm-manifesto-art" data-scene-wrap>
+            <div className="pm-halo" aria-hidden="true" />
+            <canvas className="pm-canvas" data-scene="orbit-side" data-cursor="drag" data-cursor-label="Drag" role="img" aria-label="The Care Orbit emblem turning as you read. Drag to rotate." />
+          </div>
+          <div className="wrap pm-manifesto-copy">
             <p className="pm-eyebrow" id="pm-manifesto-title">Our promise</p>
             <p className="pm-manifesto-text" data-words>
               Choosing care abroad is a big decision. We make everything around it simple: a doctor reads your reports, accredited hospitals send an itemised plan, and <em>one coordinator</em> looks after you, and the people who travel with you, from visa to recovery.

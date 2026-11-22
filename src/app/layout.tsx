@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${editorial.variable} ${humanist.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(${startIntroduction.toString()})((${resolveScene.toString()})(location.pathname,location.hash,${JSON.stringify(addresses)}),${loaderDisplayMs});` }} />
+        <script dangerouslySetInnerHTML={{ __html: `if((location.pathname.replace(/\\/+$/,"")||"/")!=="/")(${startIntroduction.toString()})((${resolveScene.toString()})(location.pathname,location.hash,${JSON.stringify(addresses)}),${loaderDisplayMs});` }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
       <body>

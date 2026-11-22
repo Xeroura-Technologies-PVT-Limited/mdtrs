@@ -106,4 +106,6 @@ The homepage (`src/components/premium/PremiumHome.tsx`, styles in `src/styles/pr
 - `src/lib/premium/orbit-scene.ts` raymarches the Care Orbit emblem (porcelain cross, lacquered ring, travelling satellite) in a fragment shader with physically based lighting, soft shadows, ambient occlusion and studio reflections. Resolution adapts if frames run slow. Drag to rotate.
 - `src/lib/premium/globe-scene.ts` renders the dotted globe with flight arcs that draw into India as you scroll.
 - The WebGL helpers in `src/lib/premium/gl.ts` have no dependencies. Scenes load only as they approach the viewport and pause off-screen.
+- `src/components/premium/PremiumLoader.tsx` is the first-visit loader for the homepage: the orbit ring is the progress bar, the plane flies around it, the cross draws in and the labels walk through the patient journey. Progress follows real milestones (fonts, page load, the hero's first 3D frame) with a short minimum time; Skip or Escape dismisses it. It replaces the site introduction on `/` only; other pages keep it. Client-side navigation back to the homepage skips it.
+- The Care Orbit also appears beside the promise paragraph (`mode: "side"`), turning and opening its orbit as the words light up.
 - Reduced motion: nothing is pinned, all text is visible and the 3D scenes render a still frame.

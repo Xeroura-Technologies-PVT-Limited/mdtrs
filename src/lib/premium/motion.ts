@@ -23,13 +23,16 @@ export function initPremium(root: HTMLElement): () => void {
   html.classList.add("pm-js");
   if (reduced) html.classList.add("pm-reduced");
 
-  /* ---------- Start the hero once the site introduction has lifted ---------- */
+  /* ---------- Start the hero once the loader (or the site introduction) has lifted ---------- */
   const ready = () => html.classList.add("pm-ready");
-  if (!html.dataset.intro) requestAnimationFrame(ready);
-  else {
-    const mo = new MutationObserver(() => { if (!html.dataset.intro) { ready(); mo.disconnect(); } });
-    mo.observe(html, { attributes: true, attributeFilter: ["data-intro"] });
-    cleanups.push(() => mo.disconnect());
+  const loader = runLoader(root, reduced, ready, cleanups);
+  if (!loader.active) {
+    if (!html.dataset.intro) requestAnimationFrame(ready);
+    else {
+      const mo = new MutationObserver(() => { if (!html.dataset.intro) { ready(); mo.disconnect(); } });
+      mo.observe(html, { attributes: true, attributeFilter: ["data-intro"] });
+      cleanups.push(() => mo.disconnect());
+    }
   }
 
   /* ---------- Split text into characters / words ---------- */
@@ -98,7 +101,7 @@ export function initPremium(root: HTMLElement): () => void {
       raf = animating ? requestAnimationFrame(step) : 0;
     };
     const blocked = (e: WheelEvent) =>
-      e.ctrlKey || html.dataset.intro || document.body.style.overflow === "hidden" ||
+      e.ctrlKey || html.dataset.intro || html.classList.contains("pm-loading") || document.body.style.overflow === "hidden" ||
       (e.target instanceof Element && e.target.closest("dialog, [data-no-smooth], .mobile-menu, textarea, select")) ||
       Math.abs(e.deltaX) > Math.abs(e.deltaY);
     const wheel = (e: WheelEvent) => {
@@ -146,6 +149,7 @@ export function initPremium(root: HTMLElement): () => void {
   const passing = Array.from(root.querySelectorAll<HTMLElement>("[data-view]"));
   const progressBar = document.querySelector<HTMLElement>(".pm-progress");
   let orbit: OrbitScene | null = null;
+  let orbitSide: OrbitScene | null = null;
   let globe: GlobeScene | null = null;
   const route = root.querySelector<SVGPathElement>("[data-route]");
   const plane = root.querySelector<SVGGElement>("[data-route-plane]");
@@ -167,6 +171,7 @@ export function initPremium(root: HTMLElement): () => void {
       const p = span > 0 ? clamp(-r.top / span) : clamp((vh - r.top) / (vh + r.height));
       el.style.setProperty("--p", p.toFixed(4));
       if (el.dataset.progress === "hero") orbit?.setProgress(p);
+      if (el.dataset.progress === "manifesto") orbitSide?.setProgress(p);
       if (el.dataset.progress === "globe") globe?.setProgress(p);
       if (el.dataset.progress === "journey") paintRoute(p);
     }
@@ -231,7 +236,11 @@ export function initPremium(root: HTMLElement): () => void {
       const canvas = e.target as HTMLCanvasElement;
       lazy.unobserve(canvas);
       try {
-        if (canvas.dataset.scene === "orbit" && !orbit) orbit = createOrbitScene(canvas, reduced);
+        if (canvas.dataset.scene === "orbit" && !orbit) {
+          orbit = createOrbitScene(canvas, reduced, { onFirstFrame: () => loader.mark("scene") });
+          if (!orbit) loader.mark("scene");
+        }
+        if (canvas.dataset.scene === "orbit-side" && !orbitSide) orbitSide = createOrbitScene(canvas, reduced, { mode: "side" });
         if (canvas.dataset.scene === "globe" && !globe) {
           const cities = Array.from(root.querySelectorAll<HTMLElement>("[data-city]"));
           globe = createGlobeScene(canvas, reduced, idx => cities.forEach((c, i) => c.toggleAttribute("data-arrived", i <= idx)));
@@ -240,11 +249,12 @@ export function initPremium(root: HTMLElement): () => void {
         lastY = -1;
       } catch (err) {
         console.warn("Medtours 3D scene unavailable", err);
+        if (canvas.dataset.scene === "orbit") loader.mark("scene");
       }
     }
   }, { rootMargin: "300px 0px" });
   root.querySelectorAll<HTMLCanvasElement>("canvas[data-scene]").forEach(c => lazy.observe(c));
-  cleanups.push(() => { lazy.disconnect(); orbit?.destroy(); globe?.destroy(); });
+  cleanups.push(() => { lazy.disconnect(); orbit?.destroy(); orbitSide?.destroy(); globe?.destroy(); });
 
   tick = requestAnimationFrame(loop);
   cleanups.push(() => cancelAnimationFrame(tick));
@@ -403,4 +413,95 @@ export function initPremium(root: HTMLElement): () => void {
     cleanups.reverse().forEach(fn => fn());
     html.classList.remove("pm-js", "pm-reduced", "pm-ready", "pm-scrolled");
   };
+}
+
+/* ---------- First-visit loader ----------
+   Progress follows real milestones (fonts, page load, the hero's first 3D
+   frame) but never runs faster than a short minimum, so the sequence reads. */
+type Loader = { active: boolean; mark(name: "scene"): void };
+
+function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cleanups: (() => void)[]): Loader {
+  const html = document.documentElement;
+  const el = root.querySelector<HTMLElement>("#pm-loader");
+  const w = window as Window & { __pmLoadStart?: number; __pmLoaderDone?: boolean };
+  const hide = () => {
+    html.classList.remove("pm-loading");
+    html.classList.add("pm-loaded");
+    el?.setAttribute("hidden", "");
+  };
+  // Only a full page load of the homepage plays it; client-side navigation goes straight in.
+  if (!el || el.hidden || !w.__pmLoadStart || w.__pmLoaderDone) {
+    hide();
+    return { active: false, mark() {} };
+  }
+  html.classList.add("pm-loading");
+
+  const milestones = { fonts: false, load: false, scene: false };
+  const total = Object.keys(milestones).length;
+  const minTime = reduced ? 500 : 2600;
+  const maxTime = 7000;
+  const start = w.__pmLoadStart;
+  const count = el.querySelector<HTMLElement>("[data-loader-count]");
+  const steps = Array.from(el.querySelectorAll<HTMLElement>("[data-loader-step]"));
+  const outside = Array.from(document.querySelectorAll<HTMLElement>("#site-content > header, #site-content > footer, #pm-home > section"));
+  outside.forEach(n => { n.inert = true; });
+
+  let shown = 0, raf = 0, finished = false, last = performance.now();
+  const done = () => Object.values(milestones).filter(Boolean).length;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    cancelAnimationFrame(raf);
+    w.__pmLoaderDone = true;
+    el.style.setProperty("--lp", "1");
+    if (count) count.textContent = "100";
+    steps.forEach((s, i) => s.toggleAttribute("data-active", i === steps.length - 1));
+    outside.forEach(n => { n.inert = false; });
+    el.dataset.state = "exit";
+    html.classList.remove("pm-loading"); // let the hero start rendering as the curtain opens
+    window.setTimeout(onReveal, reduced ? 50 : 650);
+    window.setTimeout(hide, reduced ? 350 : 1700);
+  };
+
+  const tick = (now: number) => {
+    const elapsed = now - start;
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    const byTime = Math.min(1, elapsed / minTime);
+    const byWork = done() === total ? 1 : (done() + 0.8 * (1 - Math.exp(-elapsed / 1400))) / total;
+    const target = elapsed > maxTime ? 1 : Math.min(byTime, byWork);
+    shown += (target - shown) * (1 - Math.exp(-dt / (reduced ? 0.05 : 0.22)));
+    if (target === 1 && shown > 0.985) shown = 1;
+    el.style.setProperty("--lp", shown.toFixed(4));
+    const pct = Math.floor(shown * 100);
+    if (count && count.textContent !== String(pct)) count.textContent = String(pct);
+    const step = shown >= 1 ? steps.length - 1 : Math.min(steps.length - 2, Math.floor(shown * (steps.length - 1)));
+    steps.forEach((s, i) => { s.toggleAttribute("data-active", i === step); s.toggleAttribute("data-done", i < step); });
+    if (shown >= 1) { window.setTimeout(finish, reduced ? 0 : 380); return; }
+    raf = requestAnimationFrame(tick);
+  };
+
+  document.fonts?.ready.then(() => { milestones.fonts = true; }, () => { milestones.fonts = true; });
+  if (document.readyState === "complete") milestones.load = true;
+  else window.addEventListener("load", () => { milestones.load = true; }, { once: true });
+
+  const skip = (e: Event) => {
+    if (e instanceof KeyboardEvent && e.key !== "Escape") return;
+    if (e.type === "click" && !(e.target instanceof Element && e.target.closest("[data-loader-skip]"))) return;
+    finish();
+  };
+  el.addEventListener("click", skip);
+  window.addEventListener("keydown", skip);
+  cleanups.push(() => {
+    cancelAnimationFrame(raf);
+    el.removeEventListener("click", skip);
+    window.removeEventListener("keydown", skip);
+    outside.forEach(n => { n.inert = false; });
+    // Leaving mid-load (or React re-running effects in development): release the page, keep the markup.
+    if (!finished) html.classList.remove("pm-loading");
+  });
+
+  raf = requestAnimationFrame(tick);
+  return { active: true, mark(name) { milestones[name] = true; } };
 }
