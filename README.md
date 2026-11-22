@@ -97,3 +97,14 @@ Without `RESEND_API_KEY` and `ENQUIRY_TO`, the route logs enquiries in developme
 ## Deploying
 
 Push to GitHub and import the repo in Vercel (framework: Next.js, no extra settings), then add the environment variables.
+
+## Premium line (homepage)
+
+The homepage (`src/components/premium/PremiumHome.tsx`, styles in `src/styles/premium.css`) is a scroll-driven, 3D version of the site in the client's Frosted Periwinkle `#EEF2F9` and Deep Navy `#143A66`.
+
+- `src/lib/premium/motion.ts` turns scroll into CSS variables (`--p` for pinned sections, `--v` for passing ones) and runs smooth wheel scrolling, the custom cursor, tilt and magnetic buttons, counters, the velocity marquee and the patient/attender tabs.
+- `src/lib/premium/orbit-scene.ts` renders the Care Orbit emblem (cross, orbit ring and travelling satellite) in WebGL; drag to rotate.
+- `src/lib/premium/globe-scene.ts` renders the dotted globe with flight arcs that draw into India as you scroll.
+- The WebGL helpers in `src/lib/premium/gl.ts` have no dependencies. Scenes load only as they approach the viewport and pause off-screen.
+- Reduced motion: nothing is pinned, all text is visible and the 3D scenes render a still frame.
+- The header is now a light, frosted bar on every page (`src/styles/premium-site.css`).

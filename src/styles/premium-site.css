@@ -1,0 +1,17 @@
+/* Premium line: light, frosted header across the site (client brief: light mode only). */
+.hdr {
+  position: fixed; inset-inline: 0; top: 0;
+  color: var(--aubergine);
+  background: color-mix(in srgb, var(--apricot) 72%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid color-mix(in srgb, var(--aubergine) 10%, transparent);
+  --focus-ink: var(--aubergine); --focus-halo: var(--apricot);
+  transition: background .4s, border-color .4s, box-shadow .4s;
+}
+html:not(.pm-scrolled) .hdr:has(~ main .pm) { background: transparent; border-bottom-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.hdr .logo { --ink: var(--aubergine); --paper: var(--apricot); --accent: #2c57a8; }
+.hdr .desk-nav { --accent: #2c57a8; }
+.hdr .hdr-cta { border-color: color-mix(in srgb, var(--aubergine) 40%, transparent); border-radius: 999px; padding-inline: 18px; }
+.hdr .hdr-cta:hover { background: var(--aubergine); color: var(--apricot); }
+main { padding-top: var(--header-height); }

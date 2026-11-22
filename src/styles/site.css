@@ -1,6 +1,6 @@
 :root {
-  --aubergine: #361a31;
-  --apricot: #fdf4e5;
+  --aubergine: #143a66;
+  --apricot: #eef2f9;
   --ink: var(--aubergine);
   --paper: var(--apricot);
   --accent: color-mix(in srgb, var(--aubergine) 86%, var(--apricot));
@@ -92,7 +92,7 @@ main:focus { outline: none; }
 .nav-drop summary::-webkit-details-marker { display: none; }
 .nav-drop summary svg { width: 12px; height: 12px; transition: transform var(--fast); }
 .nav-drop[open] summary svg { transform: rotate(180deg); }
-.drop-links { --accent: var(--aubergine); --focus-ink: var(--aubergine); --focus-halo: var(--apricot); color: var(--ink); position: absolute; top: 100%; left: -14px; min-width: 200px; padding: 6px; background: var(--paper-light); border: 1px solid var(--line); border-radius: 5px; box-shadow: 0 9px 24px #361a3114; }
+.drop-links { --accent: var(--aubergine); --focus-ink: var(--aubergine); --focus-halo: var(--apricot); color: var(--ink); position: absolute; top: 100%; left: -14px; min-width: 200px; padding: 6px; background: var(--paper-light); border: 1px solid var(--line); border-radius: 5px; box-shadow: 0 9px 24px #143a6614; }
 .drop-links a { display: flex; align-items: center; padding: 10px; min-height: 44px; border-radius: 2px; }
 .drop-links a:is(:hover,:focus-visible,[aria-current]) { background: var(--paper-tint); }
 .hdr-cta { min-height: 40px; border: 1px solid var(--on-dark); background: transparent; border-radius: 4px; padding: 9px 14px; font-size: .83rem; }
@@ -130,7 +130,7 @@ main:focus { outline: none; }
 .qa .ans p { padding: 0 25px 22px 2.9rem; color: var(--muted); max-width: 68ch; }
 
 .modal { padding: 0; color: var(--ink); background: var(--paper); border: 1px solid var(--line); width: min(570px,calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
-.modal::backdrop { background: #361a31bb; }
+.modal::backdrop { background: #143a66bb; }
 body:has(.modal[open]),body:has(.menu-btn[aria-expanded="true"]) { overflow: hidden; }
 .sheet { position: relative; padding: clamp(21px,4vw,38px); }
 .sheet .x { float: right; min-width: 44px; min-height: 44px; margin: -10px -10px 0 0; border: 0; color: var(--ink); background: transparent; text-decoration: underline; font-size: .83rem; }
@@ -175,7 +175,7 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
   .menu-btn[aria-expanded="true"] .burger::after { transform: translateY(-3.5px) rotate(-45deg); }
   .mobile-menu { display: block; position: absolute; top: 100%; inset-inline: 0; max-height: calc(100dvh - var(--header-height)); overflow-y: auto; overscroll-behavior: contain; color: var(--paper); background: var(--ink); z-index: 2; padding-block: 12px 22px; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity var(--fast),transform var(--fast) var(--ease),visibility 0s var(--fast); }
   .mobile-menu.is-open { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
-  .menu-scrim { display: block; position: fixed; inset: var(--header-height) 0 0; background: #361a314a; opacity: 0; visibility: hidden; transition: opacity var(--fast),visibility 0s var(--fast); }
+  .menu-scrim { display: block; position: fixed; inset: var(--header-height) 0 0; background: #143a664a; opacity: 0; visibility: hidden; transition: opacity var(--fast),visibility 0s var(--fast); }
   .menu-scrim.is-open { opacity: 1; visibility: visible; transition-delay: 0s; }
   .mobile-menu nav a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 45px; border-bottom: 1px solid var(--line-on-dark); padding: 7px 0; text-decoration: none; font: 500 clamp(1.38rem,3vh,1.8rem)/1.1 var(--f-display); }
   .mobile-menu nav a span { font: .68rem var(--f-mono); color: var(--on-dark); text-transform: uppercase; letter-spacing: .07em; }
