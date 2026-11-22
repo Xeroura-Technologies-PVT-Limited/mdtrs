@@ -14,7 +14,6 @@ import "@/styles/site.css";
 import "@/styles/pages.css";
 import "@/styles/navigation-motion.css";
 import "@/styles/destination-motion.css";
-import "@/styles/premium-site.css";
 
 const editorial = localFont({
   src: [
@@ -47,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#eef2f9",
+  themeColor: "#361a31",
   colorScheme: "light",
   viewportFit: "cover",
 };

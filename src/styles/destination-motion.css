@@ -15,7 +15,7 @@
 .hero-plate,.shared-plate { color: var(--plate-ink); background-color: var(--plate-paper); aspect-ratio: 5 / 3; }
 .phero-art.drawn-hero { padding: 6px; background: var(--paper-light); }
 .phero-art.with-photo { margin-bottom: min(2.5vw,28px); }
-.with-photo .hero-plate { position: absolute; width: clamp(112px,40%,226px); left: -3%; bottom: -7%; border: 3px solid var(--paper); box-shadow: 0 2px 7px #143a6625; z-index: 2; }
+.with-photo .hero-plate { position: absolute; width: clamp(112px,40%,226px); left: -3%; bottom: -7%; border: 3px solid var(--paper); box-shadow: 0 2px 7px #361a3125; z-index: 2; }
 .nf-plate { width: clamp(210px,32vw,450px); position: relative; margin-right: 12px; }
 .nf-plate .nf-stamp { position: absolute; bottom: -12%; right: -3%; width: clamp(70px,8vw,118px); background: var(--paper); font-size: clamp(42px,5vw,76px); }
 .shared-plate { position: fixed; z-index: 38; pointer-events: none; transform-origin: 0 0; overflow: hidden; }

@@ -19,7 +19,7 @@
 .journey-link:hover { color: var(--on-dark); text-decoration-color: currentColor; }
 .atlas-art { position: relative; isolation: isolate; min-width: 0; padding: 6px clamp(12px,1.8vw,30px) 10px 5px; }
 .atlas-grid { position: absolute; width: 122%; max-width: none; height: 119%; right: -14%; top: -8%; z-index: -2; opacity: .17; color: var(--on-dark); mask-image: radial-gradient(ellipse at 48% 51%, black 45%, transparent 73%); }
-.postage { position: relative; transform: rotate(-3deg); filter: drop-shadow(1px 7px 6px #143a6624); }
+.postage { position: relative; transform: rotate(-3deg); filter: drop-shadow(1px 7px 6px #361a3124); }
 .stamp-back { position: absolute; inset: 6% 1% 3% 4%; transform: rotate(6deg); background: var(--paper-shade); border: 1px solid var(--line-strong); }
 .stamp-face { position: relative; background: var(--apricot); padding: clamp(10px,1.08vw,19px) clamp(10px,1.15vw,20px) 0;
   mask: linear-gradient(#000 0 0) center/calc(100% - 12px) calc(100% - 12px) no-repeat,
