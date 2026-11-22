@@ -291,7 +291,12 @@ export function initPremium(root: HTMLElement): () => void {
     };
   };
   const sidePose = (t: number): Pose => {
-    const r = sideAnchor!.getBoundingClientRect();
+    // Aim at where the anchor sits once its section is pinned, so the emblem glides straight
+    // there instead of chasing the section up from the bottom of the screen. It only moves
+    // up again when the section itself scrolls away.
+    const box = pinnedBox(sideAnchor!);
+    const leave = reduced || !sideSection ? 0 : Math.min(0, sideSection.getBoundingClientRect().bottom - innerHeight);
+    const r = { left: box.left, top: box.top + leave, width: box.width, height: box.height };
     const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
     const size = Math.min(r.width, r.height) * 0.66;
     const bob = reduced ? 0 : Math.sin(t * 0.9) * size * 0.02;

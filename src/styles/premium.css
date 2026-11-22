@@ -45,9 +45,15 @@
 .pm-textlink:hover { background-size: 40% 1px; }
 
 /* ---------- 1 · Hero ---------- */
-.pm-hero { height: 210vh; background: radial-gradient(120% 90% at 72% 40%, #fffaf3 0%, #fef1e6 38%, var(--pm-bg) 70%); }
-.pm-hero .pm-sticky::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(var(--pm-line) 1px, transparent 1px), linear-gradient(90deg, var(--pm-line) 1px, transparent 1px); background-size: 88px 88px; background-position: center; mask-image: radial-gradient(80% 80% at 70% 45%, transparent 30%, black 85%); opacity: .7; }
-.pm-hero-art { position: absolute; inset: 0 0 0 42%; transform: translate3d(0, calc(var(--p) * -6vh), 0); }
+.pm-hero { height: 210vh; }
+/* The grid is painted as the section's own background so the emblem (a fixed layer) always sits above it. */
+.pm-hero { background:
+  linear-gradient(color-mix(in srgb, var(--pm-ink) 8%, transparent) 1px, transparent 1px) center top / 88px 88px,
+  linear-gradient(90deg, color-mix(in srgb, var(--pm-ink) 8%, transparent) 1px, transparent 1px) center top / 88px 88px,
+  radial-gradient(90% 60% at 70% 25%, #fffaf3 0%, var(--pm-bg) 70%); }
+.pm-hero-art { position: absolute; inset: 0 0 0 42%; }
+[data-orbit-anchor] { cursor: grab; touch-action: pan-y; }
+[data-orbit-anchor][data-dragging] { cursor: grabbing; }
 .pm-halo { position: absolute; left: 50%; top: 48%; width: min(64vh, 640px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, #ffffff 0%, #ffffffb0 35%, transparent 70%); filter: blur(10px); }
 .pm-hero-art .pm-canvas { position: absolute; inset: 0; }
 .pm-notes { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; }
@@ -88,7 +94,6 @@
 .pm-word { opacity: clamp(.13, calc(var(--p) * 1.3 * var(--n) - var(--i)), 1); transition: opacity .25s linear; }
 .pm-manifesto .pm-sticky { position: sticky; }
 .pm-manifesto-art { position: absolute; top: 4%; bottom: 4%; right: 0; width: 46vw; }
-.pm-manifesto-art .pm-canvas { position: absolute; inset: 0; }
 .pm-manifesto-copy { position: relative; z-index: 1; pointer-events: none; }
 .pm-manifesto-copy > * { pointer-events: auto; }
 .pm-manifesto-text { max-width: min(25ch, 52vw); }
@@ -266,6 +271,15 @@
 .pm-cursor:is([data-state="drag"], [data-state="view"]) .pm-cursor-ring b { opacity: 1; }
 .pm-cursor:is([data-state="drag"], [data-state="view"]) .pm-cursor-dot { opacity: 0; }
 .pm-cursor[data-press] .pm-cursor-ring { scale: .86; }
+
+/* ---------- The single 3D emblem ---------- */
+.pm-orbit-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+html.pm-loading .pm-orbit-layer { z-index: 301; }
+.pm-orbit-canvas { position: relative; display: block; width: 100%; height: 100%; }
+.pm-orbit-halo { position: absolute; left: 0; top: 0; width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 50%; background: radial-gradient(circle, #fffaf3 0%, #fffaf3d9 38%, #fffaf300 70%); opacity: 0; will-change: transform, opacity; }
+/* Sections after the promise slide over the emblem. */
+.pm-expand, .pm-globe, .pm-rail, .pm-persona, .pm-journey, .pm-trust, .pm-faq, .pm-close { position: relative; z-index: 1; }
+html.pm-gl .pm-l-fill, html.pm-gl .pm-l-cross { display: none; }
 
 /* ---------- First-visit loader ---------- */
 .pm-loader { --lp: 0; position: fixed; inset: 0; z-index: 300; display: grid; color: #fdf4e5; }

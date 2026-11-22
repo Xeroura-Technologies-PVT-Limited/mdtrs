@@ -69,13 +69,17 @@ export function PremiumHome() {
     <div id="pm-home" className="pm">
       <PremiumLoader />
       <PremiumMotion />
+      {/* One emblem for the whole page: it starts in the loader, lands in the hero and glides on to the promise. */}
+      <div className="pm-orbit-layer" aria-hidden="true">
+        <div className="pm-orbit-halo" />
+        <canvas className="pm-orbit-canvas" data-orbit-canvas />
+      </div>
 
       {/* 1 · Hero: the Care Orbit emblem in 3D */}
       <section className="pm-hero" data-progress="hero" aria-labelledby="pm-hero-title">
         <div className="pm-sticky">
-          <div className="pm-hero-art" data-scene-wrap>
-            <div className="pm-halo" aria-hidden="true" />
-            <canvas className="pm-canvas" data-scene="orbit" data-cursor="drag" data-cursor-label="Drag" aria-label="The Medtours Care Orbit emblem: a medical cross circled by a flight path. Drag to rotate." role="img" />
+          <div className="pm-hero-art" data-orbit-anchor="hero" data-cursor="drag" data-cursor-label="Drag">
+            <span className="sr-only">The Medtours Care Orbit emblem: a medical cross circled by a flight path.</span>
             <ul className="pm-notes" aria-label="Why patients choose Medtours">
               {notes.map((n, i) => (
                 <li key={n.k} className={`pm-note pm-note-${i + 1}`}>
@@ -107,10 +111,7 @@ export function PremiumHome() {
       {/* 2 · Manifesto: words light up as you read */}
       <section className="pm-manifesto" data-progress="manifesto" aria-labelledby="pm-manifesto-title">
         <div className="pm-sticky">
-          <div className="pm-manifesto-art" data-scene-wrap>
-            <div className="pm-halo" aria-hidden="true" />
-            <canvas className="pm-canvas" data-scene="orbit-side" data-cursor="drag" data-cursor-label="Drag" role="img" aria-label="The Care Orbit emblem turning as you read. Drag to rotate." />
-          </div>
+          <div className="pm-manifesto-art" data-orbit-anchor="side" data-cursor="drag" data-cursor-label="Drag" aria-hidden="true" />
           <div className="wrap pm-manifesto-copy">
             <p className="pm-eyebrow" id="pm-manifesto-title">Our promise</p>
             <p className="pm-manifesto-text" data-words>
