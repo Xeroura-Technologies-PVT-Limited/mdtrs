@@ -465,6 +465,15 @@ export function initPremium(root: HTMLElement): () => void {
       setStep(Math.max(0, Math.min(3, items().findIndex(el => el.getBoundingClientRect().top >= 0))));
       lastY = -1;
     };
+    // Hero entry links choose a journey before scrolling to it.
+    const go = (e: Event) => {
+      const link = (e.target as Element).closest<HTMLAnchorElement>("[data-persona-go]");
+      if (!link) return;
+      const tab = tabs.find(t => t.dataset.persona === link.dataset.personaGo);
+      if (tab) select(tab);
+    };
+    root.addEventListener("click", go);
+    cleanups.push(() => root.removeEventListener("click", go));
     const click = (e: Event) => {
       const target = e.target as Element;
       const tab = target.closest<HTMLButtonElement>("[role=tab]");

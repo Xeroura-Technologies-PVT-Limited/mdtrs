@@ -103,6 +103,13 @@ export function PremiumHome() {
             </div>
           </div>
           <div className="pm-scrollcue" aria-hidden="true"><span>Scroll</span><i /></div>
+          <nav className="pm-entries" aria-label="Start here">
+            <ul className="wrap">
+              <li><a href="#pm-rail-title" data-go="treatments"><span>Explore treatments<small>Six specialties, planned by a doctor</small></span><Arrow /></a></li>
+              <li><a href="#journeys" data-persona-go="patient"><span>I&apos;m a patient<small>Planning, second opinions, visa, recovery</small></span><Arrow /></a></li>
+              <li><a href="#journeys" data-persona-go="attender"><span>I&apos;m accompanying someone<small>Travel, stay, concierge and comfort</small></span><Arrow /></a></li>
+            </ul>
+          </nav>
         </div>
       </section>
 

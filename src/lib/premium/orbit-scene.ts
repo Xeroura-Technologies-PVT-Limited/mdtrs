@@ -96,7 +96,7 @@ vec3 aces(vec3 x){ return clamp((x*(2.51*x + 0.03)) / (x*(2.43*x + 0.59) + 0.14)
 vec3 shade(vec3 p, vec3 n, vec3 v, float mat){
   vec3 albedo; float rough; float metal = 0.0; float coat; float sss = 0.0;
   if (mat < 1.5) { albedo = uCross; rough = 0.3; coat = 0.75; sss = 1.0; }
-  else if (mat < 2.5) { albedo = uRing; rough = 0.22; coat = 1.0; }
+  else if (mat < 2.5) { albedo = uRing; rough = 0.24; coat = 0.5; metal = 1.0; }
   else if (mat < 3.5) { albedo = uCapsuleBody; rough = 0.16; coat = 1.0; sss = 0.5; }
   else { albedo = uSatCol; rough = 0.18; coat = 1.0; }
 
@@ -234,9 +234,10 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
   gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
+  // Green & gold: ivory porcelain, a polished gold orbit, an emerald-and-ivory capsule.
   const C = {
-    cross: lin("#FBF3EA"), ring: lin("#4A1D41"), sat: lin("#9B3D7E"), trail: lin("#F2B6D6"), capsuleBody: lin("#FFFBF6"),
-    shadow: hexToRgb("#361A31"), top: lin("#FFFBF6"), hor: lin("#FBEFE2"), bot: lin("#E9D3C6"),
+    cross: lin("#F8F4EA"), ring: lin("#D9B26A"), sat: lin("#2E7D68"), trail: lin("#F6D78F"), capsuleBody: lin("#FFFBF2"),
+    shadow: hexToRgb("#020C0A"), top: lin("#FFF8EC"), hor: lin("#E6EDE4"), bot: lin("#4E6B62"),
   };
 
   const state = {
