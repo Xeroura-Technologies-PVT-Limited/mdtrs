@@ -27,29 +27,27 @@ const stats = [
 const personas = {
   patient: {
     label: "I'm the patient",
-    title: <>Care planned around <em>you</em>, before you fly.</>,
-    image: "/editorial/consultation.webp",
-    alt: "A calm, sunlit consultation room",
+    line: <>Care planned around <em>you</em>, before you fly.</>,
     items: [
-      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours." },
-      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend." },
-      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application." },
-      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home." },
+      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", img: "/editorial/hospital-consultation.webp", alt: "A doctor talking a patient through his plan" },
+      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", img: "/editorial/treatments/medical.webp", alt: "A doctor and patient reviewing a tablet together" },
+      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", img: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" },
+      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", img: "/editorial/treatments/rehabilitation.webp", alt: "A physiotherapist supporting a patient at parallel bars" },
     ],
   },
   attender: {
     label: "I'm travelling with them",
-    title: <>The person who cares is <em>cared for</em> too.</>,
-    image: "/editorial/hospitality.webp",
-    alt: "A calm hotel room with warm light and a carved wooden screen",
+    line: <>The person who cares is <em>cared for</em> too.</>,
     items: [
-      { t: "Travel logistics", d: "Visa letters for up to two attenders, and flights planned to match the patient's dates." },
-      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer." },
-      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator." },
-      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm." },
+      { t: "Travel logistics", d: "Visa letters for up to two attenders, and flights planned to match the patient's dates.", img: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" },
+      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", img: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" },
+      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", img: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" },
+      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", img: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" },
     ],
   },
 } as const;
+type PersonaKey = keyof typeof personas;
+const personaKeys = Object.keys(personas) as PersonaKey[];
 
 const steps = [
   { t: "Share your reports", d: "Send scans and reports through the enquiry form or WhatsApp." },
@@ -200,40 +198,56 @@ export function PremiumHome() {
         </div>
       </section>
 
-      {/* 6 · Patient and attender journeys */}
+      {/* 6 · Patient and attender journeys: a pinned photo that follows the step being read */}
       <section className="pm-persona" id="journeys" aria-labelledby="pm-persona-title">
         <div className="wrap" data-persona-root data-active="patient">
           <div className="pm-persona-head" data-pm-reveal>
             <p className="pm-eyebrow">Patients &amp; attenders</p>
             <h2 id="pm-persona-title">Two journeys, <em>planned as one.</em></h2>
-            <div className="pm-switch" role="tablist" aria-label="Choose your journey">
-              <span className="pm-switch-pill" aria-hidden="true" />
-              {(Object.keys(personas) as (keyof typeof personas)[]).map((key, i) => (
-                <button key={key} role="tab" type="button" id={`pm-tab-${key}`} aria-controls={`pm-panel-${key}`} aria-selected={i === 0} tabIndex={i === 0 ? 0 : -1} data-persona={key}>
-                  {personas[key].label}
-                </button>
-              ))}
-            </div>
+            <p className="pm-body">Every plan covers the patient and the people who travel with them. Choose a journey, then scroll through what we arrange.</p>
           </div>
-          {(Object.keys(personas) as (keyof typeof personas)[]).map((key, i) => {
-            const p = personas[key];
-            return (
-              <div key={key} className="pm-persona-panel" role="tabpanel" id={`pm-panel-${key}`} aria-labelledby={`pm-tab-${key}`} hidden={i !== 0}>
-                <figure className="pm-persona-media" data-tilt>
-                  <img src={p.image} alt={p.alt} loading="lazy" decoding="async" />
-                  <figcaption>{p.title}</figcaption>
-                </figure>
-                <ol className="pm-persona-list">
-                  {p.items.map((it, j) => (
-                    <li key={it.t} style={{ ["--j" as string]: j }}>
-                      <span className="pm-num">{String(j + 1).padStart(2, "0")}</span>
-                      <div><strong>{it.t}</strong><p>{it.d}</p></div>
+          <div className="pm-persona-grid">
+            <div className="pm-persona-side">
+              <div className="pm-switch" role="tablist" aria-label="Choose your journey">
+                <span className="pm-switch-pill" aria-hidden="true" />
+                {personaKeys.map((key, i) => (
+                  <button key={key} role="tab" type="button" id={`pm-tab-${key}`} aria-controls={`pm-panel-${key}`} aria-selected={i === 0} tabIndex={i === 0 ? 0 : -1} data-persona={key}>
+                    {personas[key].label}
+                  </button>
+                ))}
+              </div>
+              <figure className="pm-stage" data-tilt data-cursor="view" data-cursor-label="Scroll">
+                {personaKeys.flatMap(key => personas[key].items.map((it, j) => (
+                  <img key={`${key}-${j}`} src={it.img} alt={it.alt} loading="lazy" decoding="async" data-shot={`${key}-${j}`} {...(key === "patient" && j === 0 ? { "data-current": "" } : {})} />
+                )))}
+                <span className="pm-stage-veil" aria-hidden="true" />
+                <span className="pm-stage-bars" aria-hidden="true">{[0, 1, 2, 3].map(i => <i key={i} data-bar={i} />)}</span>
+                <figcaption aria-hidden="true">
+                  <span className="pm-stage-count"><b data-shot-num>01</b> / 04</span>
+                  <strong data-shot-title>{personas.patient.items[0].t}</strong>
+                </figcaption>
+              </figure>
+              <p className="pm-persona-line" aria-live="polite">
+                {personaKeys.map(key => <span key={key} data-line={key}>{personas[key].line}</span>)}
+              </p>
+            </div>
+            <div className="pm-persona-lists">
+              {personaKeys.map((key, i) => (
+                <ol key={key} className="pm-steps-list" role="tabpanel" id={`pm-panel-${key}`} aria-labelledby={`pm-tab-${key}`} hidden={i !== 0}>
+                  {personas[key].items.map((it, j) => (
+                    <li key={it.t} data-step={j} data-shot-key={`${key}-${j}`} style={{ ["--j" as string]: j }} {...(j === 0 ? { "data-active": "" } : {})}>
+                      <span className="pm-step-num">{String(j + 1).padStart(2, "0")}</span>
+                      <div>
+                        <strong>{it.t}</strong>
+                        <p>{it.d}</p>
+                      </div>
+                      <span className="pm-step-rule" aria-hidden="true"><i /></span>
                     </li>
                   ))}
                 </ol>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

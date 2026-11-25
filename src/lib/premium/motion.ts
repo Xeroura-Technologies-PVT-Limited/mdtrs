@@ -179,6 +179,7 @@ export function initPremium(root: HTMLElement): () => void {
       const r = el.getBoundingClientRect();
       el.style.setProperty("--v", clamp((vh - r.top) / (vh + r.height)).toFixed(4));
     }
+    paintPersona();
     const docMax = document.documentElement.scrollHeight - vh;
     progressBar?.style.setProperty("--scroll", docMax > 0 ? (window.scrollY / docMax).toFixed(4) : "0");
     html.classList.toggle("pm-scrolled", window.scrollY > 40);
@@ -389,25 +390,90 @@ export function initPremium(root: HTMLElement): () => void {
   root.querySelectorAll("[data-count]").forEach(el => counter.observe(el));
   cleanups.push(() => counter.disconnect());
 
-  /* ---------- Patient / attender switch ---------- */
+  /* ---------- Patient / attender journeys ----------
+     The tabs swap the list; scrolling through the list picks the step, and
+     the pinned photo wipes to the shot for that step. */
   const personaRoot = root.querySelector<HTMLElement>("[data-persona-root]");
+  let paintPersona = () => {};
   if (personaRoot) {
     const tabs = Array.from(personaRoot.querySelectorAll<HTMLButtonElement>("[role=tab]"));
+    const shots = new Map(Array.from(personaRoot.querySelectorAll<HTMLImageElement>("[data-shot]")).map(img => [img.dataset.shot!, img]));
+    const num = personaRoot.querySelector<HTMLElement>("[data-shot-num]");
+    const title = personaRoot.querySelector<HTMLElement>("[data-shot-title]");
+    const caption = title?.closest("figcaption");
+    const bars = Array.from(personaRoot.querySelectorAll<HTMLElement>("[data-bar]"));
+    let current = "patient-0";
+    let step = 0;
+
+    const showShot = (key: string, label: string, index: number) => {
+      bars.forEach((b, i) => { b.toggleAttribute("data-done", i < index); b.toggleAttribute("data-on", i === index); });
+      if (key === current) return;
+      shots.forEach(img => { img.removeAttribute("data-prev"); });
+      const prev = shots.get(current);
+      if (prev) { prev.removeAttribute("data-current"); prev.setAttribute("data-prev", ""); }
+      const next = shots.get(key);
+      if (next) { next.removeAttribute("data-current"); void next.offsetWidth; next.setAttribute("data-current", ""); }
+      current = key;
+      if (num) num.textContent = String(index + 1).padStart(2, "0");
+      if (title) title.textContent = label;
+      if (caption) { caption.classList.remove("pm-swap"); void (caption as HTMLElement).offsetWidth; caption.classList.add("pm-swap"); }
+    };
+
+    const items = () => Array.from(personaRoot.querySelectorAll<HTMLElement>(".pm-steps-list:not([hidden]) [data-step]"));
+    const side = personaRoot.querySelector<HTMLElement>(".pm-persona-side");
+    // Where a step counts as "being read": 45% down the screen, or just under the pinned photo on phones.
+    const readLine = () => innerWidth <= 900 && side
+      ? Math.min(innerHeight * 0.8, side.getBoundingClientRect().bottom + 70)
+      : innerHeight * 0.45;
+    const setStep = (index: number) => {
+      const list = items();
+      const li = list[index];
+      if (!li) return;
+      step = index;
+      list.forEach((el, i) => { el.toggleAttribute("data-active", i === index); el.toggleAttribute("data-done", i < index); });
+      showShot(li.dataset.shotKey!, li.querySelector("strong")?.textContent ?? "", index);
+    };
+
+    // Called from the scroll loop: the step whose box crosses 45% of the viewport is active.
+    paintPersona = () => {
+      const list = items();
+      if (!list.length) return;
+      const line = readLine();
+      let index = 0;
+      list.forEach((el, i) => { if (el.getBoundingClientRect().top < line) index = i; });
+      const r = list[index].getBoundingClientRect();
+      const fill = clamp((line - r.top) / Math.max(1, r.height));
+      list[index].style.setProperty("--fill", fill.toFixed(3));
+      bars[index]?.style.setProperty("--fill", fill.toFixed(3));
+      if (index !== step || !list[index].hasAttribute("data-active")) setStep(index);
+    };
+
     const select = (tab: HTMLButtonElement, focus = false) => {
       const who = tab.dataset.persona!;
+      if (personaRoot.dataset.active === who) return;
       personaRoot.dataset.active = who;
       tabs.forEach(t => {
         const on = t === tab;
         t.setAttribute("aria-selected", String(on));
         t.tabIndex = on ? 0 : -1;
         const panel = document.getElementById(t.getAttribute("aria-controls")!);
-        if (panel) { panel.hidden = !on; }
+        if (panel) panel.hidden = !on;
       });
       if (focus) tab.focus();
+      // Keep the same step in the other journey, then let the scroll loop take over again.
+      step = -1;
+      setStep(Math.max(0, Math.min(3, items().findIndex(el => el.getBoundingClientRect().top >= 0))));
+      lastY = -1;
     };
     const click = (e: Event) => {
-      const tab = (e.target as Element).closest<HTMLButtonElement>("[role=tab]");
-      if (tab) select(tab);
+      const target = e.target as Element;
+      const tab = target.closest<HTMLButtonElement>("[role=tab]");
+      if (tab) { select(tab); return; }
+      const li = target.closest<HTMLElement>("[data-step]");
+      if (li) {
+        const r = li.getBoundingClientRect();
+        window.scrollTo({ top: window.scrollY + r.top - readLine() + 40, behavior: reduced ? "auto" : "smooth" });
+      }
     };
     const key = (e: KeyboardEvent) => {
       const i = tabs.indexOf(document.activeElement as HTMLButtonElement);

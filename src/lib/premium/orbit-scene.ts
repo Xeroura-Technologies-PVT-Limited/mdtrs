@@ -17,14 +17,25 @@ uniform float uFocal;
 uniform mat3 uCrossInv, uRingInv;
 uniform vec3 uCenter;
 uniform float uScale, uGroundY, uTime, uRingK, uShadowK;
-uniform vec4 uSat[10];
-uniform vec3 uCross, uRing, uSatCol, uTrail, uShadow, uEnvTop, uEnvHor, uEnvBot;
+uniform mat3 uCapsuleInv;
+uniform vec3 uCapsulePos;
+uniform float uCapsuleScale, uAngle;
+uniform vec3 uCross, uRing, uSatCol, uTrail, uShadow, uEnvTop, uEnvHor, uEnvBot, uCapsuleBody;
 
 #define PI 3.14159265
 
 float sdRoundBox(vec3 p, vec3 b, float r){ vec3 q = abs(p) - b + r; return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r; }
 float smin(float a, float b, float k){ float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0); return mix(b, a, h) - k*h*(1.0-h); }
 float sdTorus(vec3 p, vec2 t){ vec2 q = vec2(length(p.xy) - t.x, p.z); return length(q) - t.y; }
+float sdEllipsoid(vec3 p, vec3 r){ float k0 = length(p/r); float k1 = length(p/(r*r)); return k0*(k0 - 1.0)/k1; }
+float sdBox(vec3 p, vec3 b){ vec3 q = abs(p) - b; return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0); }
+
+// The capsule that circles the cross: magenta at the front, ivory behind. Local x is the direction of travel.
+vec2 sdCapsule(vec3 q){
+  vec3 c = q;
+  c.x -= clamp(c.x, -0.3, 0.3);
+  return vec2(length(c) - 0.15, q.x > 0.0 ? 1.0 : 0.0);
+}
 
 // x: distance, y: material (1 cross, 2 ring, 3+ satellite index/10)
 vec2 map(vec3 p){
@@ -35,14 +46,11 @@ vec2 map(vec3 p){
   vec3 r = uRingInv * (p - uCenter) / uScale;
   float dr = sdTorus(r, vec2(1.62 * uRingK, 0.05 * min(1.0, uRingK * 3.0))) * uScale;
   if (dr < res.x) res = vec2(dr, 2.0);
-  // Satellite and its tapering trail, blended into one smooth comet.
-  float dsat = 1e5; float id = 0.0;
-  for (int i = 0; i < 10; i++) {
-    float ds = length(p - uSat[i].xyz) - uSat[i].w;
-    if (ds < dsat) id = float(i);
-    dsat = smin(dsat, ds, 0.05);
-  }
-  if (dsat < res.x) res = vec2(dsat, 3.0 + id * 0.1);
+  // The capsule circling the cross.
+  vec3 q = uCapsuleInv * (p - uCapsulePos) / uCapsuleScale;
+  vec2 ap = sdCapsule(q);
+  ap.x *= uCapsuleScale;
+  if (ap.x < res.x) res = vec2(ap.x, 3.0 + ap.y);
   return res;
 }
 
@@ -89,7 +97,8 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float mat){
   vec3 albedo; float rough; float metal = 0.0; float coat; float sss = 0.0;
   if (mat < 1.5) { albedo = uCross; rough = 0.3; coat = 0.75; sss = 1.0; }
   else if (mat < 2.5) { albedo = uRing; rough = 0.22; coat = 1.0; }
-  else { float k = (mat - 3.0) * 10.0 / 9.0; albedo = mix(uSatCol, uTrail, k); rough = 0.18; coat = 1.0 - k*0.6; }
+  else if (mat < 3.5) { albedo = uCapsuleBody; rough = 0.16; coat = 1.0; sss = 0.5; }
+  else { albedo = uSatCol; rough = 0.18; coat = 1.0; }
 
   vec3 L = normalize(vec3(-0.55, 0.75, 0.5));
   vec3 H = normalize(L + v);
@@ -124,7 +133,15 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float mat){
   float Dc = ca*ca / (PI*cdd*cdd);
   vec3 clear = coat * (Fc*0.9*env(R, 0.0)*occ + vec3(Dc*0.25*NoL*sh*(0.04 + 0.96*pow(1.0-VoH,5.0))) * lightCol);
 
-  return diffuse + spec*lightCol + refl + clear;
+  vec3 col = diffuse + spec*lightCol + refl + clear;
+  if (mat > 1.5 && mat < 2.5) {
+    // The ring glows along the path the capsule has just travelled.
+    vec3 r = uRingInv * (p - uCenter) / uScale;
+    float behind = mod(uAngle - atan(r.y, r.x), 6.2831853);
+    float glow = exp(-behind * 1.6);
+    col = mix(col, col * 0.4 + uTrail * 1.4, glow * 0.85);
+  }
+  return col;
 }
 
 void main(){
@@ -218,7 +235,7 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
   const C = {
-    cross: lin("#FBF3EA"), ring: lin("#4A1D41"), sat: lin("#9B3D7E"), trail: lin("#E7B9CF"),
+    cross: lin("#FBF3EA"), ring: lin("#4A1D41"), sat: lin("#9B3D7E"), trail: lin("#F2B6D6"), capsuleBody: lin("#FFFBF6"),
     shadow: hexToRgb("#361A31"), top: lin("#FFFBF6"), hor: lin("#FBEFE2"), bot: lin("#E9D3C6"),
   };
 
@@ -294,13 +311,19 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     const ringFrame = m4.chain(m4.translation(...center), ringRot, m4.scaling(scale));
     const rk = Math.max(0, Math.min(1, pose.ringK));
 
-    const sats = new Float32Array(40);
-    for (let i = 0; i < 10; i++) {
-      const ai = state.angle - i * 0.05;
-      const pos = m4.apply(ringFrame, [Math.cos(ai) * RING_R * rk, Math.sin(ai) * RING_R * rk, 0]);
-      const r = rk < 0.05 ? 0 : (i === 0 ? 0.13 : 0.075 * Math.pow(1 - i / 10.5, 1.3)) * scale * Math.min(1, rk * 1.5);
-      sats.set([pos[0], pos[1], rk < 0.05 ? 1e4 : pos[2], r], i * 4);
-    }
+    // The capsule travels along the ring, lying along its direction of travel.
+    const a = state.angle;
+    const ca = Math.cos(a), sa = Math.sin(a), bank = 0.35;
+    const fwd: Vec3 = [-sa, ca, 0];
+    const cb = Math.cos(bank), sb = Math.sin(bank);
+    const up: Vec3 = [-ca * sb, -sa * sb, cb];
+    const side: Vec3 = [fwd[1] * up[2] - fwd[2] * up[1], fwd[2] * up[0] - fwd[0] * up[2], fwd[0] * up[1] - fwd[1] * up[0]];
+    const local = m4.identity();
+    local.set([...fwd, 0, ...up, 0, ...side, 0, 0, 0, 0, 1]);
+    const capsuleRot = m4.chain(ringRot, local);
+    const lift = 0.0;
+    const capsulePos: Vec3 = rk < 0.05 ? [0, 0, 1e4] : m4.apply(ringFrame, [ca * RING_R * rk + up[0] * lift, sa * RING_R * rk + up[1] * lift, up[2] * lift]);
+    const capsuleScale = Math.max(0.001, scale * 0.6 * Math.min(1, rk * 1.4));
 
     const eye: Vec3 = [0, 0, EYE_Z];
     gl!.clearColor(0, 0, 0, 0);
@@ -324,7 +347,11 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     gl!.uniform1f(prog.u("uTime"), t);
     gl!.uniform1f(prog.u("uRingK"), rk);
     gl!.uniform1f(prog.u("uShadowK"), Math.max(0, Math.min(1, pose.shadow)));
-    gl!.uniform4fv(prog.u("uSat"), sats);
+    gl!.uniformMatrix3fv(prog.u("uCapsuleInv"), false, inv3(capsuleRot));
+    gl!.uniform3fv(prog.u("uCapsulePos"), capsulePos);
+    gl!.uniform1f(prog.u("uCapsuleScale"), capsuleScale);
+    gl!.uniform1f(prog.u("uAngle"), a);
+    gl!.uniform3fv(prog.u("uCapsuleBody"), C.capsuleBody);
     gl!.uniform3fv(prog.u("uCross"), C.cross);
     gl!.uniform3fv(prog.u("uRing"), C.ring);
     gl!.uniform3fv(prog.u("uSatCol"), C.sat);

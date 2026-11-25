@@ -165,8 +165,8 @@ export function createGlobeScene(canvas: HTMLCanvasElement, reduced: boolean, on
   const count = kind.length;
 
   const C = {
-    ink: hexToRgb("#143A66"), india: hexToRgb("#2C57A8"), arc: hexToRgb("#3E6FCB"),
-    body: hexToRgb("#F7F9FE"), sky: hexToRgb("#FFFFFF"), ground: hexToRgb("#D5DEEF"), rim: hexToRgb("#AFC1E6"),
+    ink: hexToRgb("#361A31"), india: hexToRgb("#9B3D7E"), arc: hexToRgb("#B5508F"),
+    body: hexToRgb("#FFF9F2"), sky: hexToRgb("#FFFFFF"), ground: hexToRgb("#F6E6DA"), rim: hexToRgb("#EBC6D4"),
   };
 
   const state = { progress: 0, smooth: 0, drag: 0, dragV: 0, dragging: false, lastX: 0, raf: 0, visible: false, t0: performance.now(), last: performance.now(), active: -1 };
