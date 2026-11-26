@@ -97,3 +97,15 @@ Without `RESEND_API_KEY` and `ENQUIRY_TO`, the route logs enquiries in developme
 ## Deploying
 
 Push to GitHub and import the repo in Vercel (framework: Next.js, no extra settings), then add the environment variables.
+
+## Premium line (homepage)
+
+The homepage (`src/components/premium/PremiumHome.tsx`, styles in `src/styles/premium.css`) is a scroll-driven, 3D version of the site in the site's aubergine `#361a31` and apricot `#fdf4e5` theme, with a magenta accent `#9b3d7e`.
+
+- `src/lib/premium/motion.ts` turns scroll into CSS variables (`--p` for pinned sections, `--v` for passing ones) and runs smooth wheel scrolling, the custom cursor, tilt and magnetic buttons, counters, the velocity marquee and the patient/attender tabs.
+- `src/lib/premium/orbit-scene.ts` raymarches the Care Orbit emblem from a pose it is given each frame (porcelain cross, lacquered ring, and a magenta-and-ivory capsule travelling round it while the ring glows behind) in a fragment shader with physically based lighting, soft shadows, ambient occlusion and studio reflections. Resolution adapts if frames run slow. Drag to rotate.
+- `src/lib/premium/globe-scene.ts` renders the dotted globe with flight arcs that draw into India as you scroll.
+- The WebGL helpers in `src/lib/premium/gl.ts` have no dependencies. Scenes load only as they approach the viewport and pause off-screen.
+- `src/components/premium/PremiumLoader.tsx` is the first-visit loader for the homepage: the orbit ring is the progress bar, the plane flies around it, the cross draws in and the labels walk through the patient journey. Progress follows real milestones (fonts, page load, the hero's first 3D frame) with a short minimum time; Skip or Escape dismisses it. It replaces the site introduction on `/` only; other pages keep it. Client-side navigation back to the homepage skips it.
+- There is one emblem for the whole page: a fixed, full-viewport canvas (`.pm-orbit-layer`). `motion.ts` blends its position, size and rotation between anchors: the loader's mark, the hero (`[data-orbit-anchor="hero"]`) and the promise section (`[data-orbit-anchor="side"]`). In the loader the cross spins in as progress fills; at 100% it flies into the hero while its orbit ring unfolds and the curtain opens. On scroll it turns, then glides down beside the promise text and leaves with that section. Sections after the promise sit above the layer (`z-index: 1`).
+- Reduced motion: nothing is pinned, all text is visible and the 3D scenes render a still frame.
