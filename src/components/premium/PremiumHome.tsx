@@ -12,27 +12,27 @@ const Plane = ({ className }: { className?: string }) => (
 );
 const stats = [
   { n: 48, unit: "hrs", label: "Usual time to a treatment plan after we receive your reports" },
-  { n: 2, unit: "", label: "Attenders who can travel with you on India's e-Medical Attendant visa" },
+  { n: 2, unit: "", label: "Companions who can travel with you on India's e-Medical Attendant visa" },
   { n: 1, unit: "", label: "Coordinator from the first call to your last follow-up" },
   { n: 6, unit: "", label: "Specialties across clinical care and wellness" },
 ];
 
 const personas = {
   patient: {
-    label: "I'm the patient",
+    label: "I'm the guest",
     line: <>Care planned around <em>you</em>, before you fly.</>,
     items: [
-      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", img: "/editorial/hospital-consultation.webp", alt: "A doctor talking a patient through his plan" },
-      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", img: "/editorial/treatments/medical.webp", alt: "A doctor and patient reviewing a tablet together" },
+      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", img: "/editorial/hospital-consultation.webp", alt: "A doctor talking a guest through his plan" },
+      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", img: "/editorial/treatments/medical.webp", alt: "A doctor and guest reviewing a tablet together" },
       { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", img: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" },
-      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", img: "/editorial/treatments/rehabilitation.webp", alt: "A physiotherapist supporting a patient at parallel bars" },
+      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", img: "/editorial/treatments/rehabilitation.webp", alt: "A physiotherapist supporting a guest at parallel bars" },
     ],
   },
   attender: {
-    label: "I'm travelling with them",
+    label: "I'm the companion",
     line: <>The person who cares is <em>cared for</em> too.</>,
     items: [
-      { t: "Travel logistics", d: "Visa letters for up to two attenders, and flights planned to match the patient's dates.", img: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" },
+      { t: "Travel logistics", d: "Visa letters for up to two companions, and flights planned to match the guest's dates.", img: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" },
       { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", img: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" },
       { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", img: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" },
       { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", img: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" },
@@ -183,9 +183,9 @@ export function PremiumHome() {
       <section className="pm-persona" id="journeys" aria-labelledby="pm-persona-title">
         <div className="wrap" data-persona-root data-active="patient">
           <div className="pm-persona-head" data-pm-reveal>
-            <p className="pm-eyebrow">Patients &amp; attenders</p>
+            <p className="pm-eyebrow">Guests &amp; companions</p>
             <h2 id="pm-persona-title">Two journeys, <em>planned as one.</em></h2>
-            <p className="pm-body">Every plan covers the patient and the people who travel with them. Choose a journey, then scroll through what we arrange.</p>
+            <p className="pm-body">Every plan covers the guest and the companion who travels with them. Choose a journey, then scroll through what we arrange.</p>
           </div>
           <div className="pm-persona-grid">
             <div className="pm-persona-side">

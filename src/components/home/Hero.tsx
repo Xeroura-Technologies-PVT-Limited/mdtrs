@@ -33,7 +33,7 @@ export function Hero() {
               <span className="hero-line"><span>Heal With</span></span>{" "}
               <span className="hero-line"><span><em>Experience</em><span className="hero-period" aria-hidden="true">.</span></span></span>
             </h1>
-            <p className="atlas-lead">World-class Indian hospitals, joined to thoughtful hospitality, for patients and the people who travel with them.</p>
+            <p className="atlas-lead">World-class Indian hospitals, joined to thoughtful hospitality, for guests and the companions who travel with them.</p>
             <div className="hero-cta">
               <button className="btn btn-solid" data-open="enquire" type="button">Get a Treatment Quote <span aria-hidden="true">↗</span></button>
               <a className="journey-link" href="#journeys">Plan Your Medical Journey <span aria-hidden="true">↓</span></a>

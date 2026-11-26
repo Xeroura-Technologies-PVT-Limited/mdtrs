@@ -7,8 +7,8 @@ export function Journey() {
         <div>
           <p className="eyebrow">Your medical journey</p>
           <h2 id="itinerary-title">From first <em>message</em> to home</h2>
-          <p className="lead">One coordinator follows every step, for the patient and the attender.</p>
-          <img loading="lazy" decoding="async" src="/editorial/hospital-consultation.webp" alt="A patient meeting a doctor at a consultation" />
+          <p className="lead">One coordinator follows every step, for the guest and the companion.</p>
+          <img loading="lazy" decoding="async" src="/editorial/hospital-consultation.webp" alt="A guest meeting a doctor at a consultation" />
         </div>
         <ol className="journey-stops">
           {itinerary.map(([time, title, copy], i) => (

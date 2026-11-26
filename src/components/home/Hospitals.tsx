@@ -2,7 +2,7 @@ import { HospitalArrival } from "./HospitalArrival";
 
 const standards = [
   { name: "NABH", title: "National standard", legend: "NATIONAL ACCREDITATION BOARD FOR HOSPITALS · INDIA · ", copy: "India's national hospital accreditation for patient safety and quality." },
-  { name: "JCI", title: "International standard", legend: "JOINT COMMISSION INTERNATIONAL · GLOBAL STANDARD · ", copy: "Joint Commission International, recognised by patients and insurers worldwide." },
+  { name: "JCI", title: "International standard", legend: "JOINT COMMISSION INTERNATIONAL · GLOBAL STANDARD · ", copy: "Joint Commission International, recognised by guests and insurers worldwide." },
 ];
 
 export function Hospitals({ contactHref = "#contact", showArrival = false }: { contactHref?: string; showArrival?: boolean }) {

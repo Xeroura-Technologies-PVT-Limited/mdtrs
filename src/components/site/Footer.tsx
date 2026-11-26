@@ -18,7 +18,7 @@ export function Footer() {
               <span className="sr-only"> home</span>
             </Link>
             <p className="ft-intro">
-              International medical travel to India, for patients and the people who travel with them.
+              International medical travel to India, for guests and the companions who travel with them.
             </p>
           </div>
           <div>
@@ -34,8 +34,8 @@ export function Footer() {
           <div>
             <h4>Plan</h4>
             <ul>
-              <li><Link href="/#journeys">For patients</Link></li>
-              <li><Link href="/#journeys">For attenders</Link></li>
+              <li><Link href="/#journeys">For guests</Link></li>
+              <li><Link href="/#journeys">For companions</Link></li>
               <li><Link href="/#hospitals">Hospitals</Link></li>
               {GUIDE_LINKS.map(link => <li key={link.href}><Link href={link.href}>{link.label === "Hospitals" ? "Hospital network" : link.label}</Link></li>)}
               <li><Link href="/about">About us</Link></li>

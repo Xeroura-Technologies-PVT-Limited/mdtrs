@@ -7,7 +7,7 @@ import { LogoMark } from "@/components/site/Logo";
 
 export const metadata: Metadata = {
   title: "About us",
-  description: "Medtours is a doctor-led medical travel team helping international patients and their families get treatment in India.",
+  description: "Medtours is a doctor-led medical travel team helping international guests and their companions get treatment in India.",
   alternates: { canonical: "/about" },
 };
 
@@ -38,7 +38,7 @@ export default function AboutPage() {
             <p className="eyebrow gap">Who we are</p>
             <h2>Led by {SITE.founder}</h2>
             <p className="lead">
-              Medtours is led by {SITE.founder}. The idea behind it is simple: international patients should have a doctor guiding their choice of
+              Medtours is led by {SITE.founder}. The idea behind it is simple: international guests should have a doctor guiding their choice of
               hospital and specialist, and a team that takes care of everything around the treatment.
             </p>
             <p className="lead">
@@ -75,16 +75,16 @@ export default function AboutPage() {
         <div className="wrap split">
           <div>
             <p className="eyebrow gap">Two journeys</p>
-            <h2>Patients <em>and</em> attenders</h2>
+            <h2>Guests <em>and</em> companions</h2>
           </div>
           <div className="two-cards">
             <div className="icard" data-reveal="">
-              <span className="mono">For the patient</span>
+              <span className="mono">For the guest</span>
               <p>Treatment planning, second opinions, help with the e-Medical visa, and recovery support after you return home.</p>
             </div>
             <div className="icard" data-reveal="">
-              <span className="mono">For the attender</span>
-              <p>Flights, the attendant visa, a stay near the hospital, a local concierge and daily updates from the care team.</p>
+              <span className="mono">For the companion</span>
+              <p>Flights, the e-Medical Attendant visa, a stay near the hospital, a local concierge and daily updates from the care team.</p>
             </div>
           </div>
         </div>

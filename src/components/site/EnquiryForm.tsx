@@ -76,10 +76,10 @@ export function EnquiryForm({
         <legend>I am</legend>
         <div className="seg">
           <label>
-            <input type="radio" name="role" id={id("patient")} value="patient" defaultChecked={defaultRole === "patient"} /> The patient
+            <input type="radio" name="role" id={id("patient")} value="patient" defaultChecked={defaultRole === "patient"} /> The guest
           </label>
           <label>
-            <input type="radio" name="role" id={id("attender")} value="attender" defaultChecked={defaultRole === "attender"} /> An attender
+            <input type="radio" name="role" id={id("attender")} value="attender" defaultChecked={defaultRole === "attender"} /> The companion
           </label>
         </div>
       </fieldset>

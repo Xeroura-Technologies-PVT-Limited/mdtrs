@@ -13,7 +13,7 @@ export default function DoctorsPage() {
     <PageHero crumbs={[{ href: "/doctors", label: "Doctors" }]} eyebrow="Doctor-led planning"
       title={<>A doctor for <em>your journey</em></>} lead="A physician reads your reports before a hospital is suggested. You can speak with your treating specialist by video before you decide." />
     <section className="band b-white pad"><div className="wrap founder">
-      <figure className="founder-art" data-reveal=""><img src="/editorial/consultation.webp" alt="A light-filled consultation room ready for a patient visit" width={1200} height={800} loading="lazy" /></figure>
+      <figure className="founder-art" data-reveal=""><img src="/editorial/consultation.webp" alt="A light-filled consultation room ready for a guest visit" width={1200} height={800} loading="lazy" /></figure>
       <div className="founder-txt"><p className="eyebrow gap" data-reveal="">Founder, Medtours</p><h2 data-reveal="">{SITE.founder}</h2>
         <p className="lead">Medtours is led by {SITE.founder}. A doctor on the team reviews your history and shortlists hospitals and senior specialists for your condition.</p>
         <div className="hero-cta"><SiteLink className="btn btn-ghost" href="/about">About Medtours</SiteLink></div>

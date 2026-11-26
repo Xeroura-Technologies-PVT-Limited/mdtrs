@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const labels = { patient: "guest", attender: "companion" } as const;
+
 const support = {
   patient: {
     note: "Your treatment, planned with a doctor, from the first report to your last follow-up.",
@@ -13,9 +15,9 @@ const support = {
     ],
   },
   attender: {
-    note: "For family and friends who travel with a patient: everything around the hospital, taken care of.",
+    note: "For family and friends who travel with a guest: everything around the hospital, taken care of.",
     services: [
-      ["Arrive", "Travel logistics", "Flights, airport pickup and the attender visa, arranged together with the patient's."],
+      ["Arrive", "Travel logistics", "Flights, airport pickup and the e-Medical Attendant visa, arranged together with the guest's."],
       ["Stay", "Accommodation", "Comfortable rooms close to the hospital, sized to the length of treatment."],
       ["Settle", "Local concierge", "A local SIM, currency, meals, transport and an interpreter whenever you need one."],
       ["Rest", "Hospitality care", "Daily updates from the care team, a quiet place to rest, and someone to call any time."],
@@ -42,11 +44,11 @@ export function Journeys() {
           <div className="support-toggle" role="group" aria-label="Choose a journey">
             {(["patient", "attender"] as const).map((option) => (
               <button key={option} type="button" aria-pressed={role === option} aria-controls="support-panel" onClick={() => selectRole(option)}>
-                The {option}
+                The {labels[option]}
               </button>
             ))}
           </div>
-          <h2 id="support-title" aria-live="polite">For the <em>{role}</em></h2>
+          <h2 id="support-title" aria-live="polite">For the <em>{labels[role]}</em></h2>
           <p className="lead">{support[role].note}</p>
           <button type="button" className="btn btn-solid" data-open="enquire">Plan Your Medical Journey <span aria-hidden="true">↗</span></button>
         </div>

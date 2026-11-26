@@ -4,7 +4,7 @@ import { SiteLink } from "@/components/site/SiteLink";
 import { CtaBand } from "@/components/page/CtaBand";
 
 export const metadata: Metadata = {
-  title: "Hospitality", description: "Accommodation, airport pickup, meals and interpreter support for patients and attenders in India.",
+  title: "Hospitality", description: "Accommodation, airport pickup, meals and interpreter support for guests and companions in India.",
   alternates: { canonical: "/hospitality" },
 };
 export default function HospitalityPage() {
@@ -14,8 +14,8 @@ export default function HospitalityPage() {
     <section className="band b-white pad"><div className="wrap founder">
       <figure className="founder-art" data-reveal=""><img src="/editorial/hospitality.webp" alt="A warm guest room with a window overlooking trees" width={1200} height={800} loading="lazy" /></figure>
       <div className="founder-txt"><p className="eyebrow gap">For family &amp; friends</p><h2>A stay <em>nearby</em></h2>
-        <p className="lead">Flights, the attendant visa, a stay near the hospital, a local concierge and daily updates from the care team.</p>
-        <div className="hero-cta"><SiteLink className="btn btn-ghost" href="/#journeys" journeyRole="attender">Explore attender support</SiteLink></div>
+        <p className="lead">Flights, the e-Medical Attendant visa, a stay near the hospital, a local concierge and daily updates from the care team.</p>
+        <div className="hero-cta"><SiteLink className="btn btn-ghost" href="/#journeys" journeyRole="attender">Explore companion support</SiteLink></div>
       </div></div></section><CtaBand />
   </>;
 }

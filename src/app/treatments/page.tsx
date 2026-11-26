@@ -24,7 +24,7 @@ export default function TreatmentsPage() {
         title={<>The care <em>we</em> arrange</>}
         lead="Four clinical services and two wellness programmes. Whatever brings you to India, a doctor on our team reads your reports first and suggests where to go."
         art="/editorial/hospital-consultation.webp"
-        artAlt="A doctor and patient talking across a desk in a consultation room"
+        artAlt="A doctor and guest talking across a desk in a consultation room"
       >
         <button className="btn btn-solid" data-open="enquire" type="button">Get a Treatment Quote</button>
         <Link className="btn btn-ghost" href="/#journey">How it works</Link>

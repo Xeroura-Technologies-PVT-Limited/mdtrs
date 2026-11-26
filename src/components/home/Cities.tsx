@@ -20,8 +20,8 @@ const origins = [
 ];
 
 const passage = [
-  ["Wherever you are", "Patients come to us from across the world", "From the Gulf, Africa, Central and South Asia and Europe, families choose India for care they can't wait for at home."],
-  ["One flight away", "A few hours to world-class care", "We plan every step: the hospital invitation letter, the e-Medical visa, flights for patient and attenders, and pickup at arrivals."],
+  ["Wherever you are", "Guests come to us from across the world", "From the Gulf, Africa, Central and South Asia and Europe, families choose India for care they can't wait for at home."],
+  ["One flight away", "A few hours to world-class care", "We plan every step: the hospital invitation letter, the e-Medical visa, flights for the guest and companions, and pickup at arrivals."],
   ["Into trusted hands", "Six medical cities. One team.", "NABH and JCI accredited hospitals in New Delhi, Mumbai, Hyderabad, Chennai, Bengaluru and Kochi, with a coordinator beside you throughout."],
 ];
 

@@ -4,8 +4,8 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { itinerary } from "@/lib/itinerary";
 
 const views = [
-  ["hospital-consultation", "A physician reviewing a patient's reports"],
-  ["hospital-consultation", "A doctor and patient meeting in a consultation room"],
+  ["hospital-consultation", "A physician reviewing a guest's reports"],
+  ["hospital-consultation", "A doctor and guest meeting in a consultation room"],
   ["consultation", "A quiet consultation room"],
   ["hospitality", "A room arranged for a stay in India"],
   ["arrival", "A covered arrival entrance at dusk"],

@@ -7,7 +7,7 @@ export const SITE = {
   domain: "medtoursin.com",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://medtoursin.com",
   description:
-    "Medical travel to India for international patients and the people who travel with them. Accredited hospitals, an itemised estimate before you fly, and one coordinator from visa to recovery.",
+    "Medical travel to India for international guests and the companions who travel with them. Accredited hospitals, an itemised estimate before you fly, and one coordinator from visa to recovery.",
   founder: "Dr. Ravi Teja",
   phone: "+91 99856 66688",
   phoneHref: "tel:+919985666688",
@@ -19,7 +19,7 @@ export type NavLink = { href: string; label: string; kicker: string };
 
 export const NAV: NavLink[] = [
   { href: "/treatments", label: "Treatments", kicker: "Care" },
-  { href: "/#journeys", label: "Patients & attenders", kicker: "For you" },
+  { href: "/#journeys", label: "Guests & companions", kicker: "For you" },
   { href: "/#hospitals", label: "Accredited hospitals", kicker: "Trust" },
   { href: "/#journey", label: "Your journey", kicker: "How" },
   { href: "/about", label: "About us", kicker: "Who" },
@@ -28,7 +28,7 @@ export const NAV: NavLink[] = [
 ];
 
 export const GUIDE_LINKS: NavLink[] = [
-  { href: "/patient-journey", label: "Patient journey", kicker: "Itinerary" },
+  { href: "/patient-journey", label: "Care journey", kicker: "Itinerary" },
   { href: "/hospitals", label: "Hospitals", kicker: "Network" },
   { href: "/doctors", label: "Doctors", kicker: "Clinical team" },
   { href: "/wellness", label: "Wellness", kicker: "Programmes" },
@@ -59,11 +59,11 @@ export const TREATMENTS: Treatment[] = [
     name: "Medical",
     group: "Clinical",
     render: "/editorial/treatments/medical.webp",
-    alt: "A doctor and patient reviewing a tablet together",
+    alt: "A doctor and guest reviewing a tablet together",
     summary:
       "Diagnosis and treatment without surgery, and second opinions from senior physicians before you decide.",
     intro:
-      "Many patients come to India first for answers: a clear diagnosis, a review of the treatment they have been offered at home, or care that is hard to get quickly where they live. We connect you with senior physicians who look at your full history before suggesting anything.",
+      "Many guests come to India first for answers: a clear diagnosis, a review of the treatment they have been offered at home, or care that is hard to get quickly where they live. We connect you with senior physicians who look at your full history before suggesting anything.",
     areas: [
       { name: "Cardiology", text: "Assessment of chest pain, rhythm problems and heart failure, with imaging and stress testing arranged in one visit." },
       { name: "Oncology", text: "Tumour board reviews, chemotherapy, immunotherapy and radiation planning at hospitals with dedicated cancer centres." },
@@ -115,7 +115,7 @@ export const TREATMENTS: Treatment[] = [
     name: "Dental",
     group: "Clinical",
     render: "/editorial/treatments/dental.webp",
-    alt: "A dentist examining a patient in a dental chair",
+    alt: "A dentist examining a guest in a dental chair",
     summary:
       "Implants, smile restoration and full-mouth rehabilitation, often completed within a single trip.",
     intro:
@@ -141,7 +141,7 @@ export const TREATMENTS: Treatment[] = [
     name: "Rehabilitation",
     group: "Clinical",
     render: "/editorial/treatments/rehabilitation.webp",
-    alt: "A physiotherapist supporting a patient at parallel bars",
+    alt: "A physiotherapist supporting a guest at parallel bars",
     summary:
       "Physiotherapy and recovery programmes after surgery, stroke or injury, built into your stay.",
     intro:
@@ -159,7 +159,7 @@ export const TREATMENTS: Treatment[] = [
       "Teleconsult reviews after you go home",
     ],
     notes: [
-      { title: "Bring an attender", text: "Neuro rehabilitation goes better with a family member who learns the exercises too. We arrange their stay as well." },
+      { title: "Bring a companion", text: "Neuro rehabilitation goes better with a family member who learns the exercises too. We arrange their stay as well." },
     ],
   },
   {
@@ -167,7 +167,7 @@ export const TREATMENTS: Treatment[] = [
     name: "Longevity",
     group: "Wellness",
     render: "/editorial/treatments/longevity.webp",
-    alt: "A clinician measuring a patient's blood pressure",
+    alt: "A clinician measuring a guest's blood pressure",
     summary:
       "Advanced screening and a personal plan to stay healthy for longer, reviewed by physicians.",
     intro:
@@ -218,13 +218,13 @@ export const TREATMENTS: Treatment[] = [
 
 export const FAQ: [string, string][] = [
   ["How quickly will I get a treatment plan?", "Usually within 48 hours of receiving your reports. A doctor on our team reviews them and sends hospital options with an itemised estimate."],
-  ["Can family members travel with me?", "Yes. Up to two attenders can travel on India's e-Medical Attendant visa. We arrange their visa letters, flights and a stay close to the hospital."],
+  ["Can family members travel with me?", "Yes. Up to two companions can travel on India's e-Medical Attendant visa. We arrange their visa letters, flights and a stay close to the hospital."],
   ["How do I get a medical visa for India?", "Most nationalities can apply online for the e-Medical visa. Your hospital issues the invitation letter, and we help you complete the application."],
   ["What do NABH and JCI accreditation mean?", "NABH is India's national hospital accreditation. JCI is an international accreditation. Both assess patient safety, infection control and quality of care."],
   ["Will I speak with the doctor before I travel?", "Yes. You can have a video consultation with the treating specialist before you confirm the plan."],
   ["What happens after I go home?", "You leave with your complete medical records and a follow-up schedule, and your specialist continues care through teleconsults."],
   ["What does the estimate include?", "The estimate is itemised: the procedure, hospital stay, tests, medicines and follow-up are listed separately, along with an estimate for accommodation and local travel. If the plan changes, you see the new figure before anything goes ahead."],
   ["How do I pay the hospital?", "Hospital charges are paid to the hospital, usually with a deposit on admission. Your coordinator explains the hospital's accepted payment methods before you travel."],
-  ["Will someone speak my language?", "Many hospitals have international patient desks, and we arrange an interpreter when you need one."],
+  ["Will someone speak my language?", "Many hospitals have desks for international guests, and we arrange an interpreter when you need one."],
   ["What should I bring?", "Your passport and visa, recent reports and scans, a list of current medicines, and comfortable clothes for the stay. Your coordinator sends a checklist before you fly."],
 ];

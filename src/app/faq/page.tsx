@@ -6,7 +6,7 @@ import { FaqList } from "@/components/site/FaqList";
 
 export const metadata: Metadata = {
   title: "Questions",
-  description: "Answers about treatment plans, medical visas, attenders, accreditation, payments and follow-up care with Medtours.",
+  description: "Answers about treatment plans, medical visas, companions, accreditation, payments and follow-up care with Medtours.",
   alternates: { canonical: "/faq" },
 };
 
