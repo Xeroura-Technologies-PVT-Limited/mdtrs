@@ -115,7 +115,14 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
     dragging: false, lastX: 0, lastY: 0,
     raf: 0, t0: performance.now(), last: performance.now(), angle: 0.6,
     firstFrame: false, cleared: false,
+    // Resolution is settled while the loader is up (no scrolling yet), then frozen, so the
+    // drawing buffer is never reallocated during a swipe.
+    quality: Math.min(window.devicePixelRatio || 1, 2), samples: [] as number[], settled: false, frames: 0,
+    cw: canvas.clientWidth, ch: canvas.clientHeight,
   };
+  // Track the canvas size without reading layout in the draw loop.
+  const sizeObserver = new ResizeObserver(([e]) => { state.cw = e.contentRect.width; state.ch = e.contentRect.height; });
+  sizeObserver.observe(canvas);
 
   function onMove(e: PointerEvent) {
     if (!state.dragging) return;
@@ -124,6 +131,8 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
     state.lastX = e.clientX; state.lastY = e.clientY;
   }
   function onDown(e: PointerEvent) {
+    // A finger on the emblem is almost always the start of a scroll, not a drag.
+    if (e.pointerType === "touch") return;
     const anchor = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-orbit-anchor]") : null;
     if (!anchor || (e.target instanceof Element && e.target.closest("a, button"))) return;
     state.dragging = true; state.lastX = e.clientX; state.lastY = e.clientY;
@@ -148,7 +157,20 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
     state.last = now;
     const t = (now - state.t0) / 1000;
     const pose = opts.getPose(t);
-    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const cw = state.cw, ch = state.ch;
+    if (!state.settled) {
+      if (pose.interactive) state.settled = true; // the loader has lifted: freeze
+      else if (dt > 0 && ++state.frames > 30) { // skip start-up frames (hydration, shader warm-up)
+        state.samples.push(dt);
+        if (state.samples.length >= 40) {
+          const s = state.samples.sort((a, b) => a - b)[state.samples.length >> 1];
+          // Median frame time while the emblem is already drawing. Slower phones get a lighter buffer.
+          if (s > 0.026) state.quality = Math.min(state.quality, 1.25);
+          else if (s > 0.019) state.quality = Math.min(state.quality, 1.6);
+          state.samples = [];
+        }
+      }
+    }
     if (!pose.visible || cw === 0) {
       if (!state.cleared) { gl!.clearColor(0, 0, 0, 0); gl!.clear(gl!.COLOR_BUFFER_BIT); state.cleared = true; }
       return;
@@ -156,7 +178,9 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
     state.cleared = false;
 
     // Rasterising is cheap, so the canvas keeps the screen's sharpness (capped at 2x).
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = state.quality;
+    // The layer is sized in large-viewport units, so the address bar never resizes it; the
+    // drawing buffer (and its multisample storage) is only reallocated on rotation.
     const w = Math.max(1, Math.round(cw * dpr)), h = Math.max(1, Math.round(ch * dpr));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     gl!.viewport(0, 0, w, h);
@@ -233,6 +257,7 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
   return {
     destroy() {
       cancelAnimationFrame(state.raf);
+      sizeObserver.disconnect();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);

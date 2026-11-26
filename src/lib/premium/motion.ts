@@ -141,21 +141,63 @@ export function initPremium(root: HTMLElement): () => void {
       if (!pinned) { rail.style.removeProperty("height"); rail.style.removeProperty("--dist"); continue; }
       const dist = Math.max(0, track.scrollWidth - innerWidth);
       rail.style.setProperty("--dist", String(dist));
-      rail.style.height = `${dist + innerHeight * 1.1}px`;
+      rail.style.height = `${dist + VH * 1.1}px`;
     }
   };
 
   /* ---------- Scroll-linked progress ---------- */
   const pinned = Array.from(root.querySelectorAll<HTMLElement>("[data-progress]"));
   const passing = Array.from(root.querySelectorAll<HTMLElement>("[data-view]"));
+  const personaEl = root.querySelector<HTMLElement>("[data-persona-root]");
   const progressBar = document.querySelector<HTMLElement>(".pm-progress");
   let orbit: OrbitScene | null = null;
-  let heroP = 0, sideP = 0;
   let globe: GlobeScene | null = null;
   const route = root.querySelector<SVGPathElement>("[data-route]");
   const plane = root.querySelector<SVGGElement>("[data-route-plane]");
   const stops = Array.from(root.querySelectorAll<HTMLElement>("[data-stop]"));
   const routeLength = route?.getTotalLength() ?? 0;
+
+  /* ---------- Stable geometry ----------
+     On phones the address bar collapses on the first swipe, which changes innerHeight and
+     fires resize mid-gesture. Everything scroll-linked therefore uses a viewport height that
+     never changes (the small viewport, which is also what the pinned panels are sized to), and
+     section positions are measured once and cached. Nothing reads layout while scrolling. */
+  const lowPower = innerWidth < 900 || matchMedia("(pointer: coarse)").matches;
+  const probe = document.createElement("div");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
+  document.body.appendChild(probe);
+  cleanups.push(() => probe.remove());
+  let VH = innerHeight;
+  type Span = { top: number; height: number };
+  type AnchorBox = { left: number; width: number; height: number; docTop: number; dy: number; stickyTop: number; pinned: boolean };
+  const spans = new Map<Element, Span>();
+  const anchorBoxes = new Map<Element, AnchorBox>();
+  const span = (el: Element): Span => {
+    let v = spans.get(el);
+    if (!v) { const r = el.getBoundingClientRect(); v = { top: r.top + window.scrollY, height: r.height }; spans.set(el, v); }
+    return v;
+  };
+  const anchorBox = (el: HTMLElement): AnchorBox => {
+    let v = anchorBoxes.get(el);
+    if (!v) {
+      const sy = window.scrollY, r = el.getBoundingClientRect();
+      const sticky = el.closest<HTMLElement>(".pm-sticky");
+      const sr = sticky?.getBoundingClientRect();
+      v = {
+        left: r.left, width: r.width, height: r.height, docTop: r.top + sy,
+        dy: sr ? r.top - sr.top : 0, stickyTop: sticky ? parseFloat(getComputedStyle(sticky).top) || 0 : 0, pinned: !!sticky && !reduced,
+      };
+      anchorBoxes.set(el, v);
+    }
+    return v;
+  };
+  let lastWidth = innerWidth;
+  const refresh = () => {
+    VH = probe.offsetHeight || innerHeight;
+    spans.clear(); anchorBoxes.clear();
+    lastY = -1;
+  };
   const stopDots = Array.from(root.querySelectorAll<SVGCircleElement>("[data-stop-dot]"));
   if (route) stopDots.forEach((d, i) => {
     const pt = route.getPointAtLength(i / Math.max(1, stopDots.length - 1) * routeLength);
@@ -164,25 +206,35 @@ export function initPremium(root: HTMLElement): () => void {
   });
   let lastY = -1, lastH = -1, lastScroll = window.scrollY, velocity = 0;
 
+  const written = new WeakMap<HTMLElement, string>();
+  const write = (el: HTMLElement, name: string, value: string) => {
+    if (written.get(el) === value) return;
+    written.set(el, value);
+    el.style.setProperty(name, value);
+  };
+  const progressOf = (el: Element, y: number) => {
+    const b = span(el), vh = VH, top = b.top - y, room = b.height - vh;
+    return room > 0 ? clamp(-top / room) : clamp((vh - top) / (vh + b.height));
+  };
   const measure = () => {
-    const vh = innerHeight;
+    const vh = VH, y = window.scrollY;
     for (const el of pinned) {
-      const r = el.getBoundingClientRect();
-      const span = r.height - vh;
-      const p = span > 0 ? clamp(-r.top / span) : clamp((vh - r.top) / (vh + r.height));
-      el.style.setProperty("--p", p.toFixed(4));
-      if (el.dataset.progress === "hero") heroP = p;
-      if (el.dataset.progress === "manifesto") sideP = p;
+      const p = progressOf(el, y);
+      write(el, "--p", p.toFixed(4));
       if (el.dataset.progress === "globe") globe?.setProgress(p);
       if (el.dataset.progress === "journey") paintRoute(p);
     }
     for (const el of passing) {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty("--v", clamp((vh - r.top) / (vh + r.height)).toFixed(4));
+      const b = span(el), top = b.top - y;
+      write(el, "--v", clamp((vh - top) / (vh + b.height)).toFixed(4));
     }
-    paintPersona();
+    // The journey steps measure their own rows, so only run them while they are near the screen.
+    if (personaEl) {
+      const b = span(personaEl);
+      if (b.top - y < vh * 1.5 && b.top + b.height - y > -vh * 0.5) paintPersona();
+    }
     const docMax = document.documentElement.scrollHeight - vh;
-    progressBar?.style.setProperty("--scroll", docMax > 0 ? (window.scrollY / docMax).toFixed(4) : "0");
+    if (progressBar) write(progressBar, "--scroll", docMax > 0 ? (y / docMax).toFixed(4) : "0");
     html.classList.toggle("pm-scrolled", window.scrollY > 40);
   };
 
@@ -204,7 +256,12 @@ export function initPremium(root: HTMLElement): () => void {
   }
 
   /* ---------- Marquee driven by time and scroll velocity ---------- */
-  const marquees = Array.from(root.querySelectorAll<HTMLElement>("[data-marquee]")).map(el => ({ el, x: 0, dir: 1 }));
+  const marquees = Array.from(root.querySelectorAll<HTMLElement>("[data-marquee]")).map(el => ({ el, x: 0, dir: 1, seen: false, w: 0 }));
+  const marqueeSeen = new IntersectionObserver(entries => {
+    for (const e of entries) { const m = marquees.find(q => q.el === e.target); if (m) m.seen = e.isIntersecting; }
+  }, { rootMargin: "200px 0px" });
+  marquees.forEach(m => marqueeSeen.observe(m.el));
+  cleanups.push(() => marqueeSeen.disconnect());
 
   let tick = 0, lastT = performance.now();
   const loop = (now: number) => {
@@ -217,6 +274,7 @@ export function initPremium(root: HTMLElement): () => void {
     if (!reduced) {
       for (const m of marquees) {
         if (Math.abs(velocity) > 30) m.dir = velocity > 0 ? 1 : -1;
+        if (!m.seen) continue;
         const speed = 40 + Math.min(900, Math.abs(velocity) * 0.35);
         const w = m.el.scrollWidth / 2 || 1;
         m.x = (m.x - m.dir * speed * dt) % w;
@@ -227,15 +285,23 @@ export function initPremium(root: HTMLElement): () => void {
     }
     tick = requestAnimationFrame(loop);
   };
-  const onResize = () => { sizeRails(); lastY = -1; };
+  const onResize = () => {
+    if (lowPower && innerWidth === lastWidth) return; // address bar showing or hiding: nothing moved
+    lastWidth = innerWidth;
+    sizeRails(); refresh();
+  };
   on(window, "resize", onResize);
   sizeRails();
+  refresh();
+  let refreshQueued = 0;
+  const queueRefresh = () => { if (!refreshQueued) refreshQueued = requestAnimationFrame(() => { refreshQueued = 0; refresh(); }); };
+  const ro = new ResizeObserver(queueRefresh);
+  ro.observe(root);
+  document.fonts?.ready.then(queueRefresh).catch(() => {});
+  cleanups.push(() => { ro.disconnect(); cancelAnimationFrame(refreshQueued); });
 
   /* ---------- 3D scenes (created lazily as they approach) ---------- */
-  const lazy = new IntersectionObserver(entries => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      const canvas = e.target as HTMLCanvasElement;
+  const startScene = (canvas: HTMLCanvasElement) => {
       lazy.unobserve(canvas);
       try {
 
@@ -248,9 +314,22 @@ export function initPremium(root: HTMLElement): () => void {
       } catch (err) {
         console.warn("Medtours 3D scene unavailable", err);
       }
-    }
+  };
+  const lazy = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) startScene(e.target as HTMLCanvasElement);
   }, { rootMargin: "300px 0px" });
-  root.querySelectorAll<HTMLCanvasElement>("canvas[data-scene]").forEach(c => lazy.observe(c));
+  const sceneCanvases = Array.from(root.querySelectorAll<HTMLCanvasElement>("canvas[data-scene]"));
+  sceneCanvases.forEach(c => lazy.observe(c));
+  // Shader compilation is the single most expensive step; do it now, while the loader is up,
+  // so it never lands in the middle of a swipe. The scene only draws once it is on screen.
+  if (loader.active && !reduced) sceneCanvases.forEach(startScene);
+  // Likewise fetch and decode the first photos down the page now, not during the first swipe.
+  if (loader.active) {
+    for (const img of Array.from(root.querySelectorAll<HTMLImageElement>(".pm-expand img"))) {
+      img.loading = "eager";
+      img.decode?.().catch(() => {});
+    }
+  }
   cleanups.push(() => { lazy.disconnect(); orbit?.destroy(); globe?.destroy(); });
 
   /* ---------- The single Care Orbit emblem ----------
@@ -272,42 +351,30 @@ export function initPremium(root: HTMLElement): () => void {
     ringK: a.ringK + (b.ringK - a.ringK) * k, shadow: a.shadow + (b.shadow - a.shadow) * k,
     interactive: k > 0.5 ? b.interactive : a.interactive, visible: true,
   });
-  // Sticky offsets only change on resize; reading computed style every frame forces style work.
-  const stickyTops = new Map<Element, number>();
-  const stickyTopOf = (el: Element) => {
-    let v = stickyTops.get(el);
-    if (v === undefined) { v = parseFloat(getComputedStyle(el).top) || 0; stickyTops.set(el, v); }
-    return v;
-  };
-  const clearStickyTops = () => stickyTops.clear();
-  window.addEventListener("resize", clearStickyTops);
-  cleanups.push(() => window.removeEventListener("resize", clearStickyTops));
   /** An anchor's box where it sits while its section is pinned (or where it is now, if nothing pins). */
-  const pinnedBox = (el: HTMLElement) => {
-    const r = el.getBoundingClientRect();
-    const sticky = el.closest<HTMLElement>(".pm-sticky");
-    if (!sticky || reduced) return r;
-    const sr = sticky.getBoundingClientRect();
-    const top = stickyTopOf(sticky);
-    return { left: r.left, top: top + (r.top - sr.top), width: r.width, height: r.height } as DOMRect;
+  const pinnedBox = (el: HTMLElement, y: number) => {
+    const a = anchorBox(el);
+    return { left: a.left, top: a.pinned ? a.stickyTop + a.dy : a.docTop - y, width: a.width, height: a.height };
   };
-  const heroPose = (t: number): Pose => {
-    const b = heroAnchor ? pinnedBox(heroAnchor) : ({ left: innerWidth * 0.45, top: 0, width: innerWidth * 0.55, height: innerHeight } as DOMRect);
+  const heroPose = (t: number, heroP: number, y: number): Pose => {
+    const b = heroAnchor ? pinnedBox(heroAnchor, y) : { left: innerWidth * 0.45, top: 0, width: innerWidth * 0.55, height: VH };
     const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
     const size = Math.min(b.width, b.height) * 0.74 * (1 - heroP * 0.18);
     const bob = reduced ? 0 : Math.sin(t * 0.9) * size * 0.02;
     return {
-      x: b.left + b.width / 2, y: b.top + b.height / 2 - heroP * innerHeight * 0.05 + bob, ringPx: size,
+      x: b.left + b.width / 2, y: b.top + b.height / 2 - heroP * VH * 0.05 + bob, ringPx: size,
       yaw: idle + heroP * Math.PI * 0.9 - 0.42, pitch: 0.06 - heroP * 0.25,
       ringRy: 0.55 + heroP * 0.5, ringRx: 0.32 + heroP * 0.9, ringK: 1, shadow: 1, interactive: true, visible: true,
     };
   };
-  const sidePose = (t: number): Pose => {
+  const sidePose = (t: number, sideP: number, y: number): Pose => {
     // Aim at where the anchor sits once its section is pinned, so the emblem glides straight
     // there instead of chasing the section up from the bottom of the screen. It only moves
     // up again when the section itself scrolls away.
-    const box = pinnedBox(sideAnchor!);
-    const leave = reduced || !sideSection ? 0 : Math.min(0, sideSection.getBoundingClientRect().bottom - innerHeight);
+    const box = pinnedBox(sideAnchor!, y);
+    // Leaving is attached to the page itself, so it follows the real scroll position.
+    const sy = window.scrollY;
+    const leave = reduced || !sideSection ? 0 : Math.min(0, span(sideSection).top + span(sideSection).height - sy - VH);
     const r = { left: box.left, top: box.top + leave, width: box.width, height: box.height };
     const idle = reduced ? 0 : Math.sin(t * 0.25) * 0.18;
     const size = Math.min(r.width, r.height) * 0.66;
@@ -338,41 +405,57 @@ export function initPremium(root: HTMLElement): () => void {
       ringRy: 0.55, ringRx: 0.32, ringK: 0, shadow: 0, interactive: false, visible: true,
     };
   };
+  // On touch screens scroll positions arrive unevenly (finger samples and momentum steps don't
+  // line up with frames), so the emblem follows a softly damped copy of the scroll position.
+  // Frame-rate independent; the page itself still scrolls natively.
+  let smoothY = window.scrollY, lastPoseT = -1;
+  const emblemScroll = (t: number) => {
+    const y = window.scrollY;
+    const dt = lastPoseT < 0 ? 0 : clamp(t - lastPoseT, 0, 0.1);
+    lastPoseT = t;
+    if (!lowPower || reduced || loader.phase !== "done") return (smoothY = y);
+    smoothY += (y - smoothY) * (1 - Math.exp(-dt / 0.11));
+    if (Math.abs(y - smoothY) < 0.1) smoothY = y;
+    return smoothY;
+  };
   const getPose = (t: number): Pose => {
     let pose: Pose;
+    const y = emblemScroll(t);
+    const heroSection = heroAnchor?.closest<HTMLElement>("section") ?? null;
+    const heroP = heroSection ? progressOf(heroSection, y) : 0;
+    const sideP = sideSection ? progressOf(sideSection, y) : 0;
     if (loader.phase === "loading") pose = loaderPose(t);
     else if (loader.phase === "flying") {
       const f = ease((performance.now() - loader.flyStart) / (reduced ? 300 : FLIGHT_MS));
-      pose = mixPose(loaderPose(t), heroPose(t), f);
+      pose = mixPose(loaderPose(t), heroPose(t, heroP, y), f);
       pose.yaw += Math.sin(Math.PI * f) * 0.9;
       pose.ringK = clamp(f * 1.3 - 0.15);
     } else if (sideAnchor && sideSection) {
-      const top = sideSection.getBoundingClientRect().top;
-      const stickyTop = stickyTopOf(sideAnchor.closest<HTMLElement>(".pm-sticky") ?? sideSection);
+      const sideTop = span(sideSection).top;
+      const stickyTop = anchorBox(sideAnchor).stickyTop;
       // Start the glide halfway through the hero and finish as the promise pins, so the
       // emblem drifts across over a long stretch of scroll rather than snapping.
-      const heroSection = heroAnchor?.closest<HTMLElement>("section");
       let w: number;
       if (heroSection && !reduced) {
-        const hr = heroSection.getBoundingClientRect();
-        const start = hr.top + window.scrollY + (hr.height - innerHeight) * 0.5;
-        const end = top + window.scrollY - stickyTop;
-        w = clamp((window.scrollY - start) / Math.max(1, end - start));
-      } else w = clamp((innerHeight - top) / Math.max(1, innerHeight - stickyTop));
+        const hs = span(heroSection);
+        const start = hs.top + (hs.height - VH) * 0.5;
+        const end = sideTop - stickyTop;
+        w = clamp((y - start) / Math.max(1, end - start));
+      } else w = clamp((VH - (sideTop - y)) / Math.max(1, VH - stickyTop));
       const smooth = 0.5 - Math.cos(Math.PI * w) / 2;
-      pose = mixPose(heroPose(t), sidePose(t), smooth);
+      pose = mixPose(heroPose(t, heroP, y), sidePose(t, sideP, y), smooth);
       // One continuous turn for the whole journey: the rotation keeps the speed it had in the
       // hero, through the glide and on through the promise, instead of settling at each stop.
       if (heroSection && !reduced) {
-        const hr = heroSection.getBoundingClientRect();
-        const u = Math.max(0, -hr.top / Math.max(1, hr.height - innerHeight));
+        const hs = span(heroSection);
+        const u = Math.max(0, (y - hs.top) / Math.max(1, hs.height - VH));
         const idle = Math.sin(t * 0.25) * 0.18;
         pose.yaw = idle - 0.42 + u * Math.PI * 0.9;
         pose.ringRy = 0.55 + u * 0.5;
         pose.ringRx = 0.32 + u * 0.9;
         pose.pitch = 0.06 - Math.sin(Math.min(u, 1) * Math.PI / 2) * 0.25;
       }
-    } else pose = heroPose(t);
+    } else pose = heroPose(t, heroP, y);
     pose.visible = pose.y + pose.ringPx > -40 && pose.y - pose.ringPx < innerHeight + 40;
     if (halo) {
       const glow = loader.phase === "loading" ? 0 : loader.phase === "flying" ? clamp((performance.now() - loader.flyStart) / FLIGHT_MS) : 1;
@@ -384,7 +467,6 @@ export function initPremium(root: HTMLElement): () => void {
   if (orbitCanvas) {
     try {
       // Phones and tablets draw the emblem as anti-aliased meshes; desktops raymarch it.
-      const lowPower = innerWidth < 900 || matchMedia("(pointer: coarse)").matches;
       const make = lowPower ? createOrbitMesh : createOrbitScene;
       orbit = make(orbitCanvas, reduced, { getPose, onFirstFrame: () => loader.mark("scene") });
       if (orbit) html.classList.add("pm-gl");

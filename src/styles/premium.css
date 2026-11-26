@@ -306,7 +306,7 @@ li[data-active] .pm-step-rule i { transform: scaleY(var(--fill)); }
 .pm-cursor[data-press] .pm-cursor-ring { scale: .86; }
 
 /* ---------- The single 3D emblem ---------- */
-.pm-orbit-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.pm-orbit-layer { position: fixed; left: 0; right: 0; top: 0; height: 100vh; height: 100lvh; z-index: 0; pointer-events: none; contain: strict; }
 html.pm-loading .pm-orbit-layer { z-index: 301; }
 .pm-orbit-canvas { position: relative; display: block; width: 100%; height: 100%; }
 .pm-orbit-halo { position: absolute; left: 0; top: 0; width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 50%; background: radial-gradient(circle, #fbf9f3 0%, #fbf9f3d9 38%, #fbf9f300 70%); opacity: 0; will-change: transform, opacity; }
@@ -526,4 +526,13 @@ html.pm-loading { overflow: hidden; }
   .pm-quiet-hero .pm-hero-title { font-size: clamp(3.4rem, 17vw, 5.4rem); }
   .pm-quiet-hero .pm-line:nth-child(2) { bottom: auto; top: calc(var(--edge) + .9em); }
   .pm-quiet-foot { gap: 16px; }
+}
+
+/* ---------- Touch screens: keep every scroll frame cheap ---------- */
+@media (hover: none), (pointer: coarse) {
+  /* Words are driven straight from scroll; a transition here restarts on every frame. */
+  .pm-word { transition: none; }
+  /* Blending forces the page behind to be recomposited each frame as the glow moves. */
+  .pm-orbit-halo { mix-blend-mode: normal; }
+  .pm-orbit-canvas { touch-action: pan-y; }
 }

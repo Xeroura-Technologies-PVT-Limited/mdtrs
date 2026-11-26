@@ -269,6 +269,8 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
   }
   // The canvas never takes pointer events; elements marked as anchors start a drag.
   function onDown(e: PointerEvent) {
+    // A finger on the emblem is almost always the start of a scroll, not a drag.
+    if (e.pointerType === "touch") return;
     const anchor = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-orbit-anchor]") : null;
     if (!anchor || (e.target instanceof Element && e.target.closest("a, button"))) return;
     state.dragging = true; state.lastX = e.clientX; state.lastY = e.clientY;

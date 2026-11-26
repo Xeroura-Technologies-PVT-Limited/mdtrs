@@ -39,9 +39,9 @@ export const metadata: Metadata = {
     siteName: "Medtours",
     title: "Medtours · Heal With Experience",
     description: SITE.description,
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Medtours · Heal With Experience" }],
+    images: [{ url: "/og-green.jpg", width: 1200, height: 630, type: "image/jpeg", alt: "Medtours · Heal With Experience" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/og-green.jpg"] },
   alternates: { canonical: "/" },
 };
 
