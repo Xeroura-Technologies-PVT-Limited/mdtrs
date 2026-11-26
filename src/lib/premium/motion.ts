@@ -1,4 +1,5 @@
 import { createOrbitScene, type OrbitPose, type OrbitScene } from "./orbit-scene";
+import { createOrbitMesh } from "./orbit-mesh";
 import { createGlobeScene, type GlobeScene } from "./globe-scene";
 
 /** Motion engine for the premium homepage.
@@ -271,13 +272,23 @@ export function initPremium(root: HTMLElement): () => void {
     ringK: a.ringK + (b.ringK - a.ringK) * k, shadow: a.shadow + (b.shadow - a.shadow) * k,
     interactive: k > 0.5 ? b.interactive : a.interactive, visible: true,
   });
+  // Sticky offsets only change on resize; reading computed style every frame forces style work.
+  const stickyTops = new Map<Element, number>();
+  const stickyTopOf = (el: Element) => {
+    let v = stickyTops.get(el);
+    if (v === undefined) { v = parseFloat(getComputedStyle(el).top) || 0; stickyTops.set(el, v); }
+    return v;
+  };
+  const clearStickyTops = () => stickyTops.clear();
+  window.addEventListener("resize", clearStickyTops);
+  cleanups.push(() => window.removeEventListener("resize", clearStickyTops));
   /** An anchor's box where it sits while its section is pinned (or where it is now, if nothing pins). */
   const pinnedBox = (el: HTMLElement) => {
     const r = el.getBoundingClientRect();
     const sticky = el.closest<HTMLElement>(".pm-sticky");
     if (!sticky || reduced) return r;
     const sr = sticky.getBoundingClientRect();
-    const top = parseFloat(getComputedStyle(sticky).top) || 0;
+    const top = stickyTopOf(sticky);
     return { left: r.left, top: top + (r.top - sr.top), width: r.width, height: r.height } as DOMRect;
   };
   const heroPose = (t: number): Pose => {
@@ -337,7 +348,7 @@ export function initPremium(root: HTMLElement): () => void {
       pose.ringK = clamp(f * 1.3 - 0.15);
     } else if (sideAnchor && sideSection) {
       const top = sideSection.getBoundingClientRect().top;
-      const stickyTop = parseFloat(getComputedStyle(sideAnchor.closest(".pm-sticky") ?? sideSection).top) || 0;
+      const stickyTop = stickyTopOf(sideAnchor.closest<HTMLElement>(".pm-sticky") ?? sideSection);
       // Start the glide halfway through the hero and finish as the promise pins, so the
       // emblem drifts across over a long stretch of scroll rather than snapping.
       const heroSection = heroAnchor?.closest<HTMLElement>("section");
@@ -372,7 +383,10 @@ export function initPremium(root: HTMLElement): () => void {
   };
   if (orbitCanvas) {
     try {
-      orbit = createOrbitScene(orbitCanvas, reduced, { getPose, onFirstFrame: () => loader.mark("scene") });
+      // Phones and tablets draw the emblem as anti-aliased meshes; desktops raymarch it.
+      const lowPower = innerWidth < 900 || matchMedia("(pointer: coarse)").matches;
+      const make = lowPower ? createOrbitMesh : createOrbitScene;
+      orbit = make(orbitCanvas, reduced, { getPose, onFirstFrame: () => loader.mark("scene") });
       if (orbit) html.classList.add("pm-gl");
     } catch (err) {
       console.warn("Medtours 3D emblem unavailable", err);
