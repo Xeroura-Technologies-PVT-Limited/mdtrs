@@ -517,8 +517,11 @@ html.pm-loading { overflow: hidden; }
 .pm-quiet-link { display: inline-flex; align-items: center; gap: 12px; padding: 0 0 6px; border: 0; background: linear-gradient(var(--pm-gold), var(--pm-gold)) 0 100% / 100% 1px no-repeat; color: #f7f3ea; font: 500 1rem/1 var(--f-body); letter-spacing: .01em; cursor: pointer; transition: background-size .6s var(--pm-ease), color .3s; }
 .pm-quiet-link:hover { color: var(--pm-gold-light); background-size: 40% 1px; }
 .pm-quiet-link .pm-arrow { color: var(--pm-gold); }
-.pm-js .pm-quiet-foot { opacity: 0; translate: 0 14px; transition: opacity 1.2s var(--pm-ease) 1s, translate 1.2s var(--pm-ease) 1s; }
-.pm-js.pm-ready .pm-quiet-foot { opacity: calc(1 - var(--p) * 2.2); translate: 0 0; }
+/* The entrance is a one-off animation, not a transition: a transition here would also replay
+   (with its 1s delay) on every scroll frame, making the text trail behind the finger. */
+.pm-js .pm-quiet-foot { opacity: 0; }
+.pm-js.pm-ready .pm-quiet-foot { opacity: calc(1 - var(--p) * 2.2); animation: pm-foot-in 1.2s var(--pm-ease) 1s backwards; }
+@keyframes pm-foot-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
 .pm-hero .pm-scrollcue { display: none; }
 @media (max-width: 900px) {
   .pm-hero-art { inset: 18% 4% 28% 4%; height: auto; }

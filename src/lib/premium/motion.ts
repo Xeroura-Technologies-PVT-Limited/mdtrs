@@ -193,6 +193,23 @@ export function initPremium(root: HTMLElement): () => void {
     return v;
   };
   let lastWidth = innerWidth;
+
+  /* On touch screens scroll positions arrive unevenly (finger samples and momentum steps don't
+     line up with frames). The emblem and the pinned text beside it follow one softly damped copy
+     of the scroll position, computed once per frame, so they move together and glide. */
+  const smoothing = lowPower && !reduced;
+  let smoothY = window.scrollY, smoothKey = -1, smoothLast = -1;
+  const smoothScroll = () => {
+    const y = window.scrollY;
+    if (!smoothing || loader.phase !== "done") { smoothKey = -1; return (smoothY = y); }
+    const now = Number(document.timeline.currentTime ?? performance.now());
+    if (now === smoothKey) return smoothY;
+    const dt = smoothLast < 0 ? 0 : clamp((now - smoothLast) / 1000, 0, 0.1);
+    smoothKey = smoothLast = now;
+    smoothY += (y - smoothY) * (1 - Math.exp(-dt / 0.11));
+    if (Math.abs(y - smoothY) < 0.1) smoothY = y;
+    return smoothY;
+  };
   const refresh = () => {
     VH = probe.offsetHeight || innerHeight;
     spans.clear(); anchorBoxes.clear();
@@ -216,10 +233,12 @@ export function initPremium(root: HTMLElement): () => void {
     const b = span(el), vh = VH, top = b.top - y, room = b.height - vh;
     return room > 0 ? clamp(-top / room) : clamp((vh - top) / (vh + b.height));
   };
+  // Pinned sections whose text sits beside the emblem take the damped position too.
+  const glides = new Set(pinned.filter(el => el.dataset.progress === "hero" || el.dataset.progress === "manifesto"));
   const measure = () => {
-    const vh = VH, y = window.scrollY;
+    const vh = VH, y = window.scrollY, sy = smoothScroll();
     for (const el of pinned) {
-      const p = progressOf(el, y);
+      const p = progressOf(el, glides.has(el) ? sy : y);
       write(el, "--p", p.toFixed(4));
       if (el.dataset.progress === "globe") globe?.setProgress(p);
       if (el.dataset.progress === "journey") paintRoute(p);
@@ -268,7 +287,7 @@ export function initPremium(root: HTMLElement): () => void {
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     const y = window.scrollY, h = document.documentElement.scrollHeight;
-    if (y !== lastY || h !== lastH) { measure(); lastY = y; lastH = h; }
+    if (y !== lastY || h !== lastH || (smoothing && smoothScroll() !== y)) { measure(); lastY = y; lastH = h; }
     velocity += ((y - lastScroll) / Math.max(dt, 0.001) - velocity) * 0.12;
     lastScroll = y;
     if (!reduced) {
@@ -405,22 +424,9 @@ export function initPremium(root: HTMLElement): () => void {
       ringRy: 0.55, ringRx: 0.32, ringK: 0, shadow: 0, interactive: false, visible: true,
     };
   };
-  // On touch screens scroll positions arrive unevenly (finger samples and momentum steps don't
-  // line up with frames), so the emblem follows a softly damped copy of the scroll position.
-  // Frame-rate independent; the page itself still scrolls natively.
-  let smoothY = window.scrollY, lastPoseT = -1;
-  const emblemScroll = (t: number) => {
-    const y = window.scrollY;
-    const dt = lastPoseT < 0 ? 0 : clamp(t - lastPoseT, 0, 0.1);
-    lastPoseT = t;
-    if (!lowPower || reduced || loader.phase !== "done") return (smoothY = y);
-    smoothY += (y - smoothY) * (1 - Math.exp(-dt / 0.11));
-    if (Math.abs(y - smoothY) < 0.1) smoothY = y;
-    return smoothY;
-  };
   const getPose = (t: number): Pose => {
     let pose: Pose;
-    const y = emblemScroll(t);
+    const y = smoothScroll();
     const heroSection = heroAnchor?.closest<HTMLElement>("section") ?? null;
     const heroP = heroSection ? progressOf(heroSection, y) : 0;
     const sideP = sideSection ? progressOf(sideSection, y) : 0;
