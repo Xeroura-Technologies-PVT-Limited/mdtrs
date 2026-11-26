@@ -61,7 +61,7 @@ vec3 calcNormal(vec3 p){
 
 float softShadow(vec3 ro, vec3 rd, float k){
   float res = 1.0, t = 0.03;
-  for (int i = 0; i < 40; i++) {
+  for (int i = 0; i < SHADOW_STEPS; i++) {
     float h = map(ro + rd*t).x;
     res = min(res, k*h/t);
     t += clamp(h, 0.02, 0.3);
@@ -73,7 +73,7 @@ float softShadow(vec3 ro, vec3 rd, float k){
 
 float calcAO(vec3 p, vec3 n){
   float o = 0.0, s = 1.0;
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < AO_STEPS; i++) {
     float h = 0.015 + 0.11*float(i);
     o += (h - map(p + n*h).x) * s;
     s *= 0.78;
@@ -124,11 +124,15 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float mat){
 
   // Image-based reflection of the studio.
   vec3 R = reflect(-v, n);
-  vec3 Fr = F0 + (max(vec3(1.0 - rough), F0) - F0) * pow(1.0 - NoV, 5.0);
+  // Fresnel fades out right at the silhouette, so edges do not flare into a white rim,
+  // and polished metal keeps its own colour at grazing angles.
+  float edge = smoothstep(0.0, 0.32, NoV);
+  vec3 grazing = mix(max(vec3(1.0 - rough), F0), albedo * 1.15, metal);
+  vec3 Fr = F0 + (grazing - F0) * pow(1.0 - NoV, 5.0) * edge;
   vec3 refl = env(R, rough) * Fr * occ * mix(0.35, 1.0, sh*0.5 + 0.5) * (mat < 1.5 ? 0.55 : 1.0);
 
   // Clear coat: a sharp lacquer highlight on top.
-  float Fc = 0.04 + 0.96*pow(1.0 - NoV, 5.0);
+  float Fc = 0.04 + 0.96*pow(1.0 - NoV, 5.0) * edge;
   float ca = 0.06*0.06, cdd = NoH*NoH*(ca*ca - 1.0) + 1.0;
   float Dc = ca*ca / (PI*cdd*cdd);
   vec3 clear = coat * (Fc*0.9*env(R, 0.0)*occ + vec3(Dc*0.25*NoL*sh*(0.04 + 0.96*pow(1.0-VoH,5.0))) * lightCol);
@@ -159,7 +163,7 @@ void main(){
   bool hit = false;
   if (h > 0.0) {
     float t = max(-b - sqrt(h), 0.0), tmax = -b + sqrt(h);
-    for (int i = 0; i < 110; i++) {
+    for (int i = 0; i < MARCH_STEPS; i++) {
       vec2 r = map(ro + rd*t);
       if (r.x < 0.0006*t) {
         vec3 p = ro + rd*t;
@@ -180,11 +184,11 @@ void main(){
     vec3 p = ro + rd*t;
     float dist = length(p.xz - uCenter.xz);
     if (dist < 2.6*uScale) {
-      vec3 L = normalize(vec3(-0.55, 0.75, 0.5));
-      float above = softShadow(p + vec3(0.0, 0.01, 0.0), normalize(vec3(-0.2, 1.0, 0.15)), 1.6);
-      float dark = (1.0 - above) * 0.3;
-      dark *= 1.0 - smoothstep(0.5*uScale, 2.6*uScale, dist);
-      gl_FragColor = vec4(uShadow, clamp(dark, 0.0, 0.3) * uShadowK);
+      // A soft, calculated pool of shade under the emblem: smooth at every size and cheap on phones.
+      vec2 q = (p.xz - uCenter.xz) / vec2(1.3, 0.95);
+      float fall = 1.0 - smoothstep(0.0, 2.0*uScale, length(q));
+      float dark = 0.3 * pow(fall, 1.6);
+      gl_FragColor = vec4(uShadow, dark * uShadowK);
       return;
     }
   }
@@ -229,7 +233,12 @@ const EYE_Z = 9, FOV = 0.5, RING_R = 1.62;
 export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, opts: OrbitOptions): OrbitScene | null {
   const gl = createCanvasGL(canvas);
   if (!gl) return null;
-  const prog = program(gl, VS, FS);
+  // Phones and tablets get a lighter shader (fewer march, shadow and occlusion steps).
+  const low = innerWidth < 900 || matchMedia("(pointer: coarse)").matches;
+  const quality = low
+    ? "#define MARCH_STEPS 72\n#define SHADOW_STEPS 18\n#define AO_STEPS 3\n"
+    : "#define MARCH_STEPS 110\n#define SHADOW_STEPS 40\n#define AO_STEPS 6\n";
+  const prog = program(gl, VS, quality + FS);
   const quad = gl.createBuffer()!;
   gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -244,7 +253,7 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     tYaw: 0, tPitch: 0, yaw: 0, pitch: 0, spin: 0,
     dragging: false, lastX: 0, lastY: 0,
     raf: 0, t0: performance.now(), last: performance.now(), angle: 0.6,
-    res: Math.min(window.devicePixelRatio || 1, innerWidth < 900 ? 1.25 : 1.5),
+    res: Math.min(window.devicePixelRatio || 1, innerWidth < 900 ? 1.5 : 1.5),
     frameAvg: 16, frames: 0, firstFrame: false, cleared: false,
   };
 
@@ -291,7 +300,7 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
 
     if (!reduced) {
       state.frameAvg += (dt * 1000 - state.frameAvg) * 0.08;
-      if (++state.frames > 40 && state.frameAvg > 26 && state.res > 0.7) { state.res *= 0.85; state.frames = 0; }
+      if (++state.frames > 40 && state.frameAvg > (low ? 22 : 26) && state.res > (low ? 0.8 : 0.7)) { state.res *= 0.88; state.frames = 0; }
     }
     const w = Math.max(1, Math.round(cw * state.res)), h = Math.max(1, Math.round(ch * state.res));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
@@ -327,8 +336,18 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
     const capsuleScale = Math.max(0.001, scale * 0.6 * Math.min(1, rk * 1.4));
 
     const eye: Vec3 = [0, 0, EYE_Z];
+    gl!.disable(gl!.SCISSOR_TEST);
     gl!.clearColor(0, 0, 0, 0);
     gl!.clear(gl!.COLOR_BUFFER_BIT);
+    // Only shade the pixels around the emblem and its floor shadow, not the whole screen.
+    const k2 = w / cw;
+    const bx0 = Math.max(0, Math.floor((pose.x - pose.ringPx * 1.05) * k2));
+    const bx1 = Math.min(w, Math.ceil((pose.x + pose.ringPx * 1.05) * k2));
+    const by0 = Math.max(0, Math.floor((pose.y - pose.ringPx * 0.75) * k2));
+    const by1 = Math.min(h, Math.ceil((pose.y + pose.ringPx * 1.3) * k2));
+    if (bx1 <= bx0 || by1 <= by0) return;
+    gl!.enable(gl!.SCISSOR_TEST);
+    gl!.scissor(bx0, h - by1, bx1 - bx0, by1 - by0);
     prog.use();
     const loc = prog.a("aPos");
     gl!.bindBuffer(gl!.ARRAY_BUFFER, quad);
