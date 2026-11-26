@@ -183,7 +183,7 @@ void main(){
       vec3 L = normalize(vec3(-0.55, 0.75, 0.5));
       float above = softShadow(p + vec3(0.0, 0.01, 0.0), normalize(vec3(-0.2, 1.0, 0.15)), 1.6);
       float dark = (1.0 - above) * 0.3;
-      dark *= smoothstep(2.6*uScale, 0.5*uScale, dist);
+      dark *= 1.0 - smoothstep(0.5*uScale, 2.6*uScale, dist);
       gl_FragColor = vec4(uShadow, clamp(dark, 0.0, 0.3) * uShadowK);
       return;
     }

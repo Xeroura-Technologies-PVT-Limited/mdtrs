@@ -74,7 +74,7 @@ void main(){
     // Arc samples reveal from origin to India; the leading edge glows.
     float local = clamp((uDraw - aDelay) / 0.42, 0.0, 1.0);
     float on = step(aT, local) * step(0.001, local);
-    float head = smoothstep(0.12, 0.0, abs(local - aT)) * (1.0 - step(0.999, local));
+    float head = (1.0 - smoothstep(0.0, 0.12, abs(local - aT))) * (1.0 - step(0.999, local));
     a = on * (0.55 + head * 0.45) * max(a, 0.35);
     size = uSize * (1.0 + head * 1.6);
   } else if (aKind > 1.5) {
@@ -98,15 +98,15 @@ void main(){
   float d = length(c);
   if (vKind > 1.5 && vKind < 2.5) {
     // Hub: solid centre with a breathing ring.
-    float core = smoothstep(0.17, 0.12, d);
-    float ring = smoothstep(0.03, 0.0, abs(d - (0.22 + uPulse * 0.24))) * (1.0 - uPulse);
+    float core = (1.0 - smoothstep(0.12, 0.17, d));
+    float ring = (1.0 - smoothstep(0.0, 0.03, abs(d - (0.22 + uPulse * 0.24)))) * (1.0 - uPulse);
     float a = max(core, ring) * vAlpha;
     if (a < 0.01) discard;
     gl_FragColor = vec4(uIndia, a);
     return;
   }
   if (d > 0.5) discard;
-  float edge = smoothstep(0.5, 0.36, d);
+  float edge = (1.0 - smoothstep(0.36, 0.5, d));
   vec3 col = vKind > 2.5 ? uArc : (vKind > 0.5 ? uIndia : uInk);
   gl_FragColor = vec4(col, edge * vAlpha);
 }`;

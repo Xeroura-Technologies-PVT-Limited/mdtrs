@@ -338,8 +338,29 @@ export function initPremium(root: HTMLElement): () => void {
     } else if (sideAnchor && sideSection) {
       const top = sideSection.getBoundingClientRect().top;
       const stickyTop = parseFloat(getComputedStyle(sideAnchor.closest(".pm-sticky") ?? sideSection).top) || 0;
-      const w = clamp((innerHeight - top) / Math.max(1, innerHeight - stickyTop));
-      pose = mixPose(heroPose(t), sidePose(t), ease(w));
+      // Start the glide halfway through the hero and finish as the promise pins, so the
+      // emblem drifts across over a long stretch of scroll rather than snapping.
+      const heroSection = heroAnchor?.closest<HTMLElement>("section");
+      let w: number;
+      if (heroSection && !reduced) {
+        const hr = heroSection.getBoundingClientRect();
+        const start = hr.top + window.scrollY + (hr.height - innerHeight) * 0.5;
+        const end = top + window.scrollY - stickyTop;
+        w = clamp((window.scrollY - start) / Math.max(1, end - start));
+      } else w = clamp((innerHeight - top) / Math.max(1, innerHeight - stickyTop));
+      const smooth = 0.5 - Math.cos(Math.PI * w) / 2;
+      pose = mixPose(heroPose(t), sidePose(t), smooth);
+      // One continuous turn for the whole journey: the rotation keeps the speed it had in the
+      // hero, through the glide and on through the promise, instead of settling at each stop.
+      if (heroSection && !reduced) {
+        const hr = heroSection.getBoundingClientRect();
+        const u = Math.max(0, -hr.top / Math.max(1, hr.height - innerHeight));
+        const idle = Math.sin(t * 0.25) * 0.18;
+        pose.yaw = idle - 0.42 + u * Math.PI * 0.9;
+        pose.ringRy = 0.55 + u * 0.5;
+        pose.ringRx = 0.32 + u * 0.9;
+        pose.pitch = 0.06 - Math.sin(Math.min(u, 1) * Math.PI / 2) * 0.25;
+      }
     } else pose = heroPose(t);
     pose.visible = pose.y + pose.ringPx > -40 && pose.y - pose.ringPx < innerHeight + 40;
     if (halo) {

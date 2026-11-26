@@ -78,38 +78,19 @@ export function PremiumHome() {
         <div className="pm-sticky">
           <div className="pm-hero-art" data-orbit-anchor="hero" data-cursor="drag" data-cursor-label="Drag">
             <span className="sr-only">The Medtours Care Orbit emblem: a medical cross circled by a flight path.</span>
-            <ul className="pm-notes" aria-label="Why patients choose Medtours">
-              {notes.map((n, i) => (
-                <li key={n.k} className={`pm-note pm-note-${i + 1}`}>
-                  <span className="pm-note-k">{n.k}</span>
-                  <strong>{n.title}</strong>
-                  <span>{n.text}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-          <div className="wrap pm-hero-copy">
-            <p className="pm-kicker"><span className="pm-dot" />Medical travel to India</p>
+          <div className="pm-hero-copy pm-quiet-hero">
             <h1 id="pm-hero-title" className="pm-hero-title" aria-label="Heal With Experience.">
               <span className="pm-line" data-split aria-hidden="true">Heal With</span>
-              <span className="pm-line" data-split aria-hidden="true"><em>Experience.</em></span>
+              <span className="pm-line" data-split aria-hidden="true">Experience.</span>
             </h1>
-            <p className="pm-hero-lead">World-class Indian hospitals, joined to thoughtful hospitality, for patients and the people who travel with them.</p>
-            <div className="pm-ctas">
-              <button className="pm-btn pm-btn-solid" data-open="enquire" type="button" data-magnetic="0.25">
-                <span>Get a Treatment Quote</span><Arrow />
-              </button>
-              <a className="pm-btn pm-btn-line" href="#journey" data-magnetic="0.2"><span>Plan Your Medical Journey</span><Arrow /></a>
+            <div className="pm-quiet-foot">
+              <p>Specialist care in India, with someone by your side from the first consultation to the journey home.</p>
+              <button type="button" className="pm-quiet-link" data-open="enquire">Get a treatment quote <Arrow /></button>
             </div>
           </div>
           <div className="pm-scrollcue" aria-hidden="true"><span>Scroll</span><i /></div>
-          <nav className="pm-entries" aria-label="Start here">
-            <ul className="wrap">
-              <li><a href="#pm-rail-title" data-go="treatments"><span>Explore treatments<small>Six specialties, planned by a doctor</small></span><Arrow /></a></li>
-              <li><a href="#journeys" data-persona-go="patient"><span>I&apos;m a patient<small>Planning, second opinions, visa, recovery</small></span><Arrow /></a></li>
-              <li><a href="#journeys" data-persona-go="attender"><span>I&apos;m accompanying someone<small>Travel, stay, concierge and comfort</small></span><Arrow /></a></li>
-            </ul>
-          </nav>
+
         </div>
       </section>
 

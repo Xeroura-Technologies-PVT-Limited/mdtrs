@@ -498,3 +498,32 @@ html.pm-loading { overflow: hidden; }
   .pm-ctas { margin-top: 20px; }
   .pm-kicker { margin-bottom: 14px; }
 }
+
+/* ---------- Concept: quiet premium hero ---------- */
+.pm-hero { background: radial-gradient(70% 70% at 50% 45%, #1a433d 0%, #0f2724 62%, #0b1f1c 100%); }
+.pm-hero-art { inset: 6% 22% 10% 22%; }
+/* The emblem layer sits above the hero headline, so the ring passes in front of the words.
+   Sections after the promise sit above the emblem layer. */
+.pm-orbit-layer { z-index: 2; }
+.pm-expand, .pm-globe, .pm-rail, .pm-persona, .pm-journey, .pm-trust, .pm-faq, .pm-close { z-index: 3; }
+.pm-quiet-hero { --edge: clamp(40px, 7vh, 80px); position: absolute; inset: 0; width: auto; max-width: none; padding: 0; transform: translate3d(0, calc(var(--p) * -10vh), 0); }
+.pm-quiet-hero .pm-hero-title { position: static; max-width: none; font-size: clamp(4.2rem, 11.5vw, 13rem); line-height: .86; letter-spacing: -.055em; font-weight: 400; color: #f7f3ea; }
+.pm-quiet-hero .pm-line { position: absolute; margin: 0; padding: 0 0 .08em; color: #f7f3ea; }
+/* "Heal With" top left; "Experience." mirrors it in the bottom right. */
+.pm-quiet-hero .pm-line:nth-child(1) { top: var(--edge); left: var(--gutter); }
+.pm-quiet-hero .pm-line:nth-child(2) { bottom: var(--edge); right: var(--gutter); font-style: italic; }
+.pm-quiet-foot { position: absolute; left: var(--gutter); bottom: var(--edge); display: grid; gap: 22px; justify-items: start; }
+.pm-quiet-foot p { max-width: 32ch; font-size: clamp(.95rem, 1.05vw, 1.05rem); line-height: 1.6; color: #f3efe4b3; }
+.pm-quiet-link { display: inline-flex; align-items: center; gap: 12px; padding: 0 0 6px; border: 0; background: linear-gradient(var(--pm-gold), var(--pm-gold)) 0 100% / 100% 1px no-repeat; color: #f7f3ea; font: 500 1rem/1 var(--f-body); letter-spacing: .01em; cursor: pointer; transition: background-size .6s var(--pm-ease), color .3s; }
+.pm-quiet-link:hover { color: var(--pm-gold-light); background-size: 40% 1px; }
+.pm-quiet-link .pm-arrow { color: var(--pm-gold); }
+.pm-js .pm-quiet-foot { opacity: 0; translate: 0 14px; transition: opacity 1.2s var(--pm-ease) 1s, translate 1.2s var(--pm-ease) 1s; }
+.pm-js.pm-ready .pm-quiet-foot { opacity: calc(1 - var(--p) * 2.2); translate: 0 0; }
+.pm-hero .pm-scrollcue { display: none; }
+@media (max-width: 900px) {
+  .pm-hero-art { inset: 18% 4% 28% 4%; height: auto; }
+  .pm-quiet-hero { --edge: 28px; }
+  .pm-quiet-hero .pm-hero-title { font-size: clamp(3.4rem, 17vw, 5.4rem); }
+  .pm-quiet-hero .pm-line:nth-child(2) { bottom: auto; top: calc(var(--edge) + .9em); }
+  .pm-quiet-foot { gap: 16px; }
+}
