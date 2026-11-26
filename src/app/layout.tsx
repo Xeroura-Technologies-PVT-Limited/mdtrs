@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { SITE } from "@/lib/site";
 import { Header } from "@/components/site/Header";
+import { PortalSessionProvider } from "@/components/portal/PortalSession";
 import { Footer } from "@/components/site/Footer";
 import { EnquiryModal } from "@/components/site/EnquiryModal";
 import { SiteMotion } from "@/components/site/SiteMotion";
@@ -75,10 +76,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NavigationMotion />
         <div id="site-content" suppressHydrationWarning>
           <a className="skip-link" href="#top">Skip to content</a>
-          <Header />
-          <main id="top" tabIndex={-1}>{children}</main>
-          <Footer />
-          <EnquiryModal />
+          <PortalSessionProvider>
+            <Header />
+            <main id="top" tabIndex={-1}>{children}</main>
+            <Footer />
+            <EnquiryModal />
+          </PortalSessionProvider>
           <SiteMotion />
         </div>
       </body>

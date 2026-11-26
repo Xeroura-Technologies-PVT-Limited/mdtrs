@@ -8,20 +8,48 @@ Designed and built by Xeroura Technologies.
 - Next.js 15 (App Router) with React 19 and TypeScript
 - Native scrolling, SVG illustration and CSS motion
 - Plain CSS (`src/styles`), with locally hosted Cormorant and Instrument Sans
-- No database. The enquiry form posts to a route handler that emails the team (see below)
+- Supabase Auth, Postgres and private Storage power the care portal. The public quote form sends enquiries by email.
 
 ## Getting started
 
-```bash
-npm install
-npm run dev        # http://localhost:3000
-npm run build      # production build
-npm run start      # serve the build
-npm run lint
-npm run typecheck
+Use Node.js 24.x and npm for the full development toolchain. Run the commands below from the repository root (the folder containing `package.json`).
+
+### Run the website locally
+
+Install the dependencies from the lockfile, then start Next.js in the same terminal.
+
+```sh
+npm ci
+npm run dev
 ```
 
-Requires Node 18.18 or newer.
+Open [http://localhost:3000](http://localhost:3000). The public pages work without Supabase or email credentials. Keep the terminal running while browsing and press Ctrl+C to stop the server. On later runs, start it with `npm run dev`.
+
+To test accounts and reports, complete the local portal setup below. To run a production build or deploy the website, follow [Deploying](#deploying).
+
+### Enable doctor and patient logins locally
+
+1. Install the Supabase CLI and start Docker Desktop (or a Docker engine). Start the local Supabase stack from the repository root.
+
+   ```sh
+   supabase start
+   ```
+
+   On first startup, the CLI applies the SQL in `supabase/migrations/`. Its output includes the local Project URL, browser publishable key, Studio and email inbox. Run `supabase status` to display those details again. [Supabase CLI setup](https://supabase.com/docs/guides/local-development/cli/getting-started)
+
+2. Open `.env.local` in the repository root. If it's missing, copy [.env.example](.env.example) to `.env.local`. Use the Project URL and publishable key from the CLI output. The example shows the default local API port.
+
+   ```dotenv
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_LOCAL_PUBLISHABLE_KEY
+   ```
+
+3. Restart `npm run dev` after saving the file. Open [Patient login](http://localhost:3000/login/patient), select **Create a patient account**, and confirm the email in the local inbox. Sign in, save **My intake**, then attach a sample file under **My reports**.
+
+4. A fresh local database starts without demo accounts. To test both roles, register a second account and [give it doctor access](#give-a-doctor-access) using the local Studio SQL Editor. Then open [Doctor login](http://localhost:3000/login/doctor) and check **Assigned patients** for the patient whose intake you saved.
+
+When finished, stop Next.js with Ctrl+C and run `supabase stop` to stop the local services. To resume, run `supabase start`, then `npm run dev`.
 
 ## Pages
 
@@ -32,6 +60,12 @@ Requires Node 18.18 or newer.
 | `/treatments/[slug]` | Medical, Surgical, Dental, Rehabilitation, Longevity, Holistic health |
 | `/about` | Who Medtours is and how it works |
 | `/contact` | Contact details and the full enquiry form |
+| `/login/patient` | Patient sign-in and registration |
+| `/login/doctor` | Doctor sign-in |
+| `/portal` | Login chooser, signed-in redirect and Supabase email confirmation or password recovery |
+| `/portal/patient` | Patient overview with links to My intake, My reports and My account |
+| `/portal/doctor` | Doctor overview with recent intakes, Assigned patients and My account |
+| `/portal/doctor/patients/[patientId]` | An assigned patient's saved intake and reports |
 | `/faq` | All questions (with FAQPage structured data) |
 | `/privacy` | Privacy notice |
 
@@ -62,6 +96,61 @@ public/
 ```
 
 To change copy, edit `src/lib/site.ts` first. Homepage section text lives in `src/components/home/*.tsx`.
+
+## Care portal
+
+Click **Login** in the site header and choose **Patient** or **Doctor**. After sign-in, the header shows your name and opens a menu for your role. Both portals have a **My account** page where you can update your name.
+
+- **Patients** can save their details on **My intake** and attach PDF, JPEG or PNG files under **My reports** (up to 10 MiB each). The overview links to care journey, treatment, hospital, hospitality and wellness guides. Treatment quote forms prefill the account name and email, and both fields are editable.
+- **Doctors** can open **Assigned patients** and select **Review intake** to read a patient's details and download their reports. Their overview links to clinical team, hospital, treatment and patient journey guides, with a **Contact care team** shortcut in the header.
+
+### Production database migration
+
+Run the migration from this repository on a machine or release runner with Node.js 20.12+ and a running Docker engine. The first run downloads the pinned Flyway image.
+
+1. Create or select the hosted Supabase project. Copy its **Project URL** and **Publishable key** from **Connect** into `.env.production.local` at the repository root (create the file if needed). For the database migration, also set the project's **database password** as a server-only variable. Values supplied by your release runner's environment take precedence. Replace the example website origin with your live origin.
+
+   ```dotenv
+   NEXT_PUBLIC_SITE_URL=https://medtoursin.com
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
+   SUPABASE_DB_PASSWORD="YOUR_DATABASE_PASSWORD"
+   ```
+
+2. On an IPv4-only runner, select **Session pooler** in **Connect** and set `SUPABASE_DB_URL` to the PostgreSQL connection string on port 5432. This setting takes precedence over the derived direct connection. Use the host and username shown by Supabase. Percent-encode special characters in a password embedded in the URI. Keep database credentials in the ignored environment file or in the release runner's secret store. [Supabase database connections](https://supabase.com/docs/guides/database/connecting-to-postgres)
+
+3. Run the following command before deploying the website. To select a different environment file, use `npm run db:migrate -- --env-file <path>`.
+
+   ```sh
+   npm run db:migrate
+   ```
+
+   On a new project, Flyway installs the schema and backfills a patient profile for each existing Auth user. If the original care portal migration was applied through the SQL Editor or Supabase CLI, the first Flyway run checks that installation before recording it. An incompatible existing schema produces an error so you can review the differences with the existing data intact.
+
+4. In **Table Editor**, verify `profiles`, `patient_intakes` and `doctor_patient_assignments`. In **Storage**, verify the private `patient-reports` bucket.
+
+5. In hosted Supabase **Authentication**, enable email/password signup and email confirmation. Under **URL Configuration**, set **Site URL** to your live origin and add that origin plus `/portal` to **Redirect URLs** (for example, `https://medtoursin.com/portal`). Configure a custom SMTP sender for confirmation and password-reset emails. Then [build or deploy the website](#deploying).
+
+For later schema changes, add a new file named `YYYYMMDDHHMMSS_description.sql` in `supabase/migrations/`. Use fully qualified object names (for example, `public.patient_intakes`) and let Flyway manage the transaction. Keep applied files unchanged. Run the same command on each release. Flyway checks migration checksums and applies pending versions in order, with deployment history in `medtours_migrations.flyway_schema_history`. Local `supabase start` uses the same source directory. [Flyway versioned migrations](https://documentation.red-gate.com/flyway/flyway-concepts/migrations/versioned-migrations)
+
+### Give a doctor access
+
+For self-registration, the doctor first creates an account through the **Patient** option and confirms their email. A project administrator then verifies their identity and obtains their user ID from **Authentication → Users**. Run the following statements in the Supabase SQL Editor, replacing the placeholders with the correct user IDs. The doctor can then use **Login → Doctor**. Use the assignment statement for each patient the doctor is responsible for.
+
+```sql
+update public.profiles set role = 'doctor' where id = '<doctor-user-id>'::uuid;
+
+insert into public.doctor_patient_assignments (doctor_id, patient_id)
+values ('<doctor-user-id>'::uuid, '<patient-user-id>'::uuid)
+on conflict (doctor_id, patient_id) do nothing;
+```
+
+The patient appears in the doctor's portal once they have saved an intake. To end that doctor's access to the patient's information, delete the assignment.
+
+```sql
+delete from public.doctor_patient_assignments
+where doctor_id = '<doctor-user-id>'::uuid and patient_id = '<patient-user-id>'::uuid;
+```
 
 ## Enquiry form
 
@@ -96,7 +185,27 @@ Without `RESEND_API_KEY` and `ENQUIRY_TO`, the route logs enquiries in developme
 
 ## Deploying
 
-Push to GitHub and import the repo in Vercel (framework: Next.js, no extra settings), then add the environment variables.
+1. For the live care portal, complete the [production database migration and Auth setup](#production-database-migration) on your release machine. Run `npm run db:migrate` again when deploying new migrations. For live treatment quote emails, configure the [enquiry form](#enquiry-form).
+
+2. Set `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the build environment. These values are bundled when Next.js builds the site. Keep the database password or connection string on the migration runner. [Next.js environment variables](https://nextjs.org/docs/15/app/guides/environment-variables)
+
+3. Start the production build on your own host or deploy it to Vercel.
+
+   - **On your own machine or server**, use `.env.production.local` for the production settings. Stop any development server using port 3000, then install, build and start the app.
+
+     ```sh
+     npm ci
+     npm run build
+     npm start
+     ```
+
+     Open [http://localhost:3000](http://localhost:3000) to check the running build.
+
+   - **On Vercel**, import the repository, select the **Next.js** framework preset, and set the website and email variables under **Settings → Environment Variables → Production**. Deploy once the migration succeeds. Redeploy after changing public environment variables.
+
+4. On the deployed site, open `/login/patient`, confirm a test account, save an intake and upload a sample PDF. Sign in through `/login/doctor` with an assigned doctor account and verify the record and report appear under **Assigned patients**.
+
+Run `npm run lint` and `npm run typecheck` from the repository root to check the source.
 
 ## Premium line (homepage)
 

@@ -2,22 +2,29 @@
 
 import { useState } from "react";
 import { SITE } from "@/lib/site";
+import { usePortalSession } from "@/components/portal/PortalSession";
 
 const CARE = ["Not sure yet", "Medical", "Surgical", "Dental", "Rehabilitation", "Longevity", "Holistic health", "Second opinion"];
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-export function EnquiryForm({
-  idPrefix = "f",
-  defaultRole = "patient",
-  defaultCare,
-  onDone,
-}: {
+type EnquiryProps = {
   idPrefix?: string;
   defaultRole?: "patient" | "attender";
   defaultCare?: string;
   onDone?: () => void;
-}) {
+};
+
+export function EnquiryForm(props: EnquiryProps) {
+  const { user, role, name } = usePortalSession();
+  return <QuoteForm key={user?.id ?? "guest"} {...props}
+    patientName={role === "patient" ? name : ""}
+    patientEmail={role === "patient" ? user?.email : undefined} />;
+}
+
+function QuoteForm({
+  idPrefix = "f", defaultRole = "patient", defaultCare, onDone, patientName, patientEmail,
+}: EnquiryProps & { patientName: string; patientEmail?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const id = (k: string) => `${idPrefix}-${k}`;
@@ -86,7 +93,7 @@ export function EnquiryForm({
       <div className="two">
         <div className="field">
           <label htmlFor={id("name")}>Full name</label>
-          <input id={id("name")} name="name" autoComplete="name" required />
+          <input id={id("name")} name="name" autoComplete="name" defaultValue={patientName} required />
         </div>
         <div className="field">
           <label htmlFor={id("country")}>Country</label>
@@ -109,7 +116,7 @@ export function EnquiryForm({
       </div>
       <div className="field">
         <label htmlFor={id("email")}>Email (optional)</label>
-        <input id={id("email")} name="email" type="email" autoComplete="email" />
+        <input id={id("email")} name="email" type="email" autoComplete="email" defaultValue={patientEmail} />
       </div>
       <div className="field">
         <label htmlFor={id("msg")}>About the condition</label>

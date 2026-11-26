@@ -1,5 +1,6 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
 import { GUIDE_LINKS, SITE, TREATMENTS } from "@/lib/site";
+import { FooterPortalLinks } from "./SiteAccountLinks";
 import { LogoMark } from "./Logo";
 
 export function Footer() {
@@ -40,6 +41,7 @@ export function Footer() {
               {GUIDE_LINKS.map(link => <li key={link.href}><Link href={link.href}>{link.label === "Hospitals" ? "Hospital network" : link.label}</Link></li>)}
               <li><Link href="/about">About us</Link></li>
               <li><Link href="/faq">Questions</Link></li>
+              <FooterPortalLinks />
               <li>
                 <button className="linklike" data-open="enquire" type="button">Get a quote</button>
               </li>

@@ -2,7 +2,8 @@ import type { Scene, SceneId } from "./scenes";
 
 /** Trusted, authored artwork shared by the server-rendered hero and the pre-hydration stage. */
 export function scenePlate(key: SceneId, instance: "hero" | "stage") {
-  const layer = (part: string) => '<use class="drawing-' + part + '" href="/motion/plates.svg#' + key + '-' + part + '"/>';
+  const artwork = key === "portal" ? "privacy" : key;
+  const layer = (part: string) => '<use class="drawing-' + part + '" href="/motion/plates.svg#' + artwork + '-' + part + '"/>';
   const clip = instance + "-aperture";
   const aperture = key === "hospitality" ? '<path d="M106 172V99a74 57 0 0 1 148 0v73z"/>' :
     key === "hospitals" ? '<rect x="55" y="38" width="242" height="123"/>' :

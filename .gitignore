@@ -11,5 +11,7 @@ yarn-error.log*
 .env*.local
 .env
 .vercel
+supabase/.branches/
+supabase/.temp/
 *.tsbuildinfo
 next-env.d.ts.bak

@@ -1,0 +1,55 @@
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(18px, 3vw, 40px);
+}
+
+.panel {
+  display: grid;
+  min-width: 0;
+  gap: 20px;
+  padding: clamp(20px, 3.5vw, 42px);
+  color: var(--ink);
+  background: var(--paper-light);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.panel > button { justify-self: start; }
+.sectionHeader { display: grid; gap: 8px; }
+.sectionHeader h2 { font-size: clamp(2.25rem, 3.2vw, 3.4rem); }
+.sectionHeader p, .empty, .meta { color: var(--muted); }
+.meta { display: block; font-size: .9rem; }
+.panel label { font-size: .9rem; }
+.inputs { display: grid; min-width: 0; gap: 16px; margin: 0; padding: 0; border: 0; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.error { color: #833a29; }
+.stack { display: grid; gap: 22px; }
+.upload { display: grid; gap: 14px; justify-items: start; }
+.upload > div { width: 100%; }
+.upload input[type="file"] { font-size: .9rem; }
+.upload button:disabled { cursor: default; }
+.textButton { padding: 6px 0; min-height: 42px; border: 0; background: transparent; color: var(--ink); text-decoration: underline; text-underline-offset: .22em; }
+.textButton:hover { color: var(--muted); }
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.list li > div { min-width: 0; }
+.list li > div > strong { font-weight: 600; }
+.list li button { flex-shrink: 0; }
+.list .meta { margin-top: 2px; }
+.details { display: grid; margin: 0; }
+.details div { display: grid; gap: 3px; padding: 12px 0; border-top: 1px solid var(--line); }
+.details dt { color: var(--muted); font-size: .9rem; }
+.details dd { margin: 0; white-space: pre-wrap; }
+.details div:last-child { padding-bottom: 0; }
+
+@media (max-width: 840px) {
+  .columns { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  .list li { flex-wrap: wrap; }
+}
