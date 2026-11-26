@@ -10,13 +10,6 @@ const Arrow = () => (
 const Plane = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className={className}><use href="#plane" /></svg>
 );
-
-const notes = [
-  { k: "01", title: "Doctor-led planning", text: "A physician reads your reports first" },
-  { k: "02", title: "Accredited hospitals", text: "NABH and JCI standards" },
-  { k: "03", title: "One care coordinator", text: "From visa to follow-up" },
-];
-
 const stats = [
   { n: 48, unit: "hrs", label: "Usual time to a treatment plan after we receive your reports" },
   { n: 2, unit: "", label: "Attenders who can travel with you on India's e-Medical Attendant visa" },
