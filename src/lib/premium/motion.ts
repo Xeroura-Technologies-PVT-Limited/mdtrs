@@ -91,13 +91,32 @@ export function initPremium(root: HTMLElement): () => void {
     el.style.setProperty("--n", String(i));
   });
 
-  /* ---------- Smooth wheel scrolling (desktop only) ---------- */
+  /* ---------- Smooth wheel scrolling (desktop only) ----------
+     A critically damped spring (SmoothDamp) rather than a per-frame lerp: the page eases into
+     motion and eases out of it, with no speed spike when a wheel notch lands, a top speed, and
+     the same feel at 60, 120 or 144 Hz. Notches are normalised and may only queue a little over
+     one screen ahead, so spinning the wheel can't fling the scroll-linked scenes. */
   if (fine && !reduced) {
-    let target = window.scrollY, current = window.scrollY, animating = false, raf = 0;
+    const SMOOTH_TIME = 0.2;   // seconds to (nearly) settle on the target
+    const MAX_SPEED = 4200;    // px per second
+    const NOTCH = 120;         // largest single wheel event, px
+    let target = window.scrollY, current = window.scrollY, velocity = 0, last = 0, animating = false, raf = 0;
     const max = () => document.documentElement.scrollHeight - innerHeight;
-    const step = () => {
-      current += (target - current) * 0.11;
-      if (Math.abs(target - current) < 0.5) { current = target; animating = false; }
+    const step = (now: number) => {
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+      last = now;
+      // SmoothDamp (Game Programming Gems 4, ch. 1.10)
+      const omega = 2 / SMOOTH_TIME, x = omega * dt;
+      const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+      const limit = MAX_SPEED * SMOOTH_TIME;
+      const change = clamp(current - target, -limit, limit);
+      const goal = current - change;
+      const temp = (velocity + omega * change) * dt;
+      velocity = (velocity - omega * temp) * decay;
+      let next = goal + (change + temp) * decay;
+      if ((target - current > 0) === (next > target)) { next = target; velocity = 0; } // never overshoot
+      current = next;
+      if (Math.abs(target - current) < 0.5 && Math.abs(velocity) < 20) { current = target; velocity = 0; animating = false; }
       window.scrollTo(0, current);
       raf = animating ? requestAnimationFrame(step) : 0;
     };
@@ -108,13 +127,16 @@ export function initPremium(root: HTMLElement): () => void {
     const wheel = (e: WheelEvent) => {
       if (blocked(e)) return;
       e.preventDefault();
-      if (!animating) { current = target = window.scrollY; }
+      if (!animating) { current = target = window.scrollY; velocity = 0; }
       const unit = e.deltaMode === 1 ? 36 : e.deltaMode === 2 ? innerHeight : 1;
-      target = clamp(target + e.deltaY * unit, 0, max());
-      if (!animating) { animating = true; raf = requestAnimationFrame(step); }
+      // macOS accelerates fast wheel spins into very large deltas; treat each event as at most one notch.
+      const delta = clamp(e.deltaY * unit, -NOTCH, NOTCH);
+      const reach = innerHeight * 1.1;
+      target = clamp(clamp(target + delta, current - reach, current + reach), 0, max());
+      if (!animating) { animating = true; last = 0; raf = requestAnimationFrame(step); }
     };
     const native = () => { if (!animating) current = target = window.scrollY; };
-    const stop = () => { animating = false; cancelAnimationFrame(raf); current = target = window.scrollY; };
+    const stop = () => { animating = false; cancelAnimationFrame(raf); current = target = window.scrollY; velocity = 0; };
     window.addEventListener("wheel", wheel, { passive: false });
     window.addEventListener("scroll", native, { passive: true });
     window.addEventListener("keydown", stop);
