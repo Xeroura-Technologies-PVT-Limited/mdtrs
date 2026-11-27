@@ -210,8 +210,10 @@ export function initPremium(root: HTMLElement): () => void {
     if (Math.abs(y - smoothY) < 0.1) smoothY = y;
     return smoothY;
   };
+  let orbitH = innerHeight; // height of the emblem's canvas layer
   const refresh = () => {
     VH = probe.offsetHeight || innerHeight;
+    orbitH = root.querySelector<HTMLElement>(".pm-orbit-layer")?.offsetHeight || innerHeight;
     spans.clear(); anchorBoxes.clear();
     lastY = -1;
   };
@@ -460,6 +462,29 @@ export function initPremium(root: HTMLElement): () => void {
         pose.ringRy = 0.55 + u * 0.5;
         pose.ringRx = 0.32 + u * 0.9;
         pose.pitch = 0.06 - Math.sin(Math.min(u, 1) * Math.PI / 2) * 0.25;
+
+        // As the promise is read, the plus turns to face the viewer square on and holds there,
+        // fully settled by the time the last line has revealed (words finish at 1/1.3 of the
+        // pinned scroll). The ring takes over the turn the plus would have made, so the motion
+        // never stops: only the ring keeps rotating.
+        const READ = 1 / 1.3;
+        const e = clamp((sideP - 0.3) / (READ - 0.3));
+        const settle = e * e * (3 - 2 * e);
+        if (settle > 0) {
+          const ss = span(sideSection);
+          const uEnd = (ss.top + READ * (ss.height - VH) - hs.top) / Math.max(1, hs.height - VH);
+          const turnEnd = -0.42 + uEnd * Math.PI * 0.9;
+          // Face the camera exactly, allowing for where the emblem sits on screen.
+          const wpp = 2 * 9 * Math.tan(0.25) / orbitH;
+          const cx = (pose.x - innerWidth / 2) * wpp, cy = -(pose.y - orbitH / 2) * wpp;
+          const faceYaw = Math.atan2(-cx, 9), facePitch = Math.asin(cy / Math.hypot(cx, cy, 9));
+          // The cross looks the same from behind, so settle on the nearest half turn.
+          const target = faceYaw + Math.round((turnEnd - faceYaw) / Math.PI) * Math.PI;
+          const turning = pose.yaw;
+          pose.yaw = turning + (target - turning) * settle;
+          pose.pitch += (facePitch - pose.pitch) * settle;
+          pose.ringRy += turning - pose.yaw;
+        }
       }
     } else pose = heroPose(t, heroP, y);
     pose.visible = pose.y + pose.ringPx > -40 && pose.y - pose.ringPx < innerHeight + 40;

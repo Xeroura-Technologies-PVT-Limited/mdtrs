@@ -54,6 +54,13 @@ const steps = [
 
 const usps = ["Clinical excellence", "Cost transparency", "Zero wait times", "End-to-end hospitality"];
 
+/** The name set around a seal, repeated so it runs the whole way round and joins up seamlessly. */
+const sealRing = (name: string) => {
+  // Non-breaking spaces: SVG drops a plain trailing space, which would close up the join.
+  const unit = `${name.toUpperCase()}\u00a0·\u00a0`;
+  return unit.repeat(Math.max(1, Math.round(66 / unit.length)));
+};
+
 export function PremiumHome() {
   const faqs = FAQ.slice(0, 5);
   return (
@@ -291,7 +298,7 @@ export function PremiumHome() {
               <button key={s.k} type="button" className={`pm-seal pm-seal-${i + 1}`} aria-label={`${s.k}: ${s.name}. ${s.back}`} data-cursor="view" data-cursor-label="Flip">
                 <span className="pm-seal-inner">
                   <span className="pm-seal-face">
-                    <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id={`seal-ring-${i}`} d="M100 100 m-80 0 a80 80 0 1 1 160 0 a80 80 0 1 1 -160 0" /></defs><text><textPath href={`#seal-ring-${i}`}>{`${s.name.toUpperCase()} · `}</textPath></text></svg>
+                    <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id={`seal-ring-${i}`} d="M100 100 m-80 0 a80 80 0 1 1 160 0 a80 80 0 1 1 -160 0" /></defs><text textLength="502.6" lengthAdjust="spacing"><textPath href={`#seal-ring-${i}`}>{sealRing(s.name)}</textPath></text></svg>
                     <b>{s.k}</b><small>Accredited</small>
                   </span>
                   <span className="pm-seal-face pm-seal-back"><span>{s.back}</span></span>
