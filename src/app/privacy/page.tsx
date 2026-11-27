@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <div className="wrap">
           <div className="prose">
             <p>
-              This notice explains what information Medtours ({SITE.domain}) collects when you contact us, how we use it, and the choices you have.
+              This notice explains what information Medtours ({SITE.domain}) collects when you contact us or use the care portal, how we use it, and the choices you have.
               Because enquiries often include medical reports, we treat everything you share as confidential.
             </p>
             <h2>What we collect</h2>
@@ -32,6 +32,12 @@ export default function PrivacyPage() {
               <li>To arrange visas, travel, accommodation and follow-up care that you ask us to arrange.</li>
             </ul>
             <p>We do not sell your information or use your medical details for marketing.</p>
+            <h2>Your care portal</h2>
+            <p>
+              We use Supabase to manage sign-in and store the patient details and medical reports you save in the portal.
+              You can update your intake details, including your date of birth if you choose to provide it.
+              Medtours assigns doctors to patients so they can review those patients’ details and reports.
+            </p>
             <h2>Who we share it with</h2>
             <p>
               Your information is shared only with the hospitals, doctors and travel providers involved in your care, and with service providers who

@@ -1,0 +1,57 @@
+.page { min-height: 70vh; padding-block: clamp(32px, 6vw, 88px); }
+.wrap { width: min(100% - 2 * var(--gutter), 1180px); margin-inline: auto; }
+.access { display: grid; grid-template-columns: 1.15fr 1fr; align-items: stretch; gap: clamp(20px, 4vw, 56px); }
+.intro {
+  --login-photo: url("/editorial/hospital-consultation.webp");
+  display: grid; align-content: end; gap: 16px; min-height: 390px; padding: clamp(28px, 4vw, 56px);
+  color: white; border-radius: 6px;
+  background: linear-gradient(0deg, #0b2523 0%, #0b2523d9 25%, #0b25231a 78%),
+              var(--login-photo) center / cover, var(--ink);
+}
+.intro[data-role="doctor"] { --login-photo: url("/editorial/treatments/previews/medical-900.webp"); }
+.intro h1, .accountHeader h1 { font-size: clamp(3.5rem, 6vw, 6rem); }
+.intro p { max-width: 32ch; font-size: 1.12rem; }
+.card {
+  display: grid; align-content: center; gap: 16px; min-width: 0; padding: clamp(24px, 4vw, 52px);
+  background: var(--paper-light); border: 1px solid var(--line); border-radius: 6px;
+}
+.card h2 { font-size: clamp(2.55rem, 4vw, 4rem); }
+.card > p { color: var(--muted); }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); gap: 12px; }
+.changeLogin { justify-self: start; font-size: .94rem; text-underline-offset: .2em; }
+.form, .form fieldset { display: grid; gap: 16px; min-width: 0; }
+.form fieldset { margin: 0; padding: 0; border: 0; }
+.form label { font-size: .92rem; }
+.form small { color: var(--muted); font-size: .87rem; }
+.links { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; }
+.links button {
+  padding: 8px 0; min-height: 40px; border: 0; background: transparent;
+  font-size: .94rem; text-decoration: underline; text-underline-offset: .2em;
+}
+.page button:disabled { cursor: default; opacity: .6; }
+.notice { border-left: 3px solid var(--line-strong); padding: 8px 12px; background: var(--paper-tint); }
+.error { color: #833a29; }
+.accountHeader { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 30px; }
+.accountHeader p { margin-top: 10px; overflow-wrap: anywhere; }
+.accountHeader > div { min-width: 0; }
+.workspaceNav { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: clamp(20px, 3vw, 32px); padding: 5px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-light); }
+.workspaceNav a { flex: 0 1 auto; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 18px; border-radius: 4px; text-decoration: none; font-weight: 600; }
+.workspaceNav a:hover { background: var(--paper-tint); }
+.workspaceNav a[aria-current] { background: var(--ink); color: var(--paper); }
+.accountEmail { margin-bottom: 16px; overflow-wrap: anywhere; }
+.accountEmail strong { margin-inline-start: .4em; }
+.siteGuides { margin-top: clamp(28px, 4vw, 54px); }
+.siteGuides h2 { margin-bottom: 16px; font-size: clamp(2.25rem, 3.2vw, 3.4rem); }
+.siteGuides ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
+.siteGuides a { display: grid; height: 100%; grid-template-columns: 1fr auto; align-content: start; gap: 6px 12px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-light); text-decoration: none; }
+.siteGuides a:is(:hover, :focus-visible) { background: var(--paper-tint); border-color: var(--line-strong); }
+.siteGuides small { grid-column: 1 / -1; color: var(--muted); font-size: .95rem; line-height: 1.45; }
+@media (max-width: 520px) {
+  .workspaceNav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspaceNav a { padding-inline: 8px; }
+}
+@media (max-width: 760px) {
+  .access { grid-template-columns: minmax(0, 1fr); }
+  .intro { min-height: 195px; padding: 24px; background-position: center, center 42%; }
+  .intro p { font-size: 1rem; }
+}

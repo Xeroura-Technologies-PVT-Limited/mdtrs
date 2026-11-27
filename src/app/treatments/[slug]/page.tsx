@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteLink as Link } from "@/components/site/SiteLink";
+import { SiteAccountLink } from "@/components/site/SiteAccountLinks";
 import { notFound } from "next/navigation";
 import { TREATMENTS } from "@/lib/site";
 import { PageHero } from "@/components/page/PageHero";
@@ -37,6 +38,7 @@ export default async function TreatmentPage({ params }: { params: Params }) {
         artAlt={t.alt}
       >
         <button className="btn btn-solid" data-open="enquire" data-care={t.name} type="button">Get a Treatment Quote</button>
+        <SiteAccountLink doctor="patients" patient="intake" />
       </PageHero>
 
       <section className="band b-white pad">

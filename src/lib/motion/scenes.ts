@@ -18,6 +18,7 @@ export const scenes = {
   contact: { title: "Contact", caption: "Speak with the team", theme: "teal", cut: "converge", entry: "connect" },
   faq: { title: "Questions", caption: "Before you travel", theme: "paper", cut: "leaf", entry: "index" },
   privacy: { title: "Privacy notice", caption: "Your information", theme: "ink", cut: "margin", entry: "seal" },
+  portal: { title: "Care portal", caption: "Patient and doctor access", theme: "ink", cut: "margin", entry: "seal" },
   cities: { title: "Medical cities", caption: "Care across India", theme: "teal", cut: "route", entry: "route" },
   missing: { title: "Off course", caption: "Page not found", theme: "paper", cut: "bearing", entry: "compass" },
 } as const;
@@ -27,7 +28,8 @@ export type Scene = (typeof scenes)[SceneId];
 export const addresses: Record<string, SceneId> = {
   "/": "home", "/treatments": "treatments", "/patient-journey": "journey", "/hospitals": "hospitals",
   "/doctors": "doctors", "/wellness": "wellness", "/hospitality": "hospitality", "/about": "about",
-  "/contact": "contact", "/faq": "faq", "/privacy": "privacy",
+  "/contact": "contact", "/faq": "faq", "/privacy": "privacy", "/portal": "portal",
+  "/login/doctor": "portal", "/login/patient": "portal",
   "/treatments/medical": "medical", "/treatments/surgical": "surgical", "/treatments/dental": "dental",
   "/treatments/rehabilitation": "rehabilitation", "/treatments/longevity": "longevity", "/treatments/holistic-health": "holistic",
   "/#journeys": "companions", "/#journey": "journey", "/#hospitals": "hospitals", "/#cities": "cities",
@@ -37,5 +39,6 @@ export const addresses: Record<string, SceneId> = {
 // Also used before hydration. This function has no runtime dependencies.
 export function resolveScene(path: string, hash: string, routes: Record<string, SceneId>): SceneId {
   const page = path.replace(/\/+$/, "") || "/";
+  if (/^\/portal\/(doctor|patient)(\/|$)/.test(page)) return "portal";
   return routes[page + hash] ?? routes[page] ?? "missing";
 }

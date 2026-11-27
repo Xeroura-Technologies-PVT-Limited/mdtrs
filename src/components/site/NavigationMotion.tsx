@@ -9,6 +9,7 @@ import { paintStage, scenePlate } from "@/lib/motion/plate";
 import { sharePlate, transitionFrames } from "@/lib/motion/transitions";
 
 const samePage = (a: URL, b: URL) => a.pathname === b.pathname && a.search === b.search;
+const isWorkspace = (url: URL) => /^\/portal\/(doctor|patient)(\/|$)/.test(url.pathname);
 const sceneOf = (url: URL) => resolveScene(url.pathname, url.hash, addresses);
 const destinationName = (url: URL) => scenes[sceneOf(url)].title;
 
@@ -131,10 +132,12 @@ export function NavigationMotion() {
       const trip = active;
       const inBackground = background?.destination.href === url.href;
       const changed = last.href !== url.href;
+      const withinWorkspace = isWorkspace(last) && isWorkspace(url);
       const revisit = last.pathname === url.pathname && !url.hash;
       if (background && (inBackground || changed)) clear();
       last = url;
       if (changed || trip) window.dispatchEvent(new Event("mt:locationchange"));
+      if (withinWorkspace && changed) { clear(); return; }
       if (trip && trip.destination.href === url.href) {
         trip.ready = true;
         window.clearTimeout(announce);
@@ -217,7 +220,7 @@ export function NavigationMotion() {
       }
       const { href, scroll, replace, prefetch } = event.detail;
       const url = new URL(href, document.baseURI);
-      if (url.origin !== location.origin) return;
+      if (url.origin !== location.origin || (isWorkspace(last) && isWorkspace(url))) return;
       event.preventDefault();
       follow(url, scroll, replace, prefetch);
     }
@@ -230,6 +233,7 @@ export function NavigationMotion() {
       if (target && target !== "_self") return;
       const url = new URL(link.getAttribute("href")!, document.baseURI);
       if (url.origin !== location.origin || url.pathname.includes(".") || url.pathname.startsWith("/api/")) return;
+      if (isWorkspace(last) && isWorkspace(url)) return;
       event.preventDefault();
       follow(url, true);
     }
@@ -249,6 +253,7 @@ export function NavigationMotion() {
         history.replaceState(pageEntry.state, "");
       }
       if (url.href === last.href || active?.destination.href === url.href) return;
+      if (isWorkspace(last) && isWorkspace(url)) { accept(url); return; }
       if (samePage(last, url) && url.hash === "#top") {
         clear();
         last = url;

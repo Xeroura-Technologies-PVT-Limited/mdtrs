@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
 import { SiteLink } from "@/components/site/SiteLink";
+import { ContactPortalCard } from "@/components/site/SiteAccountLinks";
 import { PageHero } from "@/components/page/PageHero";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 
@@ -22,6 +23,7 @@ export default function ContactPage() {
       <section className="band b-white pad">
         <div className="wrap contact-grid">
           <div className="contact-ways">
+            <ContactPortalCard />
             <div className="way" data-reveal="">
               <span className="mono">Call or WhatsApp</span>
               <b style={{ userSelect: "all" }}>{SITE.phone}</b>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteLink as Link } from "@/components/site/SiteLink";
+import { SiteAccountLink } from "@/components/site/SiteAccountLinks";
 import { TreatmentCards } from "@/components/page/TreatmentCards";
 import { PageHero } from "@/components/page/PageHero";
 import { CtaBand } from "@/components/page/CtaBand";
@@ -27,7 +28,9 @@ export default function TreatmentsPage() {
         artAlt="A doctor and guest talking across a desk in a consultation room"
       >
         <button className="btn btn-solid" data-open="enquire" type="button">Get a Treatment Quote</button>
-        <Link className="btn btn-ghost" href="/#journey">How it works</Link>
+        <SiteAccountLink doctor="hospitals" patient="journey">
+          <Link className="btn btn-ghost" href="/#journey">How it works</Link>
+        </SiteAccountLink>
       </PageHero>
 
       {GROUPS.map((g, gi) => (
