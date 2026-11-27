@@ -505,7 +505,8 @@ html.pm-loading { overflow: hidden; }
 
 /* ---------- Concept: quiet premium hero ---------- */
 .pm-hero { background: radial-gradient(70% 70% at 50% 45%, #1a433d 0%, #0f2724 62%, #0b1f1c 100%); }
-.pm-hero-art { inset: 6% 22% 10% 22%; }
+/* Nudged down so the ring overlaps "Heal With" and "Experience." about equally. */
+.pm-hero-art { inset: 9% 22% 7% 22%; }
 /* The emblem layer sits above the hero headline, so the ring passes in front of the words.
    Sections after the promise sit above the emblem layer. */
 .pm-orbit-layer { z-index: 2; }
