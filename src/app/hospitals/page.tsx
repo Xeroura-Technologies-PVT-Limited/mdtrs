@@ -15,6 +15,6 @@ export default function HospitalsPage() {
       title={<>Hospitals <em>in India</em></>} lead="A doctor on our team reviews your reports and shortlists accredited hospitals and senior specialists for your condition.">
       <SiteAccountLink doctor="doctors" patient="journey" />
     </PageHero>
-    <div className="atlas-content"><Hospitals contactHref="/#contact" /></div><CtaBand />
+    <div className="atlas-content"><Hospitals contactHref="/contact#contact-form" /></div><CtaBand />
   </>;
 }

@@ -93,7 +93,7 @@ function CredentialsForm({ client, role, linkError }: EntryProps & { role: Porta
       <h2 id="access-heading">{mode === "signup" ? "Create a patient account" : mode === "reset" ? "Reset your password" : "Sign in"}</h2>
       {mode === "signup" && <p>Use an email address you can access to confirm your account.</p>}
       {mode === "reset" && <p>Enter your account email to request a password reset link.</p>}
-      {!client && <p role="status" className={styles.notice}>The care portal is temporarily unavailable. <a href="/contact">Contact Medtours</a> for assistance.</p>}
+      {!client && <p role="status" className={styles.notice}>The care portal is temporarily unavailable. <SiteLink href="/contact">Contact Medtours</SiteLink> for assistance.</p>}
       {linkError && !dismissedLinkError && <p role="alert" className={styles.error}>This email link could not be opened. Sign in or request a new link.</p>}
       {notice && <p role="status" className={styles.notice}>{notice}</p>}
       <form onSubmit={submit} className={styles.form} aria-busy={busy}>

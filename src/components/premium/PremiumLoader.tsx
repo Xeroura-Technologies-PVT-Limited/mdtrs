@@ -7,14 +7,27 @@
 const steps = ["Reading your reports", "Matching accredited hospitals", "Arranging visa & flights", "Preparing your stay"];
 
 // Runs as soon as the markup is parsed. If the bundle never arrives, the page is revealed anyway.
-const bootstrap = `(function(){var d=document.documentElement;window.__pmLoadStart=performance.now();d.classList.add('pm-loading');setTimeout(function(){if(!d.classList.contains('pm-loading'))return;d.classList.remove('pm-loading');d.classList.add('pm-loaded','pm-ready');},9000);})();`;
+const bootstrap = `(function () {
+  var loader = document.getElementById('pm-loader');
+  if (!loader || document.readyState !== 'loading') return;
+  var root = document.documentElement;
+  loader.__pmLoadStart = performance.now();
+  root.classList.add('pm-loading');
+  loader.hidden = false;
+  setTimeout(function () {
+    if (!loader.isConnected || !root.classList.contains('pm-loading')) return;
+    loader.hidden = true;
+    root.classList.remove('pm-loading');
+    root.classList.add('pm-loaded', 'pm-ready');
+  }, 9000);
+})();`;
 
 const CROSS = "M84 44h32a6 6 0 0 1 6 6v28h28a6 6 0 0 1 6 6v32a6 6 0 0 1-6 6h-28v28a6 6 0 0 1-6 6H84a6 6 0 0 1-6-6v-28H50a6 6 0 0 1-6-6V84a6 6 0 0 1 6-6h28V50a6 6 0 0 1 6-6z";
 
 export function PremiumLoader() {
   return (
     <>
-      <div className="pm-loader" id="pm-loader" data-state="loading">
+      <div className="pm-loader" id="pm-loader" data-state="loading" hidden suppressHydrationWarning>
         <span className="sr-only" role="status">Loading Medtours</span>
         <div className="pm-loader-panel pm-loader-panel-top" aria-hidden="true" />
         <div className="pm-loader-panel pm-loader-panel-bottom" aria-hidden="true" />

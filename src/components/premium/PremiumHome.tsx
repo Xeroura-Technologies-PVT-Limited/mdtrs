@@ -107,9 +107,17 @@ export function PremiumHome() {
       {/* 3 · Scroll-to-expand hospital arrival with counters */}
       <section className="pm-expand" data-progress="expand" aria-labelledby="pm-expand-title">
         <div className="pm-sticky">
-          <figure className="pm-expand-media">
-            <img src="/editorial/hospital-exterior.webp" alt="An accredited hospital entrance in India at dusk" loading="lazy" decoding="async" />
-          </figure>
+          <picture className="pm-expand-media">
+            <source media="(max-width: 700px) and (orientation: portrait)" srcSet="/editorial/hospital-arrival-portrait.webp" width={660} height={941} />
+            <img
+              src="/editorial/hospital-arrival.webp"
+              width={1672}
+              height={941}
+              alt="An imagined hospital entrance at dusk, with a warmly lit canopy beneath evergreen trees."
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <div className="wrap pm-expand-copy">
             <h2 id="pm-expand-title">Accredited hospitals.<br /><em>Hospitality</em> that feels like home.</h2>
           </div>
@@ -180,7 +188,7 @@ export function PremiumHome() {
       </section>
 
       {/* 6 · Patient and attender journeys: a pinned photo that follows the step being read */}
-      <section className="pm-persona" id="journeys" aria-labelledby="pm-persona-title">
+      <section className="pm-persona" id="journeys" tabIndex={-1} aria-labelledby="pm-persona-title">
         <div className="wrap" data-persona-root data-active="patient">
           <div className="pm-persona-head" data-pm-reveal>
             <p className="pm-eyebrow">Guests &amp; companions</p>
@@ -233,7 +241,7 @@ export function PremiumHome() {
       </section>
 
       {/* 7 · The journey, drawn as a flight path */}
-      <section className="pm-journey" id="journey" data-progress="journey" aria-labelledby="pm-journey-title">
+      <section className="pm-journey" id="journey" tabIndex={-1} data-progress="journey" aria-labelledby="pm-journey-title">
         <div className="pm-sticky">
           <div className="wrap pm-journey-head">
             <div>
@@ -266,7 +274,7 @@ export function PremiumHome() {
       </section>
 
       {/* 8 · Accreditation seals and USP marquee */}
-      <section className="pm-trust" id="hospitals" data-view aria-labelledby="pm-trust-title">
+      <section className="pm-trust" id="hospitals" tabIndex={-1} data-view aria-labelledby="pm-trust-title">
         <div className="pm-marquee" aria-hidden="true">
           <div className="pm-marquee-track" data-marquee>
             {[0, 1].map(k => (

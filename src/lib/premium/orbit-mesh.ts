@@ -1,4 +1,4 @@
-import { createCanvasGL, hexToRgb, m4, program, roundedBox, torus, upload, type Mat4, type Vec3 } from "./gl";
+import { createCanvasGL, disposeSceneGL, hexToRgb, m4, program, roundedBox, torus, upload, type Mat4, type Vec3 } from "./gl";
 import type { OrbitOptions, OrbitScene } from "./orbit-scene";
 
 /** The Care Orbit emblem for phones and tablets.
@@ -262,7 +262,7 @@ export function createOrbitMesh(canvas: HTMLCanvasElement, reduced: boolean, opt
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      disposeSceneGL(canvas, gl, [prog, shade], [], [barV, barH, ring, capsule, floor]);
     },
   };
 }

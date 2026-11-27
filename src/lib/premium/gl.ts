@@ -78,18 +78,30 @@ export function hexToRgb(hex: string): Vec3 {
 }
 
 export function program(gl: WebGLRenderingContext, vs: string, fs: string) {
-  const make = (type: number, src: string) => {
-    const s = gl.createShader(type)!;
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) || "shader");
-    return s;
+  const p = gl.createProgram();
+  if (!p) throw new Error("Could not create WebGL program");
+  const attach = (type: number, src: string) => {
+    const shader = gl.createShader(type);
+    if (!shader) throw new Error("Could not create WebGL shader");
+    try {
+      gl.shaderSource(shader, src);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader) || "shader");
+      gl.attachShader(p, shader);
+    } finally {
+      // Attached shaders stay available for linking until the program is deleted.
+      gl.deleteShader(shader);
+    }
   };
-  const p = gl.createProgram()!;
-  gl.attachShader(p, make(gl.VERTEX_SHADER, vs));
-  gl.attachShader(p, make(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(p);
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) || "link");
+  try {
+    attach(gl.VERTEX_SHADER, vs);
+    attach(gl.FRAGMENT_SHADER, fs);
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) || "link");
+  } catch (error) {
+    gl.deleteProgram(p);
+    throw error;
+  }
   const uniforms = new Map<string, WebGLUniformLocation | null>();
   return {
     p,
@@ -104,7 +116,7 @@ export function program(gl: WebGLRenderingContext, vs: string, fs: string) {
 export type Program = ReturnType<typeof program>;
 
 export type MeshData = { position: number[]; normal: number[]; index: number[] };
-export type Mesh = { draw(prog: Program): void; count: number };
+export type Mesh = { draw(prog: Program): void; count: number; destroy(): void };
 
 export function upload(gl: WebGLRenderingContext, data: MeshData): Mesh {
   const buf = (arr: number[]) => {
@@ -120,6 +132,11 @@ export function upload(gl: WebGLRenderingContext, data: MeshData): Mesh {
   const count = data.index.length;
   return {
     count,
+    destroy() {
+      gl.deleteBuffer(pos);
+      gl.deleteBuffer(nor);
+      gl.deleteBuffer(idx);
+    },
     draw(prog) {
       const bind = (b: WebGLBuffer, name: string) => {
         const loc = prog.a(name);
@@ -243,6 +260,30 @@ void main(){
 export function createCanvasGL(canvas: HTMLCanvasElement) {
   const gl = canvas.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: "high-performance" });
   return gl;
+}
+
+export function disposeSceneGL(
+  canvas: HTMLCanvasElement, gl: WebGLRenderingContext,
+  programs: Program[], buffers: WebGLBuffer[], meshes: Mesh[] = [],
+) {
+  if (gl.isContextLost()) return;
+  gl.useProgram(null);
+  for (const program of programs) gl.deleteProgram(program.p);
+  for (const buffer of buffers) gl.deleteBuffer(buffer);
+  for (const mesh of meshes) mesh.destroy();
+
+  if (!canvas.isConnected) {
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return;
+  }
+  // Effect replay can reuse this canvas, including with a different renderer after a resize.
+  const attributeCount = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+  for (let i = 0; i < attributeCount; i++) gl.disableVertexAttribArray(i);
+  gl.disable(gl.BLEND);
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.SCISSOR_TEST);
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
 export function fitCanvas(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, maxDpr = 2) {

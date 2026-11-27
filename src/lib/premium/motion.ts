@@ -28,8 +28,10 @@ export function initPremium(root: HTMLElement): () => void {
   const ready = () => html.classList.add("pm-ready");
   const loader = runLoader(root, reduced, ready, cleanups);
   if (!loader.active) {
-    if (!html.dataset.intro) requestAnimationFrame(ready);
-    else {
+    if (!html.dataset.intro) {
+      const frame = requestAnimationFrame(ready);
+      cleanups.push(() => cancelAnimationFrame(frame));
+    } else {
       const mo = new MutationObserver(() => { if (!html.dataset.intro) { ready(); mo.disconnect(); } });
       mo.observe(html, { attributes: true, attributeFilter: ["data-intro"] });
       cleanups.push(() => mo.disconnect());
@@ -310,7 +312,14 @@ export function initPremium(root: HTMLElement): () => void {
     sizeRails(); refresh();
   };
   on(window, "resize", onResize);
+  // The router may have already positioned a fragment before the rail grows.
+  const fragment = document.getElementById(location.hash.slice(1));
+  const fragmentTop = fragment?.getBoundingClientRect().top;
   sizeRails();
+  if (fragment && fragmentTop !== undefined && fragmentTop >= 0 && fragmentTop < innerHeight) {
+    const shift = fragment.getBoundingClientRect().top - fragmentTop;
+    if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+  }
   refresh();
   let refreshQueued = 0;
   const queueRefresh = () => { if (!refreshQueued) refreshQueued = requestAnimationFrame(() => { refreshQueued = 0; refresh(); }); };
@@ -471,11 +480,24 @@ export function initPremium(root: HTMLElement): () => void {
     return pose;
   };
   if (orbitCanvas) {
+    const onContextLost = () => {
+      html.classList.remove("pm-gl");
+      orbit?.destroy();
+      orbit = null;
+      loader.mark("scene");
+    };
+    orbitCanvas.addEventListener("webglcontextlost", onContextLost);
+    cleanups.push(() => orbitCanvas.removeEventListener("webglcontextlost", onContextLost));
     try {
       // Phones and tablets draw the emblem as anti-aliased meshes; desktops raymarch it.
       const make = lowPower ? createOrbitMesh : createOrbitScene;
-      orbit = make(orbitCanvas, reduced, { getPose, onFirstFrame: () => loader.mark("scene") });
-      if (orbit) html.classList.add("pm-gl");
+      orbit = make(orbitCanvas, reduced, {
+        getPose,
+        onFirstFrame() {
+          html.classList.add("pm-gl");
+          loader.mark("scene");
+        },
+      });
     } catch (err) {
       console.warn("Medtours 3D emblem unavailable", err);
     }
@@ -588,6 +610,10 @@ export function initPremium(root: HTMLElement): () => void {
       setStep(Math.max(0, Math.min(3, items().findIndex(el => el.getBoundingClientRect().top >= 0))));
       lastY = -1;
     };
+    if (location.hash === "#journeys") {
+      const requested = tabs.find(tab => tab.dataset.persona === html.dataset.persona);
+      if (requested) select(requested);
+    }
     // Hero entry links choose a journey before scrolling to it.
     const go = (e: Event) => {
       const link = (e.target as Element).closest<HTMLAnchorElement>("[data-persona-go]");
@@ -724,15 +750,14 @@ export const FLIGHT_MS = 1400;
 
 function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cleanups: (() => void)[]): Loader {
   const html = document.documentElement;
-  const el = root.querySelector<HTMLElement>("#pm-loader");
-  const w = window as Window & { __pmLoadStart?: number; __pmLoaderDone?: boolean };
+  const el = root.querySelector<HTMLElement & { __pmLoadStart?: number }>("#pm-loader");
   const hide = () => {
     html.classList.remove("pm-loading");
     html.classList.add("pm-loaded");
     el?.setAttribute("hidden", "");
   };
   // Only a full page load of the homepage plays it; client-side navigation goes straight in.
-  if (!el || el.hidden || !w.__pmLoadStart || w.__pmLoaderDone) {
+  if (!el || el.hidden || el.__pmLoadStart === undefined) {
     hide();
     return { active: false, phase: "done", lp: 1, flyStart: 0, mark() {} };
   }
@@ -743,20 +768,20 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
   const total = Object.keys(milestones).length;
   const minTime = reduced ? 500 : 2600;
   const maxTime = 7000;
-  const start = w.__pmLoadStart;
+  const start = el.__pmLoadStart;
   const count = el.querySelector<HTMLElement>("[data-loader-count]");
   const steps = Array.from(el.querySelectorAll<HTMLElement>("[data-loader-step]"));
   const outside = Array.from(document.querySelectorAll<HTMLElement>("#site-content > header, #site-content > footer, #pm-home > section"));
   outside.forEach(n => { n.inert = true; });
 
   let shown = 0, raf = 0, finished = false, last = performance.now();
+  let finishTimer = 0, revealTimer = 0, hideTimer = 0;
   const done = () => Object.values(milestones).filter(Boolean).length;
 
   const finish = () => {
     if (finished) return;
     finished = true;
     cancelAnimationFrame(raf);
-    w.__pmLoaderDone = true;
     el.style.setProperty("--lp", "1");
     if (count) count.textContent = "100";
     steps.forEach((s, i) => s.toggleAttribute("data-active", i === steps.length - 1));
@@ -767,8 +792,8 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
     api.phase = "flying";
     api.flyStart = performance.now();
     const flight = reduced ? 300 : FLIGHT_MS;
-    window.setTimeout(onReveal, reduced ? 50 : flight * 0.45);
-    window.setTimeout(() => { api.phase = "done"; hide(); }, flight);
+    revealTimer = window.setTimeout(onReveal, reduced ? 50 : flight * 0.45);
+    hideTimer = window.setTimeout(() => { api.phase = "done"; hide(); }, flight);
   };
 
   const tick = (now: number) => {
@@ -786,7 +811,7 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
     if (count && count.textContent !== String(pct)) count.textContent = String(pct);
     const step = shown >= 1 ? steps.length - 1 : Math.min(steps.length - 2, Math.floor(shown * (steps.length - 1)));
     steps.forEach((s, i) => { s.toggleAttribute("data-active", i === step); s.toggleAttribute("data-done", i < step); });
-    if (shown >= 1) { window.setTimeout(finish, reduced ? 0 : 380); return; }
+    if (shown >= 1) { finishTimer = window.setTimeout(finish, reduced ? 0 : 380); return; }
     raf = requestAnimationFrame(tick);
   };
 
@@ -803,11 +828,14 @@ function runLoader(root: HTMLElement, reduced: boolean, onReveal: () => void, cl
   window.addEventListener("keydown", skip);
   cleanups.push(() => {
     cancelAnimationFrame(raf);
+    window.clearTimeout(finishTimer);
+    window.clearTimeout(revealTimer);
+    window.clearTimeout(hideTimer);
     el.removeEventListener("click", skip);
     window.removeEventListener("keydown", skip);
     outside.forEach(n => { n.inert = false; });
     // Leaving mid-load (or React re-running effects in development): release the page, keep the markup.
-    if (!finished) html.classList.remove("pm-loading");
+    html.classList.remove("pm-loading");
   });
 
   raf = requestAnimationFrame(tick);
