@@ -1,4 +1,4 @@
-import { createCanvasGL, hexToRgb, m4, program, type Mat4, type Vec3 } from "./gl";
+import { createCanvasGL, disposeSceneGL, hexToRgb, m4, program, type Mat4, type Vec3 } from "./gl";
 
 /** The "Care Orbit" emblem, raymarched in a fragment shader.
  *  Signed distance fields give a seamless glazed-porcelain cross (the two bars
@@ -394,7 +394,7 @@ export function createOrbitScene(canvas: HTMLCanvasElement, reduced: boolean, op
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      disposeSceneGL(canvas, gl, [prog], [quad]);
     },
   };
 }

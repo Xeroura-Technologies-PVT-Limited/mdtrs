@@ -1,4 +1,4 @@
-import { CLAY_FS, CLAY_VS, createCanvasGL, fitCanvas, hexToRgb, m4, program, sphere, upload, type Vec3 } from "./gl";
+import { CLAY_FS, CLAY_VS, createCanvasGL, disposeSceneGL, fitCanvas, hexToRgb, m4, program, sphere, upload, type Vec3 } from "./gl";
 
 /** A dotted globe that turns to face India while flight arcs from around the
  *  world draw in with scroll. Land is approximated by coarse outlines, which
@@ -278,7 +278,7 @@ export function createGlobeScene(canvas: HTMLCanvasElement, reduced: boolean, on
       canvas.removeEventListener("pointermove", move);
       canvas.removeEventListener("pointerup", up);
       canvas.removeEventListener("pointercancel", up);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      disposeSceneGL(canvas, gl, [clay, dots], [bPos, bKind, bT, bDelay], [body]);
     },
   };
 }

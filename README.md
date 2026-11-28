@@ -171,7 +171,7 @@ Without `RESEND_API_KEY` and `ENQUIRY_TO`, the route logs enquiries in developme
 
 - `ArrivalIllustration.tsx` defines one path for the aircraft and the route reveal. Its default SVG renders the completed scene. CSS adds the flight when the browser supports motion paths and the visitor allows motion.
 - On a full document visit, the introduction displays its message for 2 seconds before revealing the hero. The priority image and fonts load during that time. Skip intro and Escape dismiss it immediately. The HTML content is available with JavaScript disabled.
-- Use `SiteLink` for internal page links. Destination messages use the same reading time for page links, section links, and browser history. The router loads the destination in parallel. If it is still pending when the curtain lifts, a small loading label stays visible until it arrives. Reduced motion opens pages directly.
+- Use `SiteLink` for internal navigation. Next.js opens the destination immediately while a 680 ms flight path, pulse or wave plays beneath the header. Section jumps and reduced-motion visits open directly. A static loading label stays visible for longer requests.
 - Section reveals keep text visible throughout. The mobile navigation, section reveals and aircraft respond to changes in the visitor's reduced-motion preference.
 
 ## Before launch

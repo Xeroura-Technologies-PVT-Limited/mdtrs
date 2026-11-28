@@ -1,5 +1,6 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
-import { FAQ, SITE, TREATMENTS, treatmentSources } from "@/lib/site";
+import { FAQ, SITE, TREATMENTS } from "@/lib/site";
+import { carePhotos } from "@/lib/care-photos";
 import { ORIGINS } from "@/lib/premium/globe-scene";
 import { PremiumMotion } from "./PremiumMotion";
 import { PremiumLoader } from "./PremiumLoader";
@@ -10,6 +11,24 @@ const Arrow = () => (
 const Plane = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className={className}><use href="#plane" /></svg>
 );
+
+function TreatmentPortrait({ slug, alt }: { slug: string; alt: string }) {
+  const path = `/editorial/treatments/cards/${slug}`;
+  // Allow for the card's cover crop and hover zoom when selecting a source.
+  return (
+    <img
+      src={`${path}-768.webp`}
+      srcSet={`${path}-512.webp 512w, ${path}-768.webp 768w, ${path}-1024.webp 1024w`}
+      sizes="(max-width: 900px) max(93vw, 51svh), 484px"
+      width={1024}
+      height={1536}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
 const stats = [
   { n: 48, unit: "hrs", label: "Usual time to a treatment plan after we receive your reports" },
   { n: 2, unit: "", label: "Companions who can travel with you on India's e-Medical Attendant visa" },
@@ -22,20 +41,20 @@ const personas = {
     label: "I'm the guest",
     line: <>Care planned around <em>you</em>, before you fly.</>,
     items: [
-      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", img: "/editorial/hospital-consultation.webp", alt: "A doctor talking a guest through his plan" },
-      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", img: "/editorial/treatments/medical.webp", alt: "A doctor and guest reviewing a tablet together" },
-      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", img: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" },
-      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", img: "/editorial/treatments/rehabilitation.webp", alt: "A physiotherapist supporting a guest at parallel bars" },
+      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", photo: carePhotos.video },
+      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", photo: carePhotos.medical },
+      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", photo: { src: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" } },
+      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", photo: carePhotos.rehabilitation },
     ],
   },
   attender: {
     label: "I'm the companion",
     line: <>The person who cares is <em>cared for</em> too.</>,
     items: [
-      { t: "Travel logistics", d: "Visa letters for up to two companions, and flights planned to match the guest's dates.", img: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" },
-      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", img: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" },
-      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", img: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" },
-      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", img: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" },
+      { t: "Travel logistics", d: "Visa letters for up to two companions, and flights planned to match the guest's dates.", photo: { src: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" } },
+      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", photo: { src: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" } },
+      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", photo: { src: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" } },
+      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", photo: { src: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" } },
     ],
   },
 } as const;
@@ -114,9 +133,17 @@ export function PremiumHome() {
       {/* 3 · Scroll-to-expand hospital arrival with counters */}
       <section className="pm-expand" data-progress="expand" aria-labelledby="pm-expand-title">
         <div className="pm-sticky">
-          <figure className="pm-expand-media">
-            <img src="/editorial/hospital-exterior.webp" alt="An accredited hospital entrance in India at dusk" loading="lazy" decoding="async" />
-          </figure>
+          <picture className="pm-expand-media">
+            <source media="(max-width: 700px) and (orientation: portrait)" srcSet="/editorial/hospital-arrival-portrait.webp" width={660} height={941} />
+            <img
+              src="/editorial/hospital-arrival.webp"
+              width={1672}
+              height={941}
+              alt="An imagined hospital entrance at dusk, with a warmly lit canopy beneath evergreen trees."
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <div className="wrap pm-expand-copy">
             <h2 id="pm-expand-title">Accredited hospitals.<br /><em>Hospitality</em> that feels like home.</h2>
           </div>
@@ -165,7 +192,7 @@ export function PremiumHome() {
             {TREATMENTS.map((t, i) => (
               <Link key={t.slug} href={`/treatments/${t.slug}`} className="pm-card" data-tilt data-cursor="view" data-cursor-label="View">
                 <span className="pm-card-media">
-                  <img src={t.render} srcSet={treatmentSources(t.render)} sizes="(max-width: 900px) 80vw, 30vw" alt={t.alt} loading="lazy" decoding="async" />
+                  <TreatmentPortrait slug={t.slug} alt={t.cardAlt} />
                 </span>
                 <span className="pm-card-glare" aria-hidden="true" />
                 <span className="pm-card-top"><span>{String(i + 1).padStart(2, "0")}</span><span>{t.group}</span></span>
@@ -187,7 +214,7 @@ export function PremiumHome() {
       </section>
 
       {/* 6 · Patient and attender journeys: a pinned photo that follows the step being read */}
-      <section className="pm-persona" id="journeys" aria-labelledby="pm-persona-title">
+      <section className="pm-persona" id="journeys" tabIndex={-1} aria-labelledby="pm-persona-title">
         <div className="wrap" data-persona-root data-active="patient">
           <div className="pm-persona-head" data-pm-reveal>
             <p className="pm-eyebrow">Guests &amp; companions</p>
@@ -206,7 +233,7 @@ export function PremiumHome() {
               </div>
               <figure className="pm-stage" data-tilt data-cursor="view" data-cursor-label="Scroll">
                 {personaKeys.flatMap(key => personas[key].items.map((it, j) => (
-                  <img key={`${key}-${j}`} src={it.img} alt={it.alt} loading="lazy" decoding="async" data-shot={`${key}-${j}`} {...(key === "patient" && j === 0 ? { "data-current": "" } : {})} />
+                  <img key={`${key}-${j}`} {...it.photo} alt={it.photo.alt} sizes="(max-width: 900px) 94vw, 43vw" loading="lazy" decoding="async" data-shot={`${key}-${j}`} {...(key === "patient" && j === 0 ? { "data-current": "" } : {})} />
                 )))}
                 <span className="pm-stage-veil" aria-hidden="true" />
                 <span className="pm-stage-bars" aria-hidden="true">{[0, 1, 2, 3].map(i => <i key={i} data-bar={i} />)}</span>
@@ -240,7 +267,7 @@ export function PremiumHome() {
       </section>
 
       {/* 7 · The journey, drawn as a flight path */}
-      <section className="pm-journey" id="journey" data-progress="journey" aria-labelledby="pm-journey-title">
+      <section className="pm-journey" id="journey" tabIndex={-1} data-progress="journey" aria-labelledby="pm-journey-title">
         <div className="pm-sticky">
           <div className="wrap pm-journey-head">
             <div>
@@ -273,7 +300,7 @@ export function PremiumHome() {
       </section>
 
       {/* 8 · Accreditation seals and USP marquee */}
-      <section className="pm-trust" id="hospitals" data-view aria-labelledby="pm-trust-title">
+      <section className="pm-trust" id="hospitals" tabIndex={-1} data-view aria-labelledby="pm-trust-title">
         <div className="pm-marquee" aria-hidden="true">
           <div className="pm-marquee-track" data-marquee>
             {[0, 1].map(k => (

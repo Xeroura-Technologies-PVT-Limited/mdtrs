@@ -1,4 +1,5 @@
 import { itinerary } from "@/lib/itinerary";
+import { carePhotos } from "@/lib/care-photos";
 
 export function Journey() {
   return (
@@ -8,7 +9,7 @@ export function Journey() {
           <p className="eyebrow">Your medical journey</p>
           <h2 id="itinerary-title">From first <em>message</em> to home</h2>
           <p className="lead">One coordinator follows every step, for the guest and the companion.</p>
-          <img loading="lazy" decoding="async" src="/editorial/hospital-consultation.webp" alt="A guest meeting a doctor at a consultation" />
+          <img loading="lazy" decoding="async" {...carePhotos.medical} alt={carePhotos.medical.alt} sizes="(max-width: 760px) 94vw, 40vw" />
         </div>
         <ol className="journey-stops">
           {itinerary.map(([time, title, copy], i) => (

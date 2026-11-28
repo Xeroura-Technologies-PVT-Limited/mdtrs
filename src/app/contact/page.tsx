@@ -48,7 +48,7 @@ export default function ContactPage() {
               </ol>
             </div>
           </div>
-          <div className="form-card" id="contact-form" data-reveal="">
+          <div className="form-card" id="contact-form" tabIndex={-1} data-reveal="">
             <p className="eyebrow" style={{ marginBottom: 12 }}>Treatment quote</p>
             <h2 className="form-title">Tell us what you need</h2>
             <EnquiryForm idPrefix="c" />

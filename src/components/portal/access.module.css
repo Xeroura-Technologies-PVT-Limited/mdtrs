@@ -2,13 +2,13 @@
 .wrap { width: min(100% - 2 * var(--gutter), 1180px); margin-inline: auto; }
 .access { display: grid; grid-template-columns: 1.15fr 1fr; align-items: stretch; gap: clamp(20px, 4vw, 56px); }
 .intro {
-  --login-photo: url("/editorial/hospital-consultation.webp");
+  position: relative; isolation: isolate; overflow: hidden;
   display: grid; align-content: end; gap: 16px; min-height: 390px; padding: clamp(28px, 4vw, 56px);
   color: white; border-radius: 6px;
-  background: linear-gradient(0deg, #0b2523 0%, #0b2523d9 25%, #0b25231a 78%),
-              var(--login-photo) center / cover, var(--ink);
+  background: var(--ink);
 }
-.intro[data-role="doctor"] { --login-photo: url("/editorial/treatments/previews/medical-900.webp"); }
+.intro img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.intro::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, #0b2523 0%, #0b2523d9 25%, #0b25231a 78%); }
 .intro h1, .accountHeader h1 { font-size: clamp(3.5rem, 6vw, 6rem); }
 .intro p { max-width: 32ch; font-size: 1.12rem; }
 .card {
@@ -52,6 +52,7 @@
 }
 @media (max-width: 760px) {
   .access { grid-template-columns: minmax(0, 1fr); }
-  .intro { min-height: 195px; padding: 24px; background-position: center, center 42%; }
+  .intro { min-height: 195px; padding: 24px; }
+  .intro img { object-position: center 42%; }
   .intro p { font-size: 1rem; }
 }

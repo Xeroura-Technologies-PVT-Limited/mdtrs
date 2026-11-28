@@ -1,4 +1,5 @@
 import { HospitalArrival } from "./HospitalArrival";
+import { SiteLink } from "@/components/site/SiteLink";
 
 const standards = [
   { name: "NABH", title: "National standard", legend: "NATIONAL ACCREDITATION BOARD FOR HOSPITALS · INDIA · ", copy: "India's national hospital accreditation for patient safety and quality." },
@@ -33,7 +34,7 @@ export function Hospitals({ contactHref = "#contact", showArrival = false }: { c
         </div>
         <div className="sample-profiles">
           {["NABH · JCI", "NABH", "Wellness"].map((type) => (
-            <a className="sample-profile" href={contactHref} key={type}><span className="atlas-meta">Sample profile · {type}</span><strong>{type === "Wellness" ? "Wellness partner" : "Partner hospital"}</strong><span aria-hidden="true">↗</span></a>
+            <SiteLink className="sample-profile" href={contactHref} key={type}><span className="atlas-meta">Sample profile · {type}</span><strong>{type === "Wellness" ? "Wellness partner" : "Partner hospital"}</strong><span aria-hidden="true">↗</span></SiteLink>
           ))}
         </div>
       </div>

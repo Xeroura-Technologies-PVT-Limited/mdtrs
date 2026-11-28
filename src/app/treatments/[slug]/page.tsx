@@ -34,8 +34,7 @@ export default async function TreatmentPage({ params }: { params: Params }) {
         eyebrow={`${t.group} · ${String(i + 1).padStart(2, "0")} of 06`}
         title={t.name}
         lead={t.summary}
-        art={t.render}
-        artAlt={t.alt}
+        photo={t.photo}
       >
         <button className="btn btn-solid" data-open="enquire" data-care={t.name} type="button">Get a Treatment Quote</button>
         <SiteAccountLink doctor="patients" patient="intake" />

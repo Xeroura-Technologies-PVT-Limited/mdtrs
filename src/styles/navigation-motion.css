@@ -5,18 +5,16 @@
   --travel-fine: var(--line-on-dark);
   --scene-ease: cubic-bezier(.19,.76,.24,1);
   --panel-motion: 190ms;
+  --route-duration: 680ms;
 }
 
-/* A single printed sheet covers the full viewport on entry. The navigation
-   stays within reach above the shorter sheet used between destinations. */
+/* The printed introduction belongs to full-document visits. */
 .motion-stage { display: none; position: fixed; inset: var(--header-height) 0 0; z-index: 36; overflow: hidden; pointer-events: none; }
 html[data-intro] .motion-stage { display: block; inset: 0; z-index: 100; pointer-events: auto; }
 html[data-intro] #site-content { interactivity: inert; }
 @supports not (interactivity: inert) {
   html[data-intro="loading"] #site-content { visibility: hidden; }
 }
-html[data-travel] .motion-stage { display: block; }
-html[data-travel="hold"] .motion-sheet { pointer-events: auto; }
 .motion-sheet { position: absolute; inset: 0; overflow: hidden; color: var(--travel-paper); background: var(--travel-ink); border-block: 2px solid var(--travel-accent); }
 .stage-frame { position: absolute; inset: clamp(21px,5vh,56px) clamp(23px,7vw,115px); display: grid; grid-template-rows: auto 1fr auto; border-block: 1px solid var(--travel-fine); }
 .stage-mast, .stage-legend, .stage-caption, .intro-skip { font: 600 clamp(.61rem,.8vw,.76rem)/1.3 var(--f-mono); letter-spacing: .13em; }
@@ -46,11 +44,29 @@ html[data-travel="hold"] .motion-sheet { pointer-events: auto; }
 .intro-skip span { color: var(--travel-accent); margin-left: .3em; }
 .intro-skip:focus-visible { outline-color: var(--travel-accent); box-shadow: none; }
 html[data-intro] .intro-skip { display: block; }
-html[data-travel] :is(.stage-introduction,.stage-loading) { display: none; }
-html[data-travel] .intro-status { display: none; }
-html[data-travel] :is(.stage-destination,.stage-transit) { display: block; }
+.route-cue {
+  display: none;
+  position: fixed;
+  z-index: 36;
+  top: calc(var(--header-height) + 8px);
+  right: var(--gutter);
+  max-width: calc(100% - 2 * var(--gutter));
+  align-items: center;
+  gap: 9px;
+  padding: 5px 14px 5px 9px;
+  border: 1px solid var(--line-on-dark);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--paper);
+  pointer-events: none;
+  font: 500 clamp(1.08rem, 1.65vw, 1.4rem)/1.15 var(--f-display);
+}
+.route-cue svg { flex: none; width: clamp(52px, 7vw, 78px); }
+.route-cue-guide { stroke: var(--on-dark); opacity: .4; stroke-dasharray: 1.5 3; }
+.route-cue-ink { stroke: #d4ad66; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.route-cue-stop { fill: var(--ink); stroke: #d4ad66; transform-box: fill-box; transform-origin: center; }
 .route-wait { display: none; position: fixed; top: calc(var(--header-height) + 8px); right: var(--gutter); z-index: 42; padding: 6px 12px; background: var(--paper); color: var(--ink); border-inline-start: 3px solid var(--accent); font: 600 .75rem/1.4 var(--f-mono); pointer-events: none; }
-body:has([data-route-pending]) .route-wait, html[data-transit-wait] .route-wait { display: block; }
+body:has([data-route-pending]) .route-wait { display: block; }
 
 @media (max-width: 700px) {
   .stage-chart { width: 132vw; right: -49%; top: 57%; }
@@ -65,12 +81,23 @@ body:has([data-route-pending]) .route-wait, html[data-transit-wait] .route-wait 
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .route-cue { display: flex; animation: route-cue-pass var(--route-duration) both; }
+  .route-cue-ink { animation: route-trace 450ms 45ms var(--scene-ease) both; }
+  .route-cue-stop { animation: route-stop 135ms 365ms var(--scene-ease) both; }
+  body:has([data-route-pending]) .route-wait { animation: route-pending var(--route-duration) step-end backwards; }
+  @keyframes route-cue-pass {
+    0% { opacity: 0; transform: translateY(-5px); }
+    18%, 77% { opacity: 1; transform: none; }
+    100% { opacity: 0; transform: translateY(-3px); }
+  }
+  @keyframes route-trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes route-stop { from { opacity: .5; transform: scale(.6); } to { opacity: 1; transform: none; } }
+  @keyframes route-pending { from { visibility: hidden; } to { visibility: visible; } }
   @keyframes signature-type { from { transform: translateY(96%) rotate(2deg); } to { transform: none; } }
   @keyframes signature-chart { from { opacity: .06; rotate: -3deg; } to { opacity: .31; rotate: 0deg; } }
   @keyframes signature-orbit { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   @keyframes progress-ink { from { transform: scaleX(0); } to { transform: scaleX(1); } }
   @keyframes intro-open { from { transform: translateY(0); } to { transform: translateY(-101%); } }
-  @keyframes in-transit { 0% { transform: translateX(-100%) scaleX(.35); } 100% { transform: translateX(100%) scaleX(.6); } }
   html[data-intro] .stage-word { animation: signature-type 700ms var(--scene-ease) both; }
   html[data-intro] .stage-tag { animation: signature-type 440ms 125ms var(--scene-ease) backwards; }
   html[data-intro] .stage-chart { animation: signature-chart 770ms var(--scene-ease) both; }
@@ -80,8 +107,6 @@ body:has([data-route-pending]) .route-wait, html[data-transit-wait] .route-wait 
   html[data-intro] .stage-track i::after { content: ""; display: block; height: 100%; background: var(--travel-accent); transform-origin: left; animation: progress-ink var(--intro-display-time) var(--scene-ease) both; }
   html[data-intro="opening"] .motion-sheet { animation: intro-open 350ms cubic-bezier(.63,0,.31,1) both; }
   html[data-intro="opening"] .intro-skip { visibility: hidden; }
-  html[data-travel] .stage-place { animation: signature-type 300ms var(--scene-ease) backwards; }
-  html[data-travel] .stage-track i { animation: in-transit 1s ease-in-out infinite; }
 
   @keyframes page-arrival { from { translate: 0 18px; } to { translate: 0 0; } }
   @keyframes hero-line-in { from { transform: translateY(88%); } to { transform: translateY(0); } }

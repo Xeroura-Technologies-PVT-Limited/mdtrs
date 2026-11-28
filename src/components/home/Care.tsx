@@ -1,5 +1,5 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
-import { TREATMENTS, treatmentSources } from "@/lib/site";
+import { TREATMENTS } from "@/lib/site";
 
 const specialties: Record<string, string[]> = {
   medical: ["Cardiology", "Oncology", "Neurology", "Second opinion"],
@@ -26,7 +26,7 @@ export function Care() {
           {TREATMENTS.map((t) => (
             <article className="care-card" key={t.slug} data-reveal="">
               <div className="care-cover">
-                <img loading="lazy" decoding="async" src={t.render} srcSet={treatmentSources(t.render)} sizes="(max-width: 700px) 90vw, (max-width: 900px) 44vw, 29vw" alt={t.alt} />
+                <img loading="lazy" decoding="async" {...t.photo} alt={t.photo.alt} sizes="(max-width: 700px) 90vw, (max-width: 900px) 44vw, 29vw" />
                 <span className="atlas-meta">{t.group}</span>
               </div>
               <h3>{t.name}</h3>

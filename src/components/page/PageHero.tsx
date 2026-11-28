@@ -1,5 +1,5 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
-import { treatmentSources } from "@/lib/site";
+import type { EditorialPhoto } from "@/lib/care-photos";
 import { addresses, resolveScene, scenes } from "@/lib/motion/scenes";
 import { HeroPlate } from "./HeroPlate";
 
@@ -11,16 +11,14 @@ export function PageHero({
   eyebrow,
   title,
   lead,
-  art,
-  artAlt = "",
+  photo,
   children,
 }: {
   crumbs?: Crumb[];
   eyebrow?: string;
   title: React.ReactNode;
   lead?: React.ReactNode;
-  art?: string;
-  artAlt?: string;
+  photo?: EditorialPhoto;
   children?: React.ReactNode;
 }) {
   const scene = resolveScene(crumbs?.at(-1)?.href ?? "/", "", addresses);
@@ -47,10 +45,10 @@ export function PageHero({
             {lead && <p className="lead">{lead}</p>}
             {children && <div className="hero-cta">{children}</div>}
           </div>
-          {art ? (
+          {photo ? (
             <div className="phero-art with-photo">
-              <div className="art-mask"><img src={art} srcSet={art.startsWith("/editorial/treatments/") ? treatmentSources(art) : undefined}
-                sizes="(max-width: 760px) 90vw, 39vw" alt={artAlt} width={1200} height={800} fetchPriority="high" /></div>
+              <div className="art-mask"><img {...photo} alt={photo.alt}
+                sizes="(max-width: 720px) min(94vw, 500px), (min-width: 1600px) 590px, 39vw" fetchPriority="high" /></div>
               <HeroPlate scene={scene} />
             </div>
           ) : <div className="phero-art drawn-hero"><HeroPlate scene={scene} /></div>}

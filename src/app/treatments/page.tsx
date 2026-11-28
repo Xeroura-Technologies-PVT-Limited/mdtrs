@@ -4,6 +4,7 @@ import { SiteAccountLink } from "@/components/site/SiteAccountLinks";
 import { TreatmentCards } from "@/components/page/TreatmentCards";
 import { PageHero } from "@/components/page/PageHero";
 import { CtaBand } from "@/components/page/CtaBand";
+import { carePhotos } from "@/lib/care-photos";
 
 export const metadata: Metadata = {
   title: "Treatments",
@@ -24,8 +25,7 @@ export default function TreatmentsPage() {
         eyebrow="Medical & wellness"
         title={<>The care <em>we</em> arrange</>}
         lead="Four clinical services and two wellness programmes. Whatever brings you to India, a doctor on our team reads your reports first and suggests where to go."
-        art="/editorial/hospital-consultation.webp"
-        artAlt="A doctor and guest talking across a desk in a consultation room"
+        photo={carePhotos.video}
       >
         <button className="btn btn-solid" data-open="enquire" type="button">Get a Treatment Quote</button>
         <SiteAccountLink doctor="hospitals" patient="journey">
