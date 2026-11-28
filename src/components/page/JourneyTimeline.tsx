@@ -2,19 +2,21 @@
 
 import { useRef, useState, type KeyboardEvent } from "react";
 import { itinerary } from "@/lib/itinerary";
+import { carePhotos, type EditorialPhoto } from "@/lib/care-photos";
 
-const views = [
-  ["hospital-consultation", "A physician reviewing a guest's reports"],
-  ["hospital-consultation", "A doctor and guest meeting in a consultation room"],
-  ["consultation", "A quiet consultation room"],
-  ["hospitality", "A room arranged for a stay in India"],
-  ["arrival", "A covered arrival entrance at dusk"],
-  ["hospital-exterior", "The illuminated entrance of a hospital"],
-  ["hospitality", "A quiet room with a window overlooking trees"],
+const views: EditorialPhoto[] = [
+  carePhotos.reports,
+  carePhotos.medical,
+  carePhotos.video,
+  { src: "/editorial/hospitality.webp", alt: "A room arranged for a stay in India", width: 1536, height: 1024 },
+  { src: "/editorial/arrival.webp", alt: "A covered arrival entrance at dusk", width: 1536, height: 1024 },
+  carePhotos.surgical,
+  carePhotos.rehabilitation,
 ];
 
 export function JourneyTimeline() {
   const [active, setActive] = useState(0);
+  const photo = views[active];
   const list = useRef<HTMLOListElement>(null);
   function move(event: KeyboardEvent<HTMLElement>, index: number) {
     const next = event.key === "ArrowDown" ? Math.min(index + 1, itinerary.length - 1) :
@@ -30,7 +32,7 @@ export function JourneyTimeline() {
     <div className="wrap timetable">
       <div className="itinerary-view">
         <p className="eyebrow gap">Your itinerary</p><h2 id="itinerary-heading">From first <em>message</em> to home</h2>
-        <figure><img key={views[active][0]} src={`/editorial/${views[active][0]}.webp`} width={720} height={480} alt={views[active][1]} loading="lazy" />
+        <figure><img key={photo.src} {...photo} alt={photo.alt} sizes="(max-width: 760px) 94vw, 38vw" loading="lazy" />
           <figcaption>{itinerary[active][0]} <span aria-hidden="true">/</span> {itinerary[active][1]}</figcaption>
         </figure>
       </div>

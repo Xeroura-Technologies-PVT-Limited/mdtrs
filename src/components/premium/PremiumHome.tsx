@@ -1,5 +1,6 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
 import { FAQ, SITE, TREATMENTS } from "@/lib/site";
+import { carePhotos } from "@/lib/care-photos";
 import { ORIGINS } from "@/lib/premium/globe-scene";
 import { PremiumMotion } from "./PremiumMotion";
 import { PremiumLoader } from "./PremiumLoader";
@@ -40,20 +41,20 @@ const personas = {
     label: "I'm the guest",
     line: <>Care planned around <em>you</em>, before you fly.</>,
     items: [
-      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", img: "/editorial/hospital-consultation.webp", alt: "A doctor talking a guest through his plan" },
-      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", img: "/editorial/treatments/medical.webp", alt: "A doctor and guest reviewing a tablet together" },
-      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", img: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" },
-      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", img: "/editorial/treatments/rehabilitation.webp", alt: "A physiotherapist supporting a guest at parallel bars" },
+      { t: "Treatment planning", d: "A doctor on our team reads your reports and sends hospital options with an itemised estimate, usually within 48 hours.", photo: carePhotos.video },
+      { t: "Second opinions", d: "A senior specialist reviews the plan you were given at home and tells you plainly what they would recommend.", photo: carePhotos.medical },
+      { t: "Medical visa", d: "Your hospital issues the invitation letter, and we help you complete the e-Medical visa application.", photo: { src: "/editorial/ink-arrival.webp", alt: "An accredited hospital entrance at night" } },
+      { t: "Post-op recovery", d: "Rehabilitation, a fit-to-fly review and teleconsult follow-ups once you are home.", photo: carePhotos.rehabilitation },
     ],
   },
   attender: {
     label: "I'm the companion",
     line: <>The person who cares is <em>cared for</em> too.</>,
     items: [
-      { t: "Travel logistics", d: "Visa letters for up to two companions, and flights planned to match the guest's dates.", img: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" },
-      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", img: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" },
-      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", img: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" },
-      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", img: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" },
+      { t: "Travel logistics", d: "Visa letters for up to two companions, and flights planned to match the guest's dates.", photo: { src: "/editorial/arrival.webp", alt: "A hospital entrance in warm evening light" } },
+      { t: "Accommodation", d: "A stay close to the hospital, chosen for rest, with room to extend if recovery takes longer.", photo: { src: "/editorial/hospitality.webp", alt: "A calm hotel room with warm light and a carved wooden screen" } },
+      { t: "Local concierge", d: "Airport pickup, transfers and an interpreter when you need one, arranged by your coordinator.", photo: { src: "/editorial/ink-care.webp", alt: "A bright hospital reception and lobby" } },
+      { t: "Hospitality", d: "Thoughtful comfort around the hospital, so the days between appointments feel calm.", photo: { src: "/editorial/recovery.webp", alt: "A quiet hospital suite with an armchair beside the bed" } },
     ],
   },
 } as const;
@@ -225,7 +226,7 @@ export function PremiumHome() {
               </div>
               <figure className="pm-stage" data-tilt data-cursor="view" data-cursor-label="Scroll">
                 {personaKeys.flatMap(key => personas[key].items.map((it, j) => (
-                  <img key={`${key}-${j}`} src={it.img} alt={it.alt} loading="lazy" decoding="async" data-shot={`${key}-${j}`} {...(key === "patient" && j === 0 ? { "data-current": "" } : {})} />
+                  <img key={`${key}-${j}`} {...it.photo} alt={it.photo.alt} sizes="(max-width: 900px) 94vw, 43vw" loading="lazy" decoding="async" data-shot={`${key}-${j}`} {...(key === "patient" && j === 0 ? { "data-current": "" } : {})} />
                 )))}
                 <span className="pm-stage-veil" aria-hidden="true" />
                 <span className="pm-stage-bars" aria-hidden="true">{[0, 1, 2, 3].map(i => <i key={i} data-bar={i} />)}</span>

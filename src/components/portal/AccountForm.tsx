@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SiteLink } from "@/components/site/SiteLink";
+import { carePhotos } from "@/lib/care-photos";
 import { maxAccountNameLength } from "@/lib/portal-identity";
 import { portalLogins, type PortalRole } from "@/lib/portal-roles";
 import styles from "./access.module.css";
@@ -14,9 +15,11 @@ const actions = { signin: "Sign in", signup: "Create account", reset: "Send rese
 type EntryProps = { client: SupabaseClient | null; linkError: boolean };
 
 export function AccountForm({ client, role, linkError }: EntryProps & { role: PortalRole | null }) {
+  const photo = role === "doctor" ? carePhotos.video : carePhotos.medical;
   return (
     <div className={styles.access}>
       <div className={styles.intro} data-role={role}>
+        <img {...photo} alt="" sizes="(max-width: 760px) 94vw, (min-width: 1300px) 600px, 49vw" />
         <h1>{role === "doctor" ? "Doctor login" : role === "patient" ? "Patient login" : "Care portal"}</h1>
         {role === "patient" && <p>Share your intake details and medical reports with your assigned doctor.</p>}
         {role === "doctor" && <p>Review intake details and medical reports for your assigned patients.</p>}

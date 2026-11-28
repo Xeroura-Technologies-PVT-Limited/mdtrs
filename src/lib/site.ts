@@ -1,6 +1,8 @@
 /** Site-wide content: contact details, navigation, treatments and FAQ.
  *  Edit copy here; pages read from this file. */
 
+import { carePhotos, type EditorialPhoto } from "./care-photos";
+
 export const SITE = {
   name: "Medtours",
   tagline: "Heal With Experience",
@@ -39,8 +41,7 @@ export type Treatment = {
   slug: string;
   name: string;
   group: "Clinical" | "Wellness";
-  render: string;
-  alt: string;
+  photo: EditorialPhoto;
   cardAlt: string;
   summary: string;
   intro: string;
@@ -49,18 +50,12 @@ export type Treatment = {
   notes: { title: string; text: string }[];
 };
 
-export function treatmentSources(file: string) {
-  const prefix = file.replace("/treatments/", "/treatments/previews/").replace(/\.webp$/, "");
-  return `${prefix}-600.webp 600w, ${prefix}-900.webp 900w, ${file} 1280w`;
-}
-
 export const TREATMENTS: Treatment[] = [
   {
     slug: "medical",
     name: "Medical",
     group: "Clinical",
-    render: "/editorial/treatments/medical.webp",
-    alt: "A doctor and guest reviewing a tablet together",
+    photo: carePhotos.medical,
     cardAlt: "A physician shows a guest a scan on a tablet during a consultation.",
     summary:
       "Diagnosis and treatment without surgery, and second opinions from senior physicians before you decide.",
@@ -88,8 +83,7 @@ export const TREATMENTS: Treatment[] = [
     slug: "surgical",
     name: "Surgical",
     group: "Clinical",
-    render: "/editorial/treatments/surgical.webp",
-    alt: "A surgical team preparing an operating room",
+    photo: carePhotos.surgical,
     cardAlt: "Two masked surgeons in green gowns prepare an instrument tray in an operating theatre.",
     summary:
       "Planned operations by experienced surgical teams, from joint replacement to cardiac and transplant surgery.",
@@ -117,8 +111,7 @@ export const TREATMENTS: Treatment[] = [
     slug: "dental",
     name: "Dental",
     group: "Clinical",
-    render: "/editorial/treatments/dental.webp",
-    alt: "A dentist examining a guest in a dental chair",
+    photo: carePhotos.dental,
     cardAlt: "A dentist points out a tooth on a dental model to a seated patient.",
     summary:
       "Implants, smile restoration and full-mouth rehabilitation, often completed within a single trip.",
@@ -144,8 +137,7 @@ export const TREATMENTS: Treatment[] = [
     slug: "rehabilitation",
     name: "Rehabilitation",
     group: "Clinical",
-    render: "/editorial/treatments/rehabilitation.webp",
-    alt: "A physiotherapist supporting a guest at parallel bars",
+    photo: carePhotos.rehabilitation,
     cardAlt: "A physiotherapist supports a patient at the waist as she practises walking between parallel bars.",
     summary:
       "Physiotherapy and recovery programmes after surgery, stroke or injury, built into your stay.",
@@ -171,8 +163,7 @@ export const TREATMENTS: Treatment[] = [
     slug: "longevity",
     name: "Longevity",
     group: "Wellness",
-    render: "/editorial/treatments/longevity.webp",
-    alt: "A clinician measuring a guest's blood pressure",
+    photo: carePhotos.longevity,
     cardAlt: "A clinician adjusts a blood pressure cuff on an older man's upper arm.",
     summary:
       "Advanced screening and a personal plan to stay healthy for longer, reviewed by physicians.",
@@ -198,8 +189,7 @@ export const TREATMENTS: Treatment[] = [
     slug: "holistic-health",
     name: "Holistic health",
     group: "Wellness",
-    render: "/editorial/treatments/holistic.webp",
-    alt: "A seated group stretching with a yoga instructor",
+    photo: carePhotos.holistic,
     cardAlt: "A woman meditates cross-legged on a sunlit garden verandah.",
     summary:
       "Ayurveda, yoga and nutrition programmes for recovery and balance, in calm retreat settings.",
