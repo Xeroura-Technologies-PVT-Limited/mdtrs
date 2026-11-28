@@ -141,7 +141,7 @@
 .pm-card { --rx: 0deg; --ry: 0deg; position: relative; flex: 0 0 clamp(280px, 27vw, 410px); height: min(66svh, 580px); border-radius: 26px; overflow: hidden; display: block; text-decoration: none; color: #fff; background: var(--pm-ink); scroll-snap-align: start; transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .6s var(--pm-ease), box-shadow .6s; box-shadow: 0 30px 60px -40px #12302c99; isolation: isolate; }
 .pm-card[data-tilting] { transition: transform .12s linear, box-shadow .6s; box-shadow: 0 40px 80px -40px #12302cb3; }
 .pm-card-media { position: absolute; inset: 0; z-index: -1; }
-.pm-card-media img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12) translate3d(calc((var(--p) - .5) * -40px), 0, 0); transition: transform 1.2s var(--pm-ease); }
+.pm-card-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 10%; transform-origin: center 25%; transform: scale(1.12) translate3d(calc((var(--p) - .5) * -40px), 0, 0); transition: transform 1.2s var(--pm-ease); }
 .pm-card:hover .pm-card-media img { transform: scale(1.18) translate3d(calc((var(--p) - .5) * -40px), 0, 0); }
 .pm-card-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #0b1f1c33 0%, #0b1f1c00 30%, #0b1f1ce0 100%); }
 .pm-card-glare { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(500px circle at var(--gx, 50%) var(--gy, 0%), #ffffff38, transparent 45%); opacity: 0; transition: opacity .4s; }

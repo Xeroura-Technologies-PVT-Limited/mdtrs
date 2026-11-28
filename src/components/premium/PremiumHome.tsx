@@ -1,5 +1,5 @@
 import { SiteLink as Link } from "@/components/site/SiteLink";
-import { FAQ, SITE, TREATMENTS, treatmentSources } from "@/lib/site";
+import { FAQ, SITE, TREATMENTS } from "@/lib/site";
 import { ORIGINS } from "@/lib/premium/globe-scene";
 import { PremiumMotion } from "./PremiumMotion";
 import { PremiumLoader } from "./PremiumLoader";
@@ -10,6 +10,24 @@ const Arrow = () => (
 const Plane = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className={className}><use href="#plane" /></svg>
 );
+
+function TreatmentPortrait({ slug, alt }: { slug: string; alt: string }) {
+  const path = `/editorial/treatments/cards/${slug}`;
+  // Allow for the card's cover crop and hover zoom when selecting a source.
+  return (
+    <img
+      src={`${path}-768.webp`}
+      srcSet={`${path}-512.webp 512w, ${path}-768.webp 768w, ${path}-1024.webp 1024w`}
+      sizes="(max-width: 900px) max(93vw, 51svh), 484px"
+      width={1024}
+      height={1536}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
 const stats = [
   { n: 48, unit: "hrs", label: "Usual time to a treatment plan after we receive your reports" },
   { n: 2, unit: "", label: "Companions who can travel with you on India's e-Medical Attendant visa" },
@@ -166,7 +184,7 @@ export function PremiumHome() {
             {TREATMENTS.map((t, i) => (
               <Link key={t.slug} href={`/treatments/${t.slug}`} className="pm-card" data-tilt data-cursor="view" data-cursor-label="View">
                 <span className="pm-card-media">
-                  <img src={t.render} srcSet={treatmentSources(t.render)} sizes="(max-width: 900px) 80vw, 30vw" alt={t.alt} loading="lazy" decoding="async" />
+                  <TreatmentPortrait slug={t.slug} alt={t.cardAlt} />
                 </span>
                 <span className="pm-card-glare" aria-hidden="true" />
                 <span className="pm-card-top"><span>{String(i + 1).padStart(2, "0")}</span><span>{t.group}</span></span>

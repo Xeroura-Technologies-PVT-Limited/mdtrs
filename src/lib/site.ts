@@ -41,6 +41,7 @@ export type Treatment = {
   group: "Clinical" | "Wellness";
   render: string;
   alt: string;
+  cardAlt: string;
   summary: string;
   intro: string;
   areas: { name: string; text: string }[];
@@ -60,6 +61,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Clinical",
     render: "/editorial/treatments/medical.webp",
     alt: "A doctor and guest reviewing a tablet together",
+    cardAlt: "A physician shows a guest a scan on a tablet during a consultation.",
     summary:
       "Diagnosis and treatment without surgery, and second opinions from senior physicians before you decide.",
     intro:
@@ -88,6 +90,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Clinical",
     render: "/editorial/treatments/surgical.webp",
     alt: "A surgical team preparing an operating room",
+    cardAlt: "Two masked surgeons in green gowns prepare an instrument tray in an operating theatre.",
     summary:
       "Planned operations by experienced surgical teams, from joint replacement to cardiac and transplant surgery.",
     intro:
@@ -116,6 +119,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Clinical",
     render: "/editorial/treatments/dental.webp",
     alt: "A dentist examining a guest in a dental chair",
+    cardAlt: "A dentist points out a tooth on a dental model to a seated patient.",
     summary:
       "Implants, smile restoration and full-mouth rehabilitation, often completed within a single trip.",
     intro:
@@ -142,6 +146,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Clinical",
     render: "/editorial/treatments/rehabilitation.webp",
     alt: "A physiotherapist supporting a guest at parallel bars",
+    cardAlt: "A physiotherapist supports a patient at the waist as she practises walking between parallel bars.",
     summary:
       "Physiotherapy and recovery programmes after surgery, stroke or injury, built into your stay.",
     intro:
@@ -168,6 +173,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Wellness",
     render: "/editorial/treatments/longevity.webp",
     alt: "A clinician measuring a guest's blood pressure",
+    cardAlt: "A clinician adjusts a blood pressure cuff on an older man's upper arm.",
     summary:
       "Advanced screening and a personal plan to stay healthy for longer, reviewed by physicians.",
     intro:
@@ -194,6 +200,7 @@ export const TREATMENTS: Treatment[] = [
     group: "Wellness",
     render: "/editorial/treatments/holistic.webp",
     alt: "A seated group stretching with a yoga instructor",
+    cardAlt: "A woman meditates cross-legged on a sunlit garden verandah.",
     summary:
       "Ayurveda, yoga and nutrition programmes for recovery and balance, in calm retreat settings.",
     intro:
